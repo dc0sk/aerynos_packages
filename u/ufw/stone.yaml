@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : ufw
+version     : "0.36.2"
+release     : 1
+homepage    : https://launchpad.net/ufw
+upstreams   :
+    - https://deb.debian.org/debian/pool/main/u/ufw/ufw_0.36.2.orig.tar.gz : 2a57a99eecef6b44db3537ed2520b30bae3759f8465456e22e404cd643838bf5
+summary     : Program for managing a Netfilter firewall
+description : |
+    Uncomplicated Firewall (ufw) is a front-end for iptables, to make
+    managing a Netfilter firewall easier. It provides a command line
+    interface with syntax similar to OpenBSD's Packet Filter.
+license     : GPL-3.0-only
+builddeps   :
+    - binary(make)
+    - binary(msgfmt)
+    - sysbinary(iptables)
+rundeps     :
+    - binary(python3)
+    - sysbinary(iptables)
+    - sysbinary(sysctl)
+build       : |
+    %python_setup
+install     : |
+    %python_install
+
+    # setup.py hardcodes state helper scripts under /lib/ufw; relocate them
+    # under /usr so boulder will actually package them. The scripts embed
+    # the literal '/lib/ufw' path themselves, which resolves fine at runtime
+    # via the standard /lib -> /usr/lib merged-usr symlink.
+    mv %(installroot)/lib/ufw %(installroot)%(libdir)/ufw
+    rmdir %(installroot)/lib || true
+
+    %install_file %(pkgdir)/ufw.service -t %(installroot)%(libdir)/systemd/system
+
+    # AerynOS is stateless/hermetic-usr: boulder drops anything setup.py
+    # installs outside /usr/ (all of /etc/ufw and /etc/default/ufw). ufw
+    # itself already ships pristine, read-only copies of the six *.rules
+    # files under %(datadir)/ufw/iptables/ (it uses these for `ufw reset`),
+    # so those are reused as tmpfiles sources. ufw.conf, sysctl.conf, the
+    # application profiles and /etc/default/ufw have no such vendor copy
+    # upstream, so ship one under %(vendordir)/ufw/ ourselves.
+    %install_file conf/ufw.conf %(installroot)%(vendordir)/ufw/ufw.conf
+    %install_file conf/ufw.defaults %(installroot)%(vendordir)/ufw/ufw.defaults
+    %install_file conf/sysctl.conf %(installroot)%(vendordir)/ufw/sysctl.conf
+    %install_dir %(installroot)%(vendordir)/ufw/applications.d
+    %install_file profiles/* -t %(installroot)%(vendordir)/ufw/applications.d
+
+    # Seed /etc on first boot from the vendor defaults above. All of these
+    # are files ufw itself may rewrite at runtime (e.g. `ufw allow 22`
+    # rewrites user.rules, `ufw default deny` rewrites /etc/default/ufw),
+    # so they're copied in only if missing, never overwritten afterwards.
+    %tmpfiles "d /etc/ufw 0755 root root -"
+    %tmpfiles "d /etc/default 0755 root root -"
+    %tmpfiles "C /etc/ufw/before.rules 0640 root root - %(datadir)/ufw/iptables/before.rules"
+    %tmpfiles "C /etc/ufw/after.rules 0640 root root - %(datadir)/ufw/iptables/after.rules"
+    %tmpfiles "C /etc/ufw/before6.rules 0640 root root - %(datadir)/ufw/iptables/before6.rules"
+    %tmpfiles "C /etc/ufw/after6.rules 0640 root root - %(datadir)/ufw/iptables/after6.rules"
+    %tmpfiles "C /etc/ufw/user.rules 0640 root root - %(datadir)/ufw/iptables/user.rules"
+    %tmpfiles "C /etc/ufw/user6.rules 0640 root root - %(datadir)/ufw/iptables/user6.rules"
+    %tmpfiles "C /etc/ufw/ufw.conf - - - - %(vendordir)/ufw/ufw.conf"
+    %tmpfiles "C /etc/ufw/sysctl.conf - - - - %(vendordir)/ufw/sysctl.conf"
+    %tmpfiles "C /etc/ufw/applications.d - - - - %(vendordir)/ufw/applications.d"
+    %tmpfiles "C /etc/default/ufw - - - - %(vendordir)/ufw/ufw.defaults"
