@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : reaction
+version     : "2.5.1"
+release     : 1
+homepage    : https://reaction.ppom.me
+upstreams   :
+    - https://framagit.org/ppom/reaction/-/archive/v2.5.1/reaction-v2.5.1.tar.gz : ef333bad9b0c4a99acb2a4e50e5b1d0c70811941b765201165de358f44768eb0
+summary     : A daemon that scans program outputs for repeated patterns, and takes action
+description : |
+    reaction scans program outputs (e.g. logs) for repeated patterns, and takes
+    action. A common usage is to scan ssh and webserver logs, and to ban hosts
+    that cause multiple authentication errors. reaction aims at being a
+    successor to fail2ban.
+license     : AGPL-3.0-only
+networking  : true
+setup       : |
+    %cargo_fetch
+build       : |
+    %cargo_build -p reaction
+install     : |
+    %cargo_install reaction
+
+    %install_dir %(installroot)%(mandir)/man1
+    cp %(cargo_target_dir)/*.1 %(installroot)%(mandir)/man1/.
+
+    %install_file %(cargo_target_dir)/reaction.bash %(installroot)%(datadir)/bash-completion/completions/reaction
+    %install_file %(cargo_target_dir)/reaction.fish %(installroot)%(datadir)/fish/completions/reaction.fish
+    %install_file %(cargo_target_dir)/_reaction %(installroot)%(datadir)/zsh/site-functions/_reaction
+
+    %install_file %(pkgdir)/reaction.service -t %(installroot)%(libdir)/systemd/system
+    %install_file %(pkgdir)/system-reaction.slice -t %(installroot)%(libdir)/systemd/system
+
+    %tmpfiles "d /etc/reaction 0755 root root -"
+check       : |
+    %cargo_test -p reaction || :
