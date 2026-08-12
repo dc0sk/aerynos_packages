@@ -1,0 +1,5 @@
+# Built .stone packages and the generated moss index (see scripts/local-repo.sh)
+/local/
+
+# Stray build output, e.g. from an interrupted in-place `boulder build`
+*.stone
