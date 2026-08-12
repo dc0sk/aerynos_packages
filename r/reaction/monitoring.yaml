@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: MPL-2.0
 
 releases:
-  id: ~
+  # https://release-monitoring.org/project/376399/ (GitLab backend, framagit.org)
+  id: 376399
   rss: ~
 security:
-  cpe: ~
+  cpe: ~ # No known CPE. Last checked 20260812
