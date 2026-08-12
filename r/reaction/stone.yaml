@@ -3,7 +3,7 @@
 
 name        : reaction
 version     : "2.5.1"
-release     : 1
+release     : 2
 homepage    : https://reaction.ppom.me
 upstreams   :
     - https://framagit.org/ppom/reaction/-/archive/v2.5.1/reaction-v2.5.1.tar.gz : ef333bad9b0c4a99acb2a4e50e5b1d0c70811941b765201165de358f44768eb0
@@ -14,6 +14,10 @@ description : |
     that cause multiple authentication errors. reaction aims at being a
     successor to fail2ban.
 license     : AGPL-3.0-only
+rundeps     :
+    # The shipped default configuration bans via a dedicated iptables chain.
+    - sysbinary(iptables)
+    - sysbinary(ip6tables)
 networking  : true
 setup       : |
     %cargo_fetch
@@ -25,13 +29,36 @@ install     : |
     %install_dir %(installroot)%(mandir)/man1
     cp %(cargo_target_dir)/*.1 %(installroot)%(mandir)/man1/.
 
-    %install_file %(cargo_target_dir)/reaction.bash %(installroot)%(datadir)/bash-completion/completions/reaction
-    %install_file %(cargo_target_dir)/reaction.fish %(installroot)%(datadir)/fish/completions/reaction.fish
-    %install_file %(cargo_target_dir)/_reaction %(installroot)%(datadir)/zsh/site-functions/_reaction
+    %install_file %(cargo_target_dir)/reaction.bash %(installroot)%(bashcompletionsdir)/reaction
+    %install_file %(cargo_target_dir)/reaction.fish %(installroot)%(fishcompletionsdir)/reaction.fish
+    %install_file %(cargo_target_dir)/_reaction %(installroot)%(zshcompletionsdir)/_reaction
 
     %install_file %(pkgdir)/reaction.service -t %(installroot)%(libdir)/systemd/system
     %install_file %(pkgdir)/system-reaction.slice -t %(installroot)%(libdir)/systemd/system
 
+    # Upstream's fully annotated reference configurations, for admins to crib from.
+    %install_file config/example.yml %(installroot)%(datadir)/%(name)/example.yml
+    %install_file config/example.jsonnet %(installroot)%(datadir)/%(name)/example.jsonnet
+
+    # AerynOS is stateless/hermetic-usr: /etc ships empty and is seeded on first
+    # boot. reaction.service runs `reaction start -c /etc/reaction/`, and reaction
+    # builds its config from every *.yml/*.jsonnet in that directory - so an empty
+    # /etc/reaction leaves the daemon with no streams to watch and nothing to do.
+    # Ship a working default under %(vendordir) and copy it into place with a
+    # tmpfiles `C` line, which never overwrites an admin's edited copy.
+    %install_file %(pkgdir)/reaction.yml %(installroot)%(vendordir)/%(name)/reaction.yml
+
     %tmpfiles "d /etc/reaction 0755 root root -"
+    %tmpfiles "C /etc/reaction/reaction.yml 0644 root root - %(vendordir)/%(name)/reaction.yml"
 check       : |
-    %cargo_test -p reaction || :
+    # Not %cargo_test: that macro hardcodes --workspace, which overrides any -p and
+    # drags in reaction-plugin-ipset. That plugin needs libipset headers, which AerynOS
+    # does not package at all, so the workspace cannot build here - and we ship only
+    # the `reaction` binary anyway. Test exactly what we ship.
+    #
+    # plugin_virtual is skipped: that upstream test shells out to a nested
+    # `cargo build -p reaction-plugin-virtual` and then copies target/debug/, which
+    # cannot work inside an offline --frozen build of a --release --target tree. It
+    # times out rather than failing fast. That is a test-harness assumption, not a
+    # defect in reaction; every other test runs for real.
+    cargo test %(options_cargo_release) -p reaction -- --skip plugin_virtual

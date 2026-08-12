@@ -1,0 +1,96 @@
+# AerynOS default configuration for reaction.
+#
+# This is seeded into /etc/reaction/ on first boot and is never overwritten
+# afterwards, so it is safe to edit in place. Drop additional *.yml or
+# *.jsonnet files alongside it to extend the configuration; reaction reads
+# every file in /etc/reaction/ in filename order.
+#
+# Annotated upstream reference configurations, covering every available
+# option, are installed at /usr/share/reaction/example.{yml,jsonnet}.
+# Full documentation lives at https://reaction.ppom.me
+#
+# Run `reaction test-config -c /etc/reaction/` after editing to validate.
+---
+
+# reaction's state database lives in its working directory, which
+# reaction.service sets to the systemd StateDirectory /var/lib/reaction.
+state_directory: .
+
+# 0 means "one concurrent action per CPU".
+concurrency: 0
+
+patterns:
+  ip:
+    type: ip
+    # Never ban ourselves or the local network.
+    ignore:
+      - 127.0.0.1
+      - ::1
+    ignorecidr:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - fe80::/10
+    # Ban IPv6 offenders by their /64 rather than the single address, since a
+    # single host is routinely handed a whole /64.
+    ipv6mask: 64
+
+# reaction owns a dedicated iptables chain so that its bans can be flushed
+# without touching rules installed by anything else on the system.
+start:
+  - [ 'iptables',  '-w', '-N', 'reaction' ]
+  - [ 'ip6tables', '-w', '-N', 'reaction' ]
+  - [ 'iptables',  '-w', '-I', 'INPUT', '-p', 'all', '-j', 'reaction' ]
+  - [ 'ip6tables', '-w', '-I', 'INPUT', '-p', 'all', '-j', 'reaction' ]
+  - [ 'iptables',  '-w', '-I', 'FORWARD', '-p', 'all', '-j', 'reaction' ]
+  - [ 'ip6tables', '-w', '-I', 'FORWARD', '-p', 'all', '-j', 'reaction' ]
+
+stop:
+  - [ 'iptables',  '-w', '-D', 'INPUT', '-p', 'all', '-j', 'reaction' ]
+  - [ 'ip6tables', '-w', '-D', 'INPUT', '-p', 'all', '-j', 'reaction' ]
+  - [ 'iptables',  '-w', '-D', 'FORWARD', '-p', 'all', '-j', 'reaction' ]
+  - [ 'ip6tables', '-w', '-D', 'FORWARD', '-p', 'all', '-j', 'reaction' ]
+  - [ 'iptables',  '-w', '-F', 'reaction' ]
+  - [ 'ip6tables', '-w', '-F', 'reaction' ]
+  - [ 'iptables',  '-w', '-X', 'reaction' ]
+  - [ 'ip6tables', '-w', '-X', 'reaction' ]
+
+streams:
+  ssh:
+    # AerynOS ships openssh-server as a plain forking daemon (sshd.service),
+    # not socket activation, so the per-connection sshd-session children stay
+    # in the sshd.service cgroup and their auth failures show up here too.
+    cmd: [ 'journalctl', '-n0', '-fu', 'sshd.service' ]
+
+    filters:
+      failedlogin:
+        regex:
+          - 'authentication failure;.*rhost=<ip>'
+          - 'Failed password for .* from <ip>'
+          - 'Invalid user .* from <ip>'
+          - 'Connection (reset|closed) by (authenticating|invalid) user .* <ip>'
+          - 'banner exchange: Connection from <ip> port [0-9]*: invalid format'
+
+        # Ban only after 3 failures within 6 hours, so a fat-fingered password
+        # does not lock out a legitimate user.
+        retry: 3
+        retryperiod: 6h
+
+        actions:
+          ban4:
+            cmd: [ 'iptables', '-w', '-A', 'reaction', '-s', '<ip>', '-j', 'DROP' ]
+            ipv4only: true
+
+          ban6:
+            cmd: [ 'ip6tables', '-w', '-A', 'reaction', '-s', '<ip>', '-j', 'DROP' ]
+            ipv6only: true
+
+          unban4:
+            cmd: [ 'iptables', '-w', '-D', 'reaction', '-s', '<ip>', '-j', 'DROP' ]
+            after: '2 days'
+            ipv4only: true
+
+          unban6:
+            cmd: [ 'ip6tables', '-w', '-D', 'reaction', '-s', '<ip>', '-j', 'DROP' ]
+            after: '2 days'
+            ipv6only: true

@@ -8,7 +8,9 @@
 				"soname(ld-linux-x86-64.so.2(x86_64))",
 				"soname(libc.so.6(x86_64))",
 				"soname(libgcc_s.so.1(x86_64))",
-				"soname(libm.so.6(x86_64))"
+				"soname(libm.so.6(x86_64))",
+				"sysbinary(ip6tables)",
+				"sysbinary(iptables)"
 			],
 			"files": [
 				"/usr/bin/reaction",
@@ -16,7 +18,8 @@
 				"/usr/lib/systemd/system/system-reaction.slice",
 				"/usr/lib/tmpfiles.d/reaction.conf",
 				"/usr/share/bash-completion/completions/reaction",
-				"/usr/share/fish/completions/reaction.fish",
+				"/usr/share/defaults/reaction/reaction.yml",
+				"/usr/share/fish/vendor_completions.d/reaction.fish",
 				"/usr/share/man/man1/reaction-flush.1",
 				"/usr/share/man/man1/reaction-rotate.1",
 				"/usr/share/man/man1/reaction-show.1",
@@ -25,6 +28,8 @@
 				"/usr/share/man/man1/reaction-test-regex.1",
 				"/usr/share/man/man1/reaction-trigger.1",
 				"/usr/share/man/man1/reaction.1",
+				"/usr/share/reaction/example.jsonnet",
+				"/usr/share/reaction/example.yml",
 				"/usr/share/zsh/site-functions/_reaction"
 			],
 			"name": "reaction",
@@ -34,6 +39,6 @@
 		}
 	},
 	"source-name": "reaction",
-	"source-release": "1",
+	"source-release": "2",
 	"source-version": "2.5.1"
 }
