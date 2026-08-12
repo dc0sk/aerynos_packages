@@ -1,0 +1,127 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : fwupd
+version     : "2.1.7"
+release     : 1
+homepage    : https://fwupd.org
+upstreams   :
+    - https://github.com/fwupd/fwupd/archive/refs/tags/2.1.7.tar.gz : 338ea5b139f9a37447ff2215d0a8d2cf23851fb5a39fba7b1b0ded52a40240cc
+summary     : Firmware update daemon
+description : |
+    fwupd manages firmware updates on Linux. It exposes a D-Bus interface used
+    by fwupdmgr and by desktop software centres, applies UEFI capsule and
+    vendor-specific firmware updates through a large set of plugins, and can
+    fetch metadata and firmware from the Linux Vendor Firmware Service.
+license     : LGPL-2.1-or-later
+builddeps   :
+    # Build-time tooling that meson looks up by program name rather than
+    # through pkgconfig: gettext for the polkit policy translations, glib's
+    # resource compiler and gdbus-codegen, and diff for a generated-source
+    # consistency check.
+    - binary(diff)
+    - binary(gdbus-codegen)
+    - binary(glib-compile-resources)
+    - binary(msgfmt)
+    # Enabling introspection also makes libfwupd generate a Vala binding, and
+    # that generate_vapi call is not itself optional.
+    - binary(vapigen)
+    # The uefi-capsule plugin rasterizes its localized update splash screens at
+    # build time, which needs python gobject introspection, python cairo, and
+    # the Pango/PangoCairo typelibs.
+    - pango
+    - python-cairo
+    - python-pygobject
+    # ...and fonts to shape that text with. make-images.py walks every language
+    # in po/LINGUAS and bails out on the first one it cannot render, and the
+    # list runs to 46 languages including Chinese, Japanese, Korean, Hindi,
+    # Punjabi, Sinhala, Georgian, Arabic and Hebrew. Noto plus Noto CJK covers
+    # the set; a Latin-only font is not enough to get through the build.
+    - font-noto
+    - font-noto-sans-cjk
+    # For /usr/share/hwdata/usb.ids, which fwupd probes for at configure time
+    # and reads at runtime to name device vendors.
+    - hwdata
+    - pkgconfig(blkid)
+    - pkgconfig(gio-unix-2.0)
+    - pkgconfig(glib-2.0)
+    - pkgconfig(gmodule-2.0)
+    - pkgconfig(gnutls)
+    - pkgconfig(gobject-introspection-1.0)
+    - pkgconfig(libcurl)
+    - pkgconfig(libdrm)
+    - pkgconfig(libmnl)
+    - pkgconfig(libsystemd)
+    - pkgconfig(libusb-1.0)
+    - pkgconfig(liblzma)
+    - pkgconfig(polkit-gobject-1)
+    - pkgconfig(readline)
+    - pkgconfig(sqlite3)
+    - pkgconfig(xmlb)
+    - pkgconfig(zlib)
+    # meson.build calls error() outright if the jinja2 python module is absent;
+    # it is used to generate sources. Packaged in this repository.
+    - python-jinja2
+rundeps     :
+    - hwdata
+setup       : |
+    # docs: the gi-docgen API documentation is not shipped; man pages are a
+    #   separate option and are still built.
+    # passim and plugin_modem_manager: neither passim nor ModemManager is
+    #   packaged for AerynOS, so pin them off rather than leaving them to an
+    #   autodetect that would silently vary with the build environment.
+    # vendor_ids_dir: upstream walks a list of candidate paths looking for
+    #   usb.ids and hard errors if none matches. Point it at hwdata directly so
+    #   the result does not depend on probe order.
+    %meson \
+        -Ddocs=disabled \
+        -Dpassim=disabled \
+        -Dplugin_modem_manager=disabled \
+        -Dvendor_ids_dir=%(datadir)/hwdata
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+
+    # AerynOS is stateless/hermetic-usr, and boulder drops anything installed
+    # outside /usr/. fwupd puts a lot there: fwupd.conf, the remotes.d and
+    # bios-settings.d drop-in directories, and the LVFS signing certificates
+    # under /etc/pki. FWUPD_SYSCONFDIR is compiled in as /etc, so the daemon
+    # does look for all of it there at runtime.
+    #
+    # Rather than list them out, relocate whatever landed under sysconfdir into
+    # the vendor tree and generate the matching tmpfiles.d entries. Doing it by
+    # discovery means a config file added by a future fwupd release gets picked
+    # up instead of being silently dropped. create_tmpfiles is the shell
+    # function that the tmpfiles macro defines, called here in a loop.
+    # The first tmpfiles call is what defines create_tmpfiles for the loops.
+    %tmpfiles "d /etc/fwupd 0755 root root -"
+
+    (cd %(installroot)%(sysconfdir) && find . -mindepth 1 -type d | sort) | while read -r dir; do
+        rel="${dir#./}"
+        test "$rel" = fwupd && continue
+        create_tmpfiles "d /etc/$rel 0755 root root -"
+    done
+
+    # Carry the executable bit across rather than flattening everything to 0644:
+    # /etc/grub.d entries in particular are only run by grub-mkconfig when they
+    # are executable. Nothing upstream ships here is executable today, so this
+    # is about not silently breaking a file a later release adds.
+    (cd %(installroot)%(sysconfdir) && find . -type f | sort) | while read -r file; do
+        rel="${file#./}"
+        src="%(installroot)%(sysconfdir)/$rel"
+        if test -x "$src"; then mode=0755; else mode=0644; fi
+        install -D -m "$mode" "$src" "%(installroot)%(vendordir)/$rel"
+        create_tmpfiles "C /etc/$rel $mode root root - %(vendordir)/$rel"
+    done
+
+    rm -rf %(installroot)%(sysconfdir)
+check       : |
+    # Deliberately not the meson_test macro, which passes --no-rebuild. The
+    # fwupd-exported-api test diffs the committed libfwupd/fwupd.map against a
+    # copy regenerated from the GIR, and that generated file is built only as a
+    # dependency of the test itself. With --no-rebuild it never gets built, and
+    # because the diff runs with -N the missing file is treated as empty, so the
+    # test "fails" by reporting every exported symbol as removed. Letting meson
+    # rebuild makes it compare two real files.
+    meson test --print-errorlogs --verbose -j "%(jobs)" -C "%(builddir)"

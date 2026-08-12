@@ -7,6 +7,7 @@ repository.
 | Package | Version | Summary |
 | --- | --- | --- |
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
+| [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`python-jinja2`](p/python-jinja2) | 3.1.6 | Template engine for Python, needed to build fwupd |
@@ -35,6 +36,24 @@ A single package:
 ```sh
 boulder build u/ufw/stone.yaml
 ```
+
+### Packages that depend on other packages here
+
+`fwupd` needs `python-jinja2` from this repository at build time, and boulder's
+default profile only knows about the stock AerynOS repositories. Build against a
+profile that also carries the local index:
+
+```sh
+boulder profile add local-x86_64 \
+    --repo name=volatile,base-uri=https://cdn.aerynos.dev/,channel=main,version=stream/volatile,priority=0 \
+    --repo name=local,uri=file:///home/dc0sk/git/aerynos_packages/local/x86_64/stone.index,priority=10
+
+scripts/local-repo.sh p/python-jinja2       # build and index the dependency first
+boulder build -p local-x86_64 f/fwupd/stone.yaml
+```
+
+The profile reads the index from disk each time, so re-running
+`scripts/local-repo.sh` is enough to refresh what a build can see.
 
 ## Using these as a local repository
 
