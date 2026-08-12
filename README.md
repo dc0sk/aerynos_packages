@@ -6,6 +6,7 @@ repository.
 
 | Package | Version | Summary |
 | --- | --- | --- |
+| [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 

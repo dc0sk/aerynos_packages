@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/9074/ (GitHub backend)
+  id: 9074
+  rss: https://github.com/linux-nvme/nvme-cli/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260812

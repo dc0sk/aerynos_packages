@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : nvme-cli
+version     : "2.16"
+release     : 1
+homepage    : https://github.com/linux-nvme/nvme-cli
+upstreams   :
+    - https://github.com/linux-nvme/nvme-cli/archive/refs/tags/v2.16.tar.gz : 989682ed7b250a2c7a8127e362ffc5d29f5c370127abe405be09c73216da2b97
+summary     : NVM Express user space tooling for Linux
+description : |
+    nvme-cli manages NVM Express (NVMe) devices from user space: identifying
+    controllers and namespaces, reading SMART and other log pages, formatting,
+    sanitizing and updating firmware, and connecting to NVMe over Fabrics
+    targets. Vendor-specific commands are provided as plugins.
+license     :
+    # Predominantly GPL-2.0-or-later, with individual files (fabrics.c among
+    # them) marked GPL-2.0-only.
+    - GPL-2.0-only
+    - GPL-2.0-or-later
+builddeps   :
+    - pkgconfig(json-c)
+    - pkgconfig(libnvme)
+    - pkgconfig(libnvme-mi)
+setup       : |
+    # -Drundir: upstream joins its rundir option onto the prefix, so the default
+    # of 'run' bakes PATH_NVMF_RUNDIR into the binary as /usr/run/nvme. Passing
+    # an absolute path makes that /run/nvme, which is where the fabrics code
+    # actually expects to find per-connection runtime configuration.
+    #
+    # -Ddocs=man: the tarball ships 267 pre-built man pages. With docs-build left
+    # at its default of false, meson installs those as-is, so the build needs no
+    # asciidoc/xmlto toolchain.
+    %meson \
+        -Ddocs=man \
+        -Drundir=/run
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+
+    # AerynOS is stateless/hermetic-usr: boulder drops anything installed outside
+    # /usr/, and meson puts discovery.conf under sysconfdir (/etc/nvme). Relocate
+    # it to a vendor default and seed /etc on first boot instead, so that an
+    # admin's edited copy is never overwritten by an update.
+    %install_dir %(installroot)%(vendordir)/nvme
+    mv %(installroot)%(sysconfdir)/nvme/discovery.conf %(installroot)%(vendordir)/nvme/discovery.conf
+    rm -rf %(installroot)%(sysconfdir)
+
+    %tmpfiles "d /etc/nvme 0755 root root -"
+    %tmpfiles "C /etc/nvme/discovery.conf 0644 root root - %(vendordir)/nvme/discovery.conf"
+check       : |
+    %meson_test
