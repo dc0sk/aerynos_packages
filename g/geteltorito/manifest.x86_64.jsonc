@@ -1,0 +1,22 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"geteltorito": {
+			"depends": [
+				"binary(perl)"
+			],
+			"files": [
+				"/usr/bin/geteltorito",
+				"/usr/share/doc/geteltorito/README"
+			],
+			"name": "geteltorito",
+			"provides": [
+				"binary(geteltorito)"
+			]
+		}
+	},
+	"source-name": "geteltorito",
+	"source-release": "1",
+	"source-version": "0.6"
+}

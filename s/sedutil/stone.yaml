@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sedutil
+version     : "1.20.0+git.5af6caf6"
+release     : 1
+homepage    : https://github.com/Drive-Trust-Alliance/sedutil
+upstreams   :
+    # Upstream has published no release since the demo.1.x tags and cuts no
+    # tarballs, but master is still maintained and carries fixes the old tags
+    # lack. Pin a commit; 1.20.0 is the version declared in configure.ac.
+    - https://github.com/Drive-Trust-Alliance/sedutil/archive/5af6caf6f73050dc689ade3cb63678d1bf81ea39.tar.gz : 1dd13077efde1b520c64417017e180d4111ec6f27a9d8edd72b4402e625bbd7d
+summary     : Manage TCG Opal self-encrypting drives
+description : |
+    sedutil-cli configures and controls TCG Opal and Enterprise self-encrypting
+    drives: taking ownership, setting and changing the drive password, enabling
+    locking, and unlocking a locked drive. It also builds linuxpba, the
+    pre-boot authorization program used by a PBA boot image to unlock a drive
+    before the operating system is started.
+license     :
+    - CC0-1.0
+    - GPL-3.0-or-later
+builddeps   :
+    - binary(autoconf)
+    - binary(automake)
+setup       : |
+    # No configure script is committed, so autoreconf has to run first.
+    %reconfigure
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase: upstream ships no test suite, and sedutil is only exercisable
+# against a real self-encrypting drive.

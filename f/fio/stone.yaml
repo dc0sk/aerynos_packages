@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : fio
+version     : "3.42"
+release     : 1
+homepage    : https://github.com/axboe/fio
+upstreams   :
+    - https://github.com/axboe/fio/archive/refs/tags/fio-3.42.tar.gz : 56b03497a918d07692257890fd759bf73168ad79df5be78a2bcbbdc8ce67895b
+summary     : Flexible I/O tester
+description : |
+    fio spawns a number of threads or processes doing a particular type of I/O
+    action as specified by the user, in order to simulate a given workload. It
+    supports a large number of I/O engines, and reports detailed latency,
+    bandwidth and IOPS statistics, which makes it the usual tool for measuring
+    and reproducing storage behaviour.
+license     : GPL-2.0-only
+builddeps   :
+    - libaio-devel
+    - pkgconfig(numa)
+    - pkgconfig(zlib)
+rundeps     :
+    # tools/fio2gnuplot, tools/fiologparser.py and the histogram scripts are
+    # installed alongside the fio binary and are python3.
+    - binary(python3)
+setup       : |
+    # fio ships a hand-written configure script rather than autotools, so the
+    # boulder configure macro does not apply; the options are passed directly.
+    # Note that macro names expand inside comments too, so do not write one here.
+    #
+    # --disable-native keeps -march=native out of the build. Everything else is
+    # autodetected from the build dependencies above.
+    ./configure \
+        --prefix=%(prefix) \
+        --disable-native
+build       : |
+    %make
+install     : |
+    %make_install
+check       : |
+    # Upstream's smoke test: a null-ioengine run plus a small verified write.
+    %make test

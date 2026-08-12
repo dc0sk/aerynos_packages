@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : tpm2-tools
+version     : "5.8"
+release     : 1
+homepage    : https://tpm2-software.github.io/
+upstreams   :
+    - https://github.com/tpm2-software/tpm2-tools/releases/download/5.8/tpm2-tools-5.8.tar.gz : 1cb73185cae814b4e15c7c2d0b22642d640faf48775f4156a1fd92edf84bef73
+summary     : Command line tools for the TPM 2.0 software stack
+description : |
+    tpm2-tools provides command line utilities built on the TPM2 Software
+    Stack for working with TPM 2.0 devices: creating and managing keys and
+    hierarchies, sealing and unsealing data, PCR and NV operations, quoting
+    and attestation, and reading the event log.
+license     : BSD-3-Clause
+tuning      :
+    # Linking tools/fapi/tss2 fails under the default thin LTO with
+    # "ld.lld: error: Expected at most one ThinLTO module per bitcode file".
+    - lto: false
+builddeps   :
+    - pkgconfig(libcrypto)
+    - pkgconfig(libcurl)
+    - pkgconfig(tss2-esys)
+    - pkgconfig(tss2-fapi)
+    - pkgconfig(tss2-mu)
+    - pkgconfig(tss2-rc)
+    - pkgconfig(tss2-sys)
+    - pkgconfig(tss2-tctildr)
+setup       : |
+    # --with-bashcompdir is set explicitly rather than left to the
+    # bash-completion pkgconfig probe, so the install location does not depend
+    # on whether bash-completion happens to be in the build environment.
+    %configure \
+        --with-bashcompdir=%(bashcompletionsdir)
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase. The cmocka unit tests are gated behind --enable-unit, and that
+# switch makes configure hard-require tpm2-abrmd plus a TPM simulator (swtpm or
+# tpm_server) before it will even complete, none of which AerynOS packages. With
+# unit tests off, TESTS is empty and `make check` passes without running
+# anything, so a check phase here would assert nothing at all.

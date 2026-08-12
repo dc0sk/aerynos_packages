@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/12841/ (GitHub backend)
+  id: 12841
+  rss: https://github.com/tpm2-software/tpm2-tools/releases.atom
+security:
+  cpe:
+  - vendor: tpm2-tools_project
+    product: tpm2-tools

@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : geteltorito
+version     : "0.6"
+release     : 1
+homepage    : https://github.com/rainer042/geteltorito
+upstreams   :
+    # Upstream publishes neither tarballs nor tags: the author's original
+    # download page at uni-koblenz.de now just redirects to this repository.
+    # Pin the tree to a commit; $utilVersion in the script itself says 0.6.
+    - https://github.com/rainer042/geteltorito/archive/46474a4a86692b7c38ecdb4f135bee7badbfa8b0.tar.gz : 5c0d2f86f678e67d0403516da3ea249d34789c8280b29b361d8655a85d07e1e1
+summary     : El Torito boot image extractor
+description : |
+    geteltorito extracts the initial or default El Torito boot image from a
+    bootable CD or DVD image. It is most often used to pull the bootable
+    floppy or hard disk image out of a vendor BIOS update ISO so that it can
+    be written to a USB stick.
+license     : GPL-3.0-only
+rundeps     :
+    - binary(perl)
+install     : |
+    # Upstream also carries geteltorito.bash, a partial reimplementation kept
+    # for systems without perl. Only the perl script is packaged, matching what
+    # other distributions ship.
+    %install_exe geteltorito.pl %(installroot)%(bindir)/geteltorito
+
+    %install_file README %(installroot)%(datadir)/doc/%(name)/README

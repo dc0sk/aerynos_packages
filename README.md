@@ -6,8 +6,12 @@ repository.
 
 | Package | Version | Summary |
 | --- | --- | --- |
+| [`fio`](f/fio) | 3.42 | Flexible I/O tester |
+| [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
+| [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
+| [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 
 ## Layout

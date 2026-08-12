@@ -1,0 +1,61 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"fio": {
+			"build-depends": [
+				"libaio-devel",
+				"pkgconfig(numa)",
+				"pkgconfig(zlib)"
+			],
+			"depends": [
+				"binary(python3)",
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libaio.so.1(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libnuma.so.1(x86_64))",
+				"soname(libz.so.1(x86_64))"
+			],
+			"files": [
+				"/usr/bin/fio",
+				"/usr/bin/fio-btrace2fio",
+				"/usr/bin/fio-dedupe",
+				"/usr/bin/fio-genzipf",
+				"/usr/bin/fio-histo-log-pctiles.py",
+				"/usr/bin/fio-verify-state",
+				"/usr/bin/fio2gnuplot",
+				"/usr/bin/fio_generate_plots",
+				"/usr/bin/fio_jsonplus_clat2csv",
+				"/usr/bin/fiologparser.py",
+				"/usr/bin/fiologparser_hist.py",
+				"/usr/bin/genfio",
+				"/usr/share/fio/graph2D.gpm",
+				"/usr/share/fio/graph3D.gpm",
+				"/usr/share/fio/math.gpm",
+				"/usr/share/man/man1/fio.1",
+				"/usr/share/man/man1/fio2gnuplot.1",
+				"/usr/share/man/man1/fio_generate_plots.1",
+				"/usr/share/man/man1/fiologparser_hist.py.1"
+			],
+			"name": "fio",
+			"provides": [
+				"binary(fio)",
+				"binary(fio-btrace2fio)",
+				"binary(fio-dedupe)",
+				"binary(fio-genzipf)",
+				"binary(fio-histo-log-pctiles.py)",
+				"binary(fio-verify-state)",
+				"binary(fio2gnuplot)",
+				"binary(fio_generate_plots)",
+				"binary(fio_jsonplus_clat2csv)",
+				"binary(fiologparser.py)",
+				"binary(fiologparser_hist.py)",
+				"binary(genfio)"
+			]
+		}
+	},
+	"source-name": "fio",
+	"source-release": "1",
+	"source-version": "3.42"
+}

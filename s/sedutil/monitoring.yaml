@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/15203/ (GitHub backend). Upstream
+  # tags are the old demo.1.x series, well behind master, so an autoupdate here
+  # would move the recipe backwards; the recipe pins a commit instead.
+  id: 15203
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260812
