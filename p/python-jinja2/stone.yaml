@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : python-jinja2
+version     : "3.1.6"
+release     : 1
+homepage    : https://jinja.palletsprojects.com/
+upstreams   :
+    - https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-3.1.6.tar.gz : 0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d
+summary     : Fast and expressive template engine for Python
+description : |
+    Jinja is a template engine for Python. It renders templates with an
+    expressive syntax, sandboxed execution and optional automatic escaping of
+    untrusted input. It is packaged here because fwupd requires the module at
+    build time to generate sources.
+license     : BSD-3-Clause
+builddeps   :
+    - python-flit-core
+rundeps     :
+    - python(markupsafe)
+build       : |
+    %pyproject_build
+install     : |
+    %pyproject_install
+    %python_compile

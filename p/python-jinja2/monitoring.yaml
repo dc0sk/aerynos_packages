@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/3894/ (PyPI backend)
+  id: 3894
+  rss: ~
+security:
+  cpe:
+  - vendor: pocoo
+    product: jinja2
