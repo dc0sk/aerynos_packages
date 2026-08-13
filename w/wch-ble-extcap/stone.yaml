@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : wch-ble-extcap
+version     : "0.1.1"
+release     : 1
+homepage    : https://github.com/dc0sk/wireshark-extcap-wch-ble
+upstreams   :
+    - https://github.com/dc0sk/wireshark-extcap-wch-ble/archive/refs/tags/v0.1.1.tar.gz : ebca96bfee5c1b1d073c262266656a82920297fd8d7f705548dde13b1bf12f82
+summary     : Wireshark extcap plugin for the WCH BLE Analyzer Pro
+description : |
+    A Wireshark extcap plugin for the WCH BLE Analyzer Pro, a Bluetooth Low
+    Energy sniffer dongle. Once installed the radios appear as capture
+    interfaces in Wireshark and tshark, and the captured advertising and
+    connection traffic is handed over as PCAP.
+license     : GPL-3.0-only
+builddeps   :
+    - pkgconfig(libudev)
+    - pkgconfig(libusb-1.0)
+networking  : true
+setup       : |
+    %cargo_fetch
+build       : |
+    # Deliberately not --features vendored. That feature statically links a
+    # libusb built from source, which suits the standalone and cross-compiled
+    # builds upstream ships it for, but a distribution package should link the
+    # system libusb so it picks up security fixes with everything else.
+    %cargo_build
+install     : |
+    # AerynOS builds wireshark with an extcap directory of
+    # %(libdir)/wireshark/wireshark/extcap - note the doubled path segment,
+    # confirmed against the extcap helpers wireshark-cli itself ships. This is
+    # not the %(libdir)/wireshark/extcap that upstream's own PKGBUILD uses,
+    # since Arch configures wireshark without the multiarch-style layout. Put
+    # the plugin anywhere else and wireshark simply will not list it.
+    %install_exe %(cargo_target_dir)/%(name) %(installroot)%(libdir)/wireshark/wireshark/extcap/%(name)
+
+    # Also reachable on PATH, for driving it by hand or piping into tshark.
+    %install_dir %(installroot)%(bindir)
+    ln -sf %(libdir)/wireshark/wireshark/extcap/%(name) %(installroot)%(bindir)/%(name)
+
+    # Gives the logged-in user raw USB access to the dongle through logind's
+    # uaccess. The 60- prefix is load-bearing and upstream documents why: the
+    # uaccess builtin runs from systemd's 73-seat-late.rules, so a rule
+    # numbered above that applies the tag too late and the device stays
+    # root-only.
+    %install_file udev/60-wch-ble-analyzer.rules %(installroot)%(udevrulesdir)/60-wch-ble-analyzer.rules
+
+    %install_file LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE
+    %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md
+# No check phase: the crate carries no tests at all - no #[test] anywhere under
+# src/ and no tests/ directory - so cargo test would report success having run
+# nothing. Wireshark is deliberately not a dependency either, matching the
+# optdepends upstream uses in its own packaging: the plugin is usable on its
+# own, and installing it should not drag in wireshark for someone who only
+# wants the capture binary.

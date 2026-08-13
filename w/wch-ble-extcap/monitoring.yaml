@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # Not registered with release-monitoring.org, so there is nothing for
+  # `boulder recipe update` to track. The tags feed below is the next best
+  # thing to watch by hand.
+  id: ~
+  rss: https://github.com/dc0sk/wireshark-extcap-wch-ble/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260813
