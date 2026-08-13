@@ -1,0 +1,157 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : apparmor
+version     : "5.0.2"
+release     : 1
+homepage    : https://apparmor.net/
+upstreams   :
+    - https://gitlab.com/apparmor/apparmor/-/archive/v5.0.2/apparmor-v5.0.2.tar.gz : bef45f228c0bde2f80d9630084e56bd8020b3fc4dfa7ee48a6aca585bb5ea0ed
+summary     : Mandatory access control based on per-program profiles
+description : |
+    AppArmor confines individual programs to the files, capabilities and
+    network operations named in a per-program profile. This package carries
+    the userspace side: libapparmor, the apparmor_parser that compiles
+    profiles and loads them into the kernel, the aa-* administration tools,
+    and the reference profile set.
+
+    The kernel on AerynOS is built with AppArmor support, but it is not among
+    the LSMs enabled by default. Booting with apparmor in the lsm= kernel
+    command line is required before any of this takes effect.
+license     :
+    - GPL-2.0-only
+    - LGPL-2.1-only
+builddeps   :
+    - autoconf-archive
+    - binary(autoconf)
+    - binary(automake)
+    # libapparmor's test suite is a dejagnu harness.
+    - dejagnu
+    - binary(bison)
+    - binary(flex)
+    # The parser makefile probes for awk by running `which awk`, and refuses to
+    # build without either of them.
+    - binary(awk)
+    - binary(which)
+    - binary(libtoolize)
+    - binary(msgfmt)
+    - binary(swig)
+    # The parser compresses the policy blobs it hands the kernel.
+    - pkgconfig(libzstd)
+    - python-devel
+    # libapparmor's configure imports setuptools to work out where the python
+    # bindings belong, and errors out if it cannot.
+    - python-setuptools
+rundeps     :
+    - binary(python3)
+environment : |
+    # The build refers to these throughout rather than probing for an
+    # interpreter, and the utils tree imports the freshly built LibAppArmor
+    # bindings before anything is installed.
+    export PYTHON=/usr/bin/python3
+    export PYTHON_VERSION=3
+    export PYTHON_VERSIONS=python3
+    export PYTHONPATH=%(workdir)/libraries/libapparmor/swig/python
+setup       : |
+    %patch %(pkgdir)/0001-libapparmor-avoid-vla-in-union.patch
+
+    # There is no top-level build: the root makefile prints a pointer to the
+    # README and exits 1. Each component is configured and built in the order
+    # that README lays out, because the parser and utils both link or import
+    # what libapparmor produces.
+    cd %(workdir)/libraries/libapparmor
+    sh ./autogen.sh
+    %configure \
+        --with-python \
+        --without-perl \
+        --without-ruby
+build       : |
+    cd %(workdir)/libraries/libapparmor
+    %make
+
+    cd %(workdir)/binutils
+    %make
+
+    cd %(workdir)/parser
+    %make
+
+    cd %(workdir)/utils
+    %make
+install     : |
+    cd %(workdir)/libraries/libapparmor
+    %make_install
+
+    cd %(workdir)/binutils
+    %make_install
+
+    cd %(workdir)/parser
+    %make_install
+
+    cd %(workdir)/utils
+    %make_install
+
+    cd %(workdir)/profiles
+    %make_install
+
+    # Both targets: install-systemd alone drops the unit and apparmor.systemd
+    # but not rc.apparmor.functions, which apparmor.systemd sources on every
+    # start, so the service would fail the first time it ran.
+    #
+    # APPARMOR_BIN_PREFIX is redirected from /lib/apparmor into %(libdir),
+    # since boulder discards anything outside /usr/. apparmor.service and
+    # apparmor.systemd both refer to /lib/apparmor by absolute path, which
+    # still resolves through the standard merged-usr /lib -> /usr/lib symlink,
+    # the same arrangement ufw relies on here.
+    # Run as two invocations, not one: both targets create APPARMOR_BIN_PREFIX
+    # with `install -d`, and under the parallel make these macros use they race,
+    # leaving one of them to fail with "cannot create directory: File exists".
+    cd %(workdir)/init
+    %make install-indep \
+        DESTDIR=%(installroot) \
+        APPARMOR_BIN_PREFIX=%(installroot)%(libdir)/apparmor
+    %make install-systemd \
+        DESTDIR=%(installroot) \
+        APPARMOR_BIN_PREFIX=%(installroot)%(libdir)/apparmor
+
+    cd %(workdir)
+
+    # AerynOS is stateless/hermetic-usr and boulder drops anything outside
+    # /usr/. AppArmor puts its whole reference profile set in /etc/apparmor.d
+    # and its own configuration in /etc/apparmor, both of which an admin is
+    # expected to edit. Move them under the vendor tree and seed them on first
+    # boot. A directory-level tmpfiles copy is used rather than one line per
+    # file because the profile set runs to hundreds of files; the tradeoff is
+    # that profiles added by a later release will not appear in an /etc that
+    # already exists.
+    %install_dir %(installroot)%(vendordir)
+    test -d %(installroot)%(sysconfdir)/apparmor.d && \
+        mv %(installroot)%(sysconfdir)/apparmor.d %(installroot)%(vendordir)/apparmor.d
+    test -d %(installroot)%(sysconfdir)/apparmor && \
+        mv %(installroot)%(sysconfdir)/apparmor %(installroot)%(vendordir)/apparmor
+
+    %tmpfiles "C /etc/apparmor.d - - - - %(vendordir)/apparmor.d"
+    %tmpfiles "C /etc/apparmor - - - - %(vendordir)/apparmor"
+
+    # Anything else upstream dropped outside /usr is not something this recipe
+    # knows how to place; fail loudly rather than let boulder discard it.
+    if test -d %(installroot)%(sysconfdir) && \
+       test -n "$(find %(installroot)%(sysconfdir) -mindepth 1 -print -quit)"; then
+        echo "unhandled files under sysconfdir:"
+        find %(installroot)%(sysconfdir) -mindepth 1
+        exit 1
+    fi
+    rm -rf %(installroot)%(sysconfdir)
+check       : |
+    # Not libapparmor's suite: that one is a dejagnu harness, and the diff
+    # procedure it calls is dejagnu's own - nothing under apparmor's testsuite
+    # defines diff or calls fconfigure. That procedure uses
+    # `fconfigure -encoding binary`, which Tcl 9 removed ("unknown encoding
+    # binary: No longer supported"), so the harness dies before running a
+    # single assertion. That is a dejagnu/Tcl mismatch in the distribution
+    # rather than anything wrong with apparmor, and it should start working on
+    # its own once dejagnu catches up.
+    #
+    # The parser has its own suite, needs no dejagnu, and covers the component
+    # that carries the most weight here, so run that instead.
+    cd %(workdir)/parser
+    %make check

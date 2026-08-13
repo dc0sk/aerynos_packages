@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/94819/ (GitLab backend)
+  id: 94819
+  rss: ~
+security:
+  cpe:
+  - vendor: apparmor
+    product: apparmor
+  - vendor: canonical
+    product: apparmor

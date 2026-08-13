@@ -1,0 +1,27 @@
+From: AerynOS packaging
+Subject: [PATCH] libapparmor: avoid a variable length array inside a union
+
+kernel.c sizes the scratch buffer in self_syscall_enabled_init_once()
+from the total_size variable. Because total_size is a variable rather
+than a constant expression, the array member is a variable length array
+inside a union, which is a GCC extension that clang rejects outright:
+
+  kernel.c:375:8: error: fields must have a constant size:
+  'variable length array in structure' extension will never be supported
+
+The value is sizeof(struct lsm_ctx) + 8, which is a constant expression
+already, so spell it out in the declaration. total_size keeps its
+initialiser and every later use of it is unchanged, so the buffer has
+exactly the same size and layout as before.
+
+--- a/libraries/libapparmor/src/kernel.c
++++ b/libraries/libapparmor/src/kernel.c
+@@ -372,7 +372,7 @@ static void self_syscall_enabled_init_once(void)
+ 	__u32 total_size = sizeof(struct lsm_ctx) + 8;
+ 	union {
+ 		struct lsm_ctx ctx_buff;
+-		char buff[total_size]; /* force allocate trailing space */
++		char buff[sizeof(struct lsm_ctx) + 8]; /* force allocate trailing space */
+ 	} buff;
+ 	struct lsm_ctx *ctx = &buff.ctx_buff;
+ 	
