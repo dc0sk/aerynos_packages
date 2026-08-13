@@ -1,0 +1,13 @@
+[Unit]
+Description=SDRplay RSP API service
+Documentation=https://www.sdrplay.com/api/
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sdrplay_apiService
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

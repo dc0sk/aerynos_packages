@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sdrplay-api
+version     : "3.15.2"
+release     : 1
+homepage    : https://www.sdrplay.com/api/
+upstreams   :
+    # A Makeself self-extracting installer, not an archive boulder can unpack
+    # on its own, so it is fetched verbatim and unpacked in the setup phase.
+    - https://www.sdrplay.com/software/SDRplay_RSP_API-Linux-3.15.2.run :
+        hash : 3a97ca764263bbe76fb0f2220e6408942357e8864c19e1408a6d6987af382fe3
+        unpack : false
+summary     : SDRplay RSP API library and service (proprietary)
+description : |
+    The vendor API for SDRplay RSP receivers: a closed source library and the
+    sdrplay_apiService daemon that arbitrates access to the hardware. Needed
+    by anything that talks to an RSP, including SoapySDRPlay3.
+
+    This package contains proprietary binaries. The SDRplay licence grants
+    only the right to publicly display and publicly perform the software in
+    object form, restricts use to SDRplay hardware, and does not grant
+    redistribution, so the built package should be kept to the machine that
+    built it and not served to anyone else.
+license     : LicenseRef-SDRplay-EULA
+builddeps   :
+    # The Makeself archive pipes its payload through gzip into tar. Neither is
+    # in the build environment by default, and the failure is opaque when they
+    # are missing: the extractor reports "Extraction failed" to /dev/tty, which
+    # does not exist either, then SIGTERMs itself, so the build dies on 143
+    # with the tty error as the only visible symptom.
+    - binary(gzip)
+    - binary(tar)
+setup       : |
+    # Makeself unpacks in place with --noexec; running the bundled
+    # install_lib.sh is not wanted here since it sudo-installs to the live
+    # system, writes udev rules directly into /etc, and edits usb.ids.
+    # An upstream declared unpack:false is left verbatim in %(sourcedir)
+    # rather than being copied into the working directory.
+    sh %(sourcedir)/SDRplay_RSP_API-Linux-3.15.2.run \
+        --noexec --nochown --noprogress --quiet --target ./api < /dev/null
+install     : |
+    # The library ships as an unversioned-soname .so.3.15; install it under its
+    # real name and add the soname and development symlinks by hand.
+    %install_exe api/amd64/libsdrplay_api.so.3.15 %(installroot)%(libdir)/libsdrplay_api.so.3.15
+    ln -sf libsdrplay_api.so.3.15 %(installroot)%(libdir)/libsdrplay_api.so.3
+    ln -sf libsdrplay_api.so.3 %(installroot)%(libdir)/libsdrplay_api.so
+
+    %install_exe api/amd64/sdrplay_apiService %(installroot)%(bindir)/sdrplay_apiService
+
+    %install_dir %(installroot)%(includedir)
+    %install_file api/inc/*.h -t %(installroot)%(includedir)
+
+    %install_file %(pkgdir)/sdrplay-api.service -t %(installroot)%(libdir)/systemd/system
+
+    # The udev rule the vendor installer writes into /etc directly, shipped as
+    # a normal package file instead. It matches every RSP product id.
+    %install_file %(pkgdir)/66-sdrplay.rules %(installroot)%(udevrulesdir)/66-sdrplay.rules
+
+    %install_file api/sdrplay_license.txt %(installroot)%(datadir)/licenses/%(name)/sdrplay_license.txt
+# No check phase: there is nothing to test without an RSP attached, and the
+# payload is a prebuilt binary this recipe only repackages.

@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : soapysdrplay3
+version     : "0.5.2"
+release     : 1
+homepage    : https://github.com/pothosware/SoapySDRPlay3
+upstreams   :
+    - https://github.com/pothosware/SoapySDRPlay3/archive/refs/tags/soapy-sdrplay3-0.5.2.tar.gz : d0191ee40d8206d7a8d2a52f0a06fa2f495e6ae314da0c3abd9b8e9888620722
+summary     : SoapySDR module for SDRplay RSP receivers
+description : |
+    A SoapySDR driver module for SDRplay RSP receivers, built against the
+    vendor API version 3. Installing it makes an attached RSP usable from
+    anything that speaks SoapySDR, including SoapySDRUtil, GNU Radio and
+    CubicSDR.
+license     : MIT
+builddeps   :
+    # -devel, not the base package: FindLibSDRplay.cmake does
+    # find_library(NAMES sdrplay_api), which resolves the unversioned
+    # libsdrplay_api.so, and boulder files that development symlink into the
+    # -devel subpackage alongside the headers.
+    - sdrplay-api-devel
+    - soapysdr-devel
+setup       : |
+    # Upstream declares cmake_minimum_required(VERSION 2.8.12); CMake 4 refuses
+    # anything below 3.5, and this is the escape hatch it names in the error.
+    %cmake \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+build       : |
+    %cmake_build
+install     : |
+    %cmake_install
+# No check phase: upstream ships no tests, and the module cannot do anything
+# without an RSP attached and the vendor API service running.

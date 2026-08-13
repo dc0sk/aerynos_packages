@@ -1,0 +1,83 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"soapysdr": {
+			"build-depends": [
+				"binary(swig)",
+				"python-devel"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libpython3.14.so.1.0(x86_64))",
+				"soname(libstdc++.so.6(x86_64))"
+			],
+			"files": [
+				"/usr/bin/SoapySDRUtil",
+				"/usr/lib/libSoapySDR.so.0.8",
+				"/usr/lib/libSoapySDR.so.0.8.1",
+				"/usr/lib/python3.14/site-packages/SoapySDR.py",
+				"/usr/lib/python3.14/site-packages/_SoapySDR.so",
+				"/usr/share/man/man1/SoapySDRUtil.1"
+			],
+			"name": "soapysdr",
+			"provides": [
+				"binary(SoapySDRUtil)",
+				"soname(libSoapySDR.so.0.8(x86_64))",
+				"soname(python3.14/site-packages/_SoapySDR.so(x86_64))"
+			]
+		},
+		"soapysdr-devel": {
+			"build-depends": [
+				"binary(swig)",
+				"python-devel"
+			],
+			"depends": [
+				"soapysdr"
+			],
+			"files": [
+				"/usr/include/SoapySDR/Config.h",
+				"/usr/include/SoapySDR/Config.hpp",
+				"/usr/include/SoapySDR/Constants.h",
+				"/usr/include/SoapySDR/ConverterPrimitives.hpp",
+				"/usr/include/SoapySDR/ConverterRegistry.hpp",
+				"/usr/include/SoapySDR/Converters.h",
+				"/usr/include/SoapySDR/Device.h",
+				"/usr/include/SoapySDR/Device.hpp",
+				"/usr/include/SoapySDR/Errors.h",
+				"/usr/include/SoapySDR/Errors.hpp",
+				"/usr/include/SoapySDR/Formats.h",
+				"/usr/include/SoapySDR/Formats.hpp",
+				"/usr/include/SoapySDR/Logger.h",
+				"/usr/include/SoapySDR/Logger.hpp",
+				"/usr/include/SoapySDR/Modules.h",
+				"/usr/include/SoapySDR/Modules.hpp",
+				"/usr/include/SoapySDR/Registry.hpp",
+				"/usr/include/SoapySDR/Time.h",
+				"/usr/include/SoapySDR/Time.hpp",
+				"/usr/include/SoapySDR/Types.h",
+				"/usr/include/SoapySDR/Types.hpp",
+				"/usr/include/SoapySDR/Version.h",
+				"/usr/include/SoapySDR/Version.hpp",
+				"/usr/lib/libSoapySDR.so",
+				"/usr/lib/pkgconfig/SoapySDR.pc",
+				"/usr/share/cmake/SoapySDR/SoapySDRConfig.cmake",
+				"/usr/share/cmake/SoapySDR/SoapySDRConfigVersion.cmake",
+				"/usr/share/cmake/SoapySDR/SoapySDRExport-release.cmake",
+				"/usr/share/cmake/SoapySDR/SoapySDRExport.cmake",
+				"/usr/share/cmake/SoapySDR/SoapySDRUtil.cmake"
+			],
+			"name": "soapysdr-devel",
+			"provides": [
+				"cmake(SoapySDR)",
+				"pkgconfig(SoapySDR)"
+			]
+		}
+	},
+	"source-name": "soapysdr",
+	"source-release": "1",
+	"source-version": "0.8.1"
+}

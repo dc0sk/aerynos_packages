@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/14536/ (GitHub backend)
+  id: 14536
+  rss: https://github.com/pothosware/SoapySDR/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260813

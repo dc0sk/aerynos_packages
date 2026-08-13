@@ -1,0 +1,19 @@
+# SDRplay RSP receivers.
+#
+# The product ids are the ones the vendor installer writes into
+# /etc/udev/rules.d; shipping the rule as a package file instead keeps it
+# tracked and updatable.
+#
+# The vendor rule sets MODE:="0666", which leaves the device world writable.
+# TAG+="uaccess" with mode 0660 is used here instead: logind grants an ACL to
+# whoever is logged in at the seat, which is what a desktop user needs and
+# nothing wider. The file is numbered below systemd's 73-seat-late.rules,
+# which runs the uaccess builtin, so the tag lands in time to take effect.
+
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="2500", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3000", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3010", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3020", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3030", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3050", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="1df7", ATTRS{idProduct}=="3060", MODE="0660", TAG+="uaccess"

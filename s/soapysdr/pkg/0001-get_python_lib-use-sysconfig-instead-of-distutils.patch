@@ -1,0 +1,31 @@
+From: AerynOS packaging
+Subject: [PATCH] get_python_lib: use sysconfig instead of distutils
+
+distutils was removed from the standard library in Python 3.12, so this
+helper raises ModuleNotFoundError on any current interpreter. cmake runs it
+through execute_process and never checks the exit status, so the failure is
+silent: PYTHON3_INSTALL_DIR comes back empty, the install DESTINATION becomes
+empty, and a build configured with -DENABLE_PYTHON3=ON quietly produces no
+bindings at all rather than failing.
+
+sysconfig has been in the standard library since 3.2, and its "platlib" path
+is what get_python_lib(plat_specific=True) returned, so this behaves the same
+on old and new interpreters. The site-packages fallback below, which decides
+the answer whenever the prefix is recognised, is untouched.
+
+--- a/python/get_python_lib.py
++++ b/python/get_python_lib.py
+@@ -1,7 +1,12 @@
+ import os
+ import sys
+ import site
+-from distutils.sysconfig import get_python_lib
++import sysconfig
++
++def get_python_lib(plat_specific=False, prefix=None):
++    key = "platlib" if plat_specific else "purelib"
++    vars = {"base": prefix, "platbase": prefix} if prefix else {}
++    return sysconfig.get_paths(scheme="posix_prefix", vars=vars)[key]
+ 
+ if __name__ == '__main__':
+     prefix = sys.argv[1]

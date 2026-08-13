@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : python-scipy
+version     : "1.18.0"
+release     : 1
+homepage    : https://scipy.org/
+upstreams   :
+    - https://files.pythonhosted.org/packages/a7/25/c2700dfaf6442b4effaa91af24ebce5dc9d31bb4a69706313aae70d72cd0/scipy-1.18.0.tar.gz : 67b2ad2ad54c72ca6d04975a9b2df8c3638c34ddd5b28738e94fc2b57929d378
+summary     : Fundamental algorithms for scientific computing in Python
+description : |
+    SciPy builds on numpy with algorithms for optimization, integration,
+    interpolation, eigenvalue problems, signal and image processing,
+    statistics, sparse matrices and more.
+license     : BSD-3-Clause
+tuning      :
+    # The default flags are clang's and gfortran is GCC. -flto=thin reaches it
+    # through FFLAGS and LDFLAGS and GCC rejects that spelling outright (it
+    # wants -flto or -flto=N), and --icf is an lld/gold option that GNU ld does
+    # not take. Both show up only as meson's "Compiler gfortran cannot compile
+    # programs", with the real cause buried in its log.
+    - lto: false
+    - icf: false
+builddeps   :
+    # gfortran is GCC, and GCC drives binutils: without ld and as on PATH the
+    # Fortran objects fail to link with "collect2: cannot find 'ld'". The rest
+    # of the build environment is LLVM, which supplies ld.lld under a different
+    # name, so binutils has to be asked for explicitly.
+    - binary(gfortran)
+    - binutils
+    - binary(ninja)
+    - binary(patchelf)
+    - pkgconfig(openblas)
+    - pkgconfig(pybind11)
+    - python(cython)
+    - python-build
+    - python-installer
+    - python-meson-python
+    - python-numpy
+build       : |
+    # use-pythran=false: scipy accelerates a handful of modules by compiling
+    # them with pythran, which AerynOS does not package. Upstream supports
+    # building without it and the affected code falls back to its plain python
+    # or cython implementations.
+    #
+    # --skip-dependency-check is needed alongside it because scipy lists
+    # pythran unconditionally in build-system.requires, and pypa/build enforces
+    # that list before meson ever sees use-pythran=false. With the option off
+    # pythran genuinely is not invoked, so the declared requirement is the only
+    # thing standing in the way.
+    %pyproject_build --skip-dependency-check -Csetup-args=-Duse-pythran=false
+install     : |
+    %pyproject_install
+    %python_compile
+check       : |
+    # scipy.test() wants pytest and hypothesis, neither of which is packaged
+    # here, so this checks what packaging is most likely to break instead: that
+    # the compiled extensions import, that the Fortran-backed linear algebra
+    # and the ODE, optimize and FFT paths compute correct answers, and that it
+    # is using the same openblas numpy was built against.
+    #
+    # Run from installroot: %(workdir) is the scipy source tree and an import
+    # from there picks up unbuilt sources.
+    cd %(installroot)
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 %(pkgdir)/smoke-test.py

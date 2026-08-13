@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : python-pyserial
+version     : "3.5"
+release     : 1
+homepage    : https://github.com/pyserial/pyserial
+upstreams   :
+    - https://files.pythonhosted.org/packages/1e/7d/ae3f0a63f41e4d2f6cb66a5b57197850f919f59e558159a4dd3a818f5082/pyserial-3.5.tar.gz : 3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb
+summary     : Serial port access for Python
+description : |
+    pyserial provides a portable interface to serial ports from Python,
+    covering local ports as well as RFC 2217 network ports, along with the
+    miniterm terminal and a port listing tool.
+license     : BSD-3-Clause
+builddeps   :
+    - python-setuptools
+build       : |
+    # No pyproject.toml in 3.5, only setup.py. python-build falls back to the
+    # legacy setuptools backend for that, so this still produces a wheel rather
+    # than going through the deprecated `setup.py install`.
+    %pyproject_build
+install     : |
+    %pyproject_install
+    %python_compile
+# No check phase: the tests upstream ships expect a real or looped-back serial
+# port to talk to, which the build container does not have.
