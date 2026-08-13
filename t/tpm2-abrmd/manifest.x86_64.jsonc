@@ -1,0 +1,80 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"tpm2-abrmd": {
+			"build-depends": [
+				"binary(dbus-run-session)",
+				"pkgconfig(cmocka)",
+				"pkgconfig(gio-unix-2.0)",
+				"pkgconfig(glib-2.0)",
+				"pkgconfig(gobject-2.0)",
+				"pkgconfig(tss2-mu)",
+				"pkgconfig(tss2-rc)",
+				"pkgconfig(tss2-sys)",
+				"pkgconfig(tss2-tctildr)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgio-2.0.so.0(x86_64))",
+				"soname(libglib-2.0.so.0(x86_64))",
+				"soname(libgobject-2.0.so.0(x86_64))",
+				"soname(libtss2-mu.so.0(x86_64))",
+				"soname(libtss2-rc.so.0(x86_64))",
+				"soname(libtss2-sys.so.1(x86_64))",
+				"soname(libtss2-tctildr.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/lib/libtss2-tcti-tabrmd.so.0",
+				"/usr/lib/libtss2-tcti-tabrmd.so.0.0.0",
+				"/usr/lib/systemd/system-preset/tpm2-abrmd.preset",
+				"/usr/lib/systemd/system/tpm2-abrmd.service",
+				"/usr/sbin/tpm2-abrmd",
+				"/usr/share/dbus-1/system-services/com.intel.tss2.Tabrmd.service",
+				"/usr/share/dbus-1/system.d/tpm2-abrmd.conf",
+				"/usr/share/man/man7/tss2-tcti-tabrmd.7",
+				"/usr/share/man/man8/tpm2-abrmd.8"
+			],
+			"name": "tpm2-abrmd",
+			"provides": [
+				"soname(libtss2-tcti-tabrmd.so.0(x86_64))",
+				"sysbinary(tpm2-abrmd)"
+			]
+		},
+		"tpm2-abrmd-devel": {
+			"build-depends": [
+				"binary(dbus-run-session)",
+				"pkgconfig(cmocka)",
+				"pkgconfig(gio-unix-2.0)",
+				"pkgconfig(glib-2.0)",
+				"pkgconfig(gobject-2.0)",
+				"pkgconfig(tss2-mu)",
+				"pkgconfig(tss2-rc)",
+				"pkgconfig(tss2-sys)",
+				"pkgconfig(tss2-tctildr)"
+			],
+			"depends": [
+				"pkgconfig(gio-2.0)",
+				"pkgconfig(glib-2.0)",
+				"pkgconfig(tss2-mu)",
+				"pkgconfig(tss2-sys)",
+				"tpm2-abrmd"
+			],
+			"files": [
+				"/usr/include/tss2/tss2-tcti-tabrmd.h",
+				"/usr/lib/libtss2-tcti-tabrmd.a",
+				"/usr/lib/libtss2-tcti-tabrmd.so",
+				"/usr/lib/pkgconfig/tss2-tcti-tabrmd.pc",
+				"/usr/share/man/man3/Tss2_Tcti_Tabrmd_Init.3"
+			],
+			"name": "tpm2-abrmd-devel",
+			"provides": [
+				"pkgconfig(tss2-tcti-tabrmd)"
+			]
+		}
+	},
+	"source-name": "tpm2-abrmd",
+	"source-release": "1",
+	"source-version": "3.0.0"
+}

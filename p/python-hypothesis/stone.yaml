@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : python-hypothesis
+version     : "6.165.5"
+release     : 1
+homepage    : https://hypothesis.readthedocs.io/
+upstreams   :
+    - https://files.pythonhosted.org/packages/7a/3a/b840ea8b26e0c4795584dc93c832c5d1a9ff37db1818cc91b2ee8110f757/hypothesis-6.165.5.tar.gz : 0df7fdefd2e10bbfe7d690eb22c7181a739e8040026907207faa305d86e6e4db
+summary     : Property-based testing for Python
+description : |
+    Hypothesis generates test inputs from a description of what is valid,
+    shrinking any failing case to a minimal example. It is packaged here
+    because the numpy and scipy test suites require it.
+license     : MPL-2.0
+builddeps   :
+    # No longer pure python: since the 6.14x series the sdist carries a rust/
+    # crate built through the maturin backend, so this needs cargo as well as
+    # the backend itself.
+    - binary(cargo)
+    - python-build
+    - python-installer
+    - python-maturin
+    # Also a builddep, not just a rundep: rundeps are not installed into the
+    # build container, and the check phase has to import hypothesis, which
+    # imports sortedcontainers at module scope.
+    - python-sortedcontainers
+rundeps     :
+    - python(sortedcontainers)
+# The rust crate's dependencies are fetched by cargo during the build; upstream
+# does not vendor them in the sdist.
+networking  : true
+build       : |
+    %pyproject_build
+install     : |
+    %pyproject_install
+    %python_compile
+check       : |
+    # Hypothesis' own suite is enormous and needs a pile of extra plugins, so
+    # this checks that the compiled rust extension loads and that the engine
+    # actually generates and shrinks a case, which is what numpy and scipy rely
+    # on it for.
+    cd %(installroot)
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 %(pkgdir)/smoke-test.py

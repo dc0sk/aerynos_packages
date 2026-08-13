@@ -13,15 +13,18 @@ repository.
 | [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
+| [`python-hypothesis`](p/python-hypothesis) | 6.165.5 | Property-based testing for Python, needed by the numpy and scipy suites |
 | [`python-jinja2`](p/python-jinja2) | 3.1.6 | Template engine for Python, needed to build fwupd |
 | [`python-numpy`](p/python-numpy) | 2.5.2 | Fundamental package for scientific computing with Python |
 | [`python-pyserial`](p/python-pyserial) | 3.5 | Serial port access for Python |
 | [`python-scipy`](p/python-scipy) | 1.18.0 | Fundamental algorithms for scientific computing in Python |
+| [`python-sortedcontainers`](p/python-sortedcontainers) | 2.4.0 | Sorted list, dict and set implementations, needed by hypothesis |
 | [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
 | [`sdrplay-api`](s/sdrplay-api) | 3.15.2 | SDRplay RSP API library and service (proprietary) |
 | [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
 | [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
 | [`soapysdrplay3`](s/soapysdrplay3) | 0.5.2 | SoapySDR module for SDRplay RSP receivers |
+| [`tpm2-abrmd`](t/tpm2-abrmd) | 3.0.0 | TPM2 access broker and resource manager daemon |
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |

@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : tpm2-abrmd
+version     : "3.0.0"
+release     : 1
+homepage    : https://github.com/tpm2-software/tpm2-abrmd
+upstreams   :
+    - https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz : d59aff34164aa705b05155b86607f6b66918a433104f754a3fcf76216dd9f465
+summary     : TPM2 access broker and resource manager daemon
+description : |
+    tpm2-abrmd is a system daemon that arbitrates access to a TPM 2.0 between
+    several clients and manages the very limited transient object memory the
+    device has, so that applications do not have to. It also ships the
+    tabrmd TCTI that clients use to reach it.
+
+    It is packaged here mainly because tpm2-tools requires it, together with a
+    TPM simulator, before its unit tests can even be configured.
+license     : BSD-2-Clause
+builddeps   :
+    # Every test, unit ones included, is wrapped in dbus-run-session by the
+    # AM_TESTS_ENVIRONMENT in Makefile.am.
+    - binary(dbus-run-session)
+    - pkgconfig(cmocka)
+    - pkgconfig(gio-unix-2.0)
+    - pkgconfig(glib-2.0)
+    - pkgconfig(gobject-2.0)
+    - pkgconfig(tss2-mu)
+    - pkgconfig(tss2-rc)
+    - pkgconfig(tss2-sys)
+    - pkgconfig(tss2-tctildr)
+setup       : |
+    # --with-dbuspolicydir: upstream defaults it to ${sysconfdir}/dbus-1/system.d,
+    # which boulder discards along with everything else outside /usr. dbus has
+    # read policy from the datadir location for years, and putting it there
+    # keeps the file in the package rather than needing tmpfiles seeding.
+    #
+    # The daemon runs as User=tss, which tpm2-tss already creates, so no
+    # sysusers entry is added here.
+    # --enable-unit, or there is no test coverage at all: the cmocka unit tests
+    # default to off, and `make check` then runs zero tests in under a second
+    # while still reporting success. Unlike tpm2-tools, enabling them here does
+    # not drag in the integration suite - that is behind a separate
+    # --enable-integration and only then appends TESTS_INTEGRATION, which is
+    # what needs a simulator.
+    %configure \
+        --enable-unit \
+        --with-dbuspolicydir=%(datadir)/dbus-1/system.d \
+        --with-systemdsystemunitdir=%(libdir)/systemd/system \
+        --with-systemdpresetdir=%(libdir)/systemd/system-preset
+build       : |
+    %make
+install     : |
+    %make_install
+check       : |
+    # 24 of the 26 unit tests pass. The two that do not are the only two that
+    # mock libc rather than project or glib symbols - random_unit wraps
+    # open/read/close, tcti-tabrmd-receive_unit wraps poll - and on this
+    # toolchain ld --wrap does not interpose those calls, so cmocka reports the
+    # queued return values as never consumed. Every test that wraps a project
+    # or glib symbol passes, which is what points at the mechanism rather than
+    # at the daemon.
+    #
+    # Neither of the obvious culprits is responsible: building with
+    # -D_FORTIFY_SOURCE removed, and separately with thin LTO removed, gives
+    # exactly the same 24/26 (both ablations were confirmed to change the
+    # compiler flags, so those are real negative results, not inert ones).
+    # Turning hardening off on a daemon that brokers TPM access to satisfy two
+    # tests would be a poor trade even if it had worked.
+    #
+    # They are marked expected-failure rather than skipped, so they keep
+    # running: if a toolchain update fixes the interposition, make check
+    # reports XPASS and this note can go.
+    %make check XFAIL_TESTS="test/random_unit test/tcti-tabrmd-receive_unit"

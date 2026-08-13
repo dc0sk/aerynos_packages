@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : python-sortedcontainers
+version     : "2.4.0"
+release     : 1
+homepage    : https://grantjenks.com/docs/sortedcontainers/
+upstreams   :
+    - https://files.pythonhosted.org/packages/e8/c4/ba2f8066cceb6f23394729afe52f3bf7adec04bf9ed2c820b39e19299111/sortedcontainers-2.4.0.tar.gz : 25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88
+summary     : Sorted list, dict and set implementations in pure Python
+description : |
+    sortedcontainers provides SortedList, SortedDict and SortedSet, kept in
+    order without a C extension. Packaged here as the one runtime dependency
+    of hypothesis.
+license     : Apache-2.0
+builddeps   :
+    - python-setuptools
+build       : |
+    %pyproject_build
+install     : |
+    %pyproject_install
+    %python_compile
+check       : |
+    cd %(installroot)
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 -c "from sortedcontainers import SortedList; l = SortedList([3, 1, 2]); assert list(l) == [1, 2, 3], l; print('sortedcontainers ok')"

@@ -1,0 +1,37 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"python-sortedcontainers": {
+			"build-depends": [
+				"python-setuptools"
+			],
+			"files": [
+				"/usr/lib/python3.14/site-packages/sortedcontainers-2.4.0.dist-info/METADATA",
+				"/usr/lib/python3.14/site-packages/sortedcontainers-2.4.0.dist-info/RECORD",
+				"/usr/lib/python3.14/site-packages/sortedcontainers-2.4.0.dist-info/WHEEL",
+				"/usr/lib/python3.14/site-packages/sortedcontainers-2.4.0.dist-info/licenses/LICENSE",
+				"/usr/lib/python3.14/site-packages/sortedcontainers-2.4.0.dist-info/top_level.txt",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__init__.py",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/__init__.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/__init__.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sorteddict.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sorteddict.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sortedlist.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sortedlist.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sortedset.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/__pycache__/sortedset.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/sorteddict.py",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/sortedlist.py",
+				"/usr/lib/python3.14/site-packages/sortedcontainers/sortedset.py"
+			],
+			"name": "python-sortedcontainers",
+			"provides": [
+				"python(sortedcontainers)"
+			]
+		}
+	},
+	"source-name": "python-sortedcontainers",
+	"source-release": "1",
+	"source-version": "2.4.0"
+}
