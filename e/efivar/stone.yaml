@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : efivar
+version     : "39"
+release     : 1
+homepage    : https://github.com/rhboot/efivar
+upstreams   :
+    - https://github.com/rhboot/efivar/archive/refs/tags/39.tar.gz : c9edd15f2eeeea63232f3e669a48e992c7be9aff57ee22672ac31f5eca1609a6
+summary     : Tools and library to manipulate EFI variables
+description : |
+    efivar provides a library and a command line tool for reading and writing
+    EFI variables through efivarfs, along with efisecdb for inspecting and
+    editing the UEFI Secure Boot signature databases. It is the base that
+    efibootmgr and mokutil are built on.
+license     : LGPL-2.1-or-later
+setup       : |
+    # docs/ holds thirty-odd ready-made man pages plus efisecdb.1.mdoc, which
+    # upstream converts with mandoc. AerynOS does not package mandoc, and
+    # turning docs off to avoid it would throw away every other page too.
+    # mdoc is a man macro package in its own right and groff renders it
+    # natively, so install the source as the page and stamp it newer than its
+    # input, which leaves make with nothing to convert.
+    cp docs/efisecdb.1.mdoc docs/efisecdb.1
+    touch docs/efisecdb.1
+build       : |
+    # Plain makefiles, no configure. LIBDIR has to be set because upstream
+    # defaults it to $(PREFIX)/lib64, which is not where AerynOS puts libraries.
+    #
+    # CC has to arrive on the command line, not just in the environment:
+    # defaults.mk only copies it into COMPILER when origin CC is "command line",
+    # and HOSTCC is derived from COMPILER. Left alone, the host tools build with
+    # gcc while everything else uses clang, and gcc rejects clang's -flto=thin.
+    %make \
+        CC="$CC" \
+        PREFIX=%(prefix) \
+        LIBDIR=%(libdir) \
+        BINDIR=%(bindir) \
+        MANDIR=%(mandir) \
+        INCLUDEDIR=%(includedir)
+install     : |
+    %make_install \
+        CC="$CC" \
+        PREFIX=%(prefix) \
+        LIBDIR=%(libdir) \
+        BINDIR=%(bindir) \
+        MANDIR=%(mandir) \
+        INCLUDEDIR=%(includedir)
+check       : |
+    # Three of the fourteen tests drive grub2-editenv to build their fixtures.
+    # AerynOS boots with systemd-boot and packages no grub at all, so those
+    # three cannot run here; the remaining eleven, including the whole efisecdb
+    # signature-database set, do. Overriding TESTS on the command line reaches
+    # the sub-make in tests/. If upstream renames a test the build breaks rather
+    # than quietly skipping it, which is the failure mode worth having.
+    %make test TESTS="test.bootorder.var \
+                      test.conin.var \
+                      test.efivar.threading \
+                      test.parse.db \
+                      test.esl.annotation \
+                      test.esl.sha256.unsorted \
+                      test.esl.sha256.ascending \
+                      test.esl.sha256.removal.descending \
+                      test.esl.sha256.addition.unsorted \
+                      test.esl.cert.addition \
+                      test.esl.cert.removal"

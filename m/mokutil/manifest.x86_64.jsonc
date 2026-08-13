@@ -1,0 +1,35 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"mokutil": {
+			"build-depends": [
+				"binary(help2man)",
+				"keyutils-devel",
+				"pkgconfig(efivar)",
+				"pkgconfig(libcrypt)",
+				"pkgconfig(openssl)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libcrypt.so.2(x86_64))",
+				"soname(libcrypto.so.3(x86_64))",
+				"soname(libefivar.so.1(x86_64))",
+				"soname(libkeyutils.so.1(x86_64))"
+			],
+			"files": [
+				"/usr/bin/mokutil",
+				"/usr/share/bash-completion/completions/mokutil",
+				"/usr/share/man/man1/mokutil.1"
+			],
+			"name": "mokutil",
+			"provides": [
+				"binary(mokutil)"
+			]
+		}
+	},
+	"source-name": "mokutil",
+	"source-release": "1",
+	"source-version": "0.7.2"
+}

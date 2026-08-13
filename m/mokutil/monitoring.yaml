@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/246006/ (GitHub backend)
+  id: 246006
+  rss: https://github.com/lcp/mokutil/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260813

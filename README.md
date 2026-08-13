@@ -6,6 +6,8 @@ repository.
 
 | Package | Version | Summary |
 | --- | --- | --- |
+| [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
+| [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
 | [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |

@@ -1,0 +1,50 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"sbsigntools": {
+			"build-depends": [
+				"binary(autoconf)",
+				"binary(automake)",
+				"binary(help2man)",
+				"binutils-devel",
+				"gnu-efi",
+				"gnu-efi-devel",
+				"pkgconfig(libcrypto)",
+				"pkgconfig(uuid)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libcrypto.so.3(x86_64))",
+				"soname(libuuid.so.1(x86_64))"
+			],
+			"files": [
+				"/usr/bin/sbattach",
+				"/usr/bin/sbkeysync",
+				"/usr/bin/sbsiglist",
+				"/usr/bin/sbsign",
+				"/usr/bin/sbvarsign",
+				"/usr/bin/sbverify",
+				"/usr/share/man/man1/sbattach.1",
+				"/usr/share/man/man1/sbkeysync.1",
+				"/usr/share/man/man1/sbsiglist.1",
+				"/usr/share/man/man1/sbsign.1",
+				"/usr/share/man/man1/sbvarsign.1",
+				"/usr/share/man/man1/sbverify.1"
+			],
+			"name": "sbsigntools",
+			"provides": [
+				"binary(sbattach)",
+				"binary(sbkeysync)",
+				"binary(sbsiglist)",
+				"binary(sbsign)",
+				"binary(sbvarsign)",
+				"binary(sbverify)"
+			]
+		}
+	},
+	"source-name": "sbsigntools",
+	"source-release": "1",
+	"source-version": "0.9.5"
+}

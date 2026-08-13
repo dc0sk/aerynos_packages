@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/663/ (GitHub backend)
+  id: 663
+  rss: https://github.com/rhboot/efibootmgr/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260813

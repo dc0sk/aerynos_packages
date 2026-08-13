@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sbsigntools
+version     : "0.9.5"
+release     : 1
+homepage    : https://git.kernel.org/pub/scm/linux/kernel/git/jejb/sbsigntools.git/
+upstreams   :
+    # Debian's repacked tarball rather than a cgit snapshot of the upstream
+    # tag: upstream carries ccan as a git submodule, which a snapshot of the
+    # tag would not include, and this tarball bundles it.
+    - https://deb.debian.org/debian/pool/main/s/sbsigntool/sbsigntool_0.9.5.orig.tar.gz : fa93920ef80a406115c1de6f7764ffa4c34e3d1bd7890b9145c36de899a258f5
+summary     : Tools to sign and verify UEFI Secure Boot binaries
+description : |
+    sbsigntools signs EFI binaries for UEFI Secure Boot and inspects existing
+    signatures: sbsign and sbverify for attaching and checking signatures,
+    sbattach for manipulating them directly, and sbkeysync and sbvarsign for
+    maintaining the firmware key databases.
+license     :
+    # The bundled ccan modules under lib/ccan carry the other three.
+    - BSD-3-Clause
+    - GPL-3.0-or-later
+    - LGPL-2.1-or-later
+    - LGPL-3.0-or-later
+builddeps   :
+    - binary(autoconf)
+    - binary(automake)
+    - binary(help2man)
+    # bfd.h, for reading the PE/COFF sections that get signed.
+    - binutils-devel
+    # configure hunts for crt0-efi-$arch.o across a fixed list of paths; on
+    # AerynOS it lands in /usr/lib, which is one of the ones it looks in.
+    - gnu-efi
+    - gnu-efi-devel
+    - pkgconfig(libcrypto)
+    - pkgconfig(uuid)
+setup       : |
+    # No configure script is committed, only autogen.sh.
+    %reconfigure
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase. Every test in the suite signs a PE/COFF fixture that the suite
+# builds itself, and that fixture cannot be produced here. Three separate things
+# block it; the first two are fixable and the third is not, so they are recorded
+# rather than half-applied:
+#
+#   1. The int-cert.pem rule writes its openssl extension file with
+#      `echo -e "[ca]\n..."`. Recipes run under /bin/sh, which is dash, whose
+#      echo has no -e and prints it literally, so openssl rejects line 1 with
+#      "missing equal sign". SHELL=/usr/bin/bash on the make command line cures
+#      it - SHELL is only ever taken from the command line, never the
+#      environment.
+#   2. The fixture links against gnu-efi's elf_x86_64_efi.lds, and lld rejects
+#      that script under its default -z relro with ".dynamic is not contiguous
+#      with other relro sections". EFILDFLAGS="-z norelro" cures it.
+#   3. The linked ELF is then converted with `objcopy --target=efi-app-x86_64`.
+#      AerynOS's binutils does not offer efi-app-x86_64 at all - `objcopy
+#      --info` lists pei-x86-64 and pe-x86-64 but no efi-app alias - and
+#      --target sets the input format as well as the output, so even
+#      --target=pei-x86-64 fails on an ELF input with "file format not
+#      recognized". llvm-objcopy, which boulder exports as OBJCOPY, does not
+#      implement the target either.
+#
+# Rewriting the rule to emit a plain PE would get the suite running, but the
+# tests would then sign a binary that is not the one upstream tests, so a pass
+# would not mean what it appears to mean. The tools themselves build and install
+# unaffected; only this fixture is out of reach.

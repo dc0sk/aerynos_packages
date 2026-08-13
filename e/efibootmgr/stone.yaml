@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : efibootmgr
+version     : "18"
+release     : 1
+homepage    : https://github.com/rhboot/efibootmgr
+upstreams   :
+    - https://github.com/rhboot/efibootmgr/archive/refs/tags/18.tar.gz : 442867d12f8525034a404fc8af3036dba8e1fc970998af2486c3b940dfad0874
+summary     : Manipulate the UEFI boot manager configuration
+description : |
+    efibootmgr creates, edits, reorders and deletes the boot entries the UEFI
+    firmware uses to decide what to boot, and can set the next boot target for
+    a single reboot. efibootdump prints a boot entry in readable form.
+license     : GPL-2.0-or-later
+builddeps   :
+    - pkgconfig(efiboot)
+    - pkgconfig(efivar)
+    - pkgconfig(popt)
+build       : |
+    # Same makefile family as efivar, and the same reasons: libdir defaults to
+    # $(prefix)/lib64, and CC has to be on the command line to reach HOSTCC.
+    #
+    # EFIDIR names the vendor subdirectory of the EFI System Partition, and
+    # becomes the compiled-in DEFAULT_LOADER of \EFI\<EFIDIR>\<loader> that
+    # `efibootmgr -c` uses when no loader is given with -l. Upstream reads it
+    # from a git config key and hard errors when unset, so it has to be passed.
+    # It follows the distro ID, which is aerynos per /etc/os-release.
+    %make \
+        CC="$CC" \
+        EFIDIR=aerynos \
+        prefix=%(prefix) \
+        libdir=%(libdir) \
+        bindir=%(bindir) \
+        sbindir=%(sbindir) \
+        mandir=%(mandir)
+install     : |
+    %make_install \
+        CC="$CC" \
+        EFIDIR=aerynos \
+        prefix=%(prefix) \
+        libdir=%(libdir) \
+        bindir=%(bindir) \
+        sbindir=%(sbindir) \
+        mandir=%(mandir)
+# No check phase: upstream ships no test suite, and efibootmgr is only
+# meaningfully exercisable against real UEFI firmware through efivarfs.

@@ -1,0 +1,34 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"efibootmgr": {
+			"build-depends": [
+				"pkgconfig(efiboot)",
+				"pkgconfig(efivar)",
+				"pkgconfig(popt)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libefiboot.so.1(x86_64))",
+				"soname(libefivar.so.1(x86_64))",
+				"soname(libpopt.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/sbin/efibootdump",
+				"/usr/sbin/efibootmgr",
+				"/usr/share/man/man8/efibootdump.8",
+				"/usr/share/man/man8/efibootmgr.8"
+			],
+			"name": "efibootmgr",
+			"provides": [
+				"sysbinary(efibootdump)",
+				"sysbinary(efibootmgr)"
+			]
+		}
+	},
+	"source-name": "efibootmgr",
+	"source-release": "1",
+	"source-version": "18"
+}

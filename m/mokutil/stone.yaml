@@ -1,0 +1,35 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : mokutil
+version     : "0.7.2"
+release     : 1
+homepage    : https://github.com/lcp/mokutil
+upstreams   :
+    - https://github.com/lcp/mokutil/archive/refs/tags/0.7.2.tar.gz : 839d677c4fc9805f1565703ca32863e4652692c53da66a88ae9b9e30676f9e17
+summary     : Manage the shim Machine Owner Keys
+description : |
+    mokutil manages the Machine Owner Key list that shim consults under UEFI
+    Secure Boot: enrolling and deleting keys and hashes, listing what is
+    enrolled or pending, toggling validation, and reporting the current Secure
+    Boot state.
+license     : GPL-3.0-or-later
+builddeps   :
+    - binary(help2man)
+    - keyutils-devel
+    - pkgconfig(efivar)
+    # mokutil.c includes crypt.h for the password hashing it hands to shim.
+    # configure does not probe for it, so a missing header only shows up as a
+    # compile error partway through the build.
+    - pkgconfig(libcrypt)
+    - pkgconfig(openssl)
+setup       : |
+    # No configure script is committed, only autogen.sh.
+    %reconfigure \
+        --with-bash-completion-dir=%(bashcompletionsdir)
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase: upstream ships no test suite, and mokutil only does anything
+# against a Secure Boot capable firmware with shim present.
