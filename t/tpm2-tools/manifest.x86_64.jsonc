@@ -4,6 +4,14 @@
 	"packages": {
 		"tpm2-tools": {
 			"build-depends": [
+				"binary(expect)",
+				"binary(openssl)",
+				"binary(pandoc)",
+				"binary(python)",
+				"binary(swtpm)",
+				"binary(xxd)",
+				"perl",
+				"pkgconfig(cmocka)",
 				"pkgconfig(libcrypto)",
 				"pkgconfig(libcurl)",
 				"pkgconfig(tss2-esys)",
@@ -11,7 +19,10 @@
 				"pkgconfig(tss2-mu)",
 				"pkgconfig(tss2-rc)",
 				"pkgconfig(tss2-sys)",
-				"pkgconfig(tss2-tctildr)"
+				"pkgconfig(tss2-tctildr)",
+				"python-pyyaml",
+				"sysbinary(ss)",
+				"sysbinary(tpm2-abrmd)"
 			],
 			"depends": [
 				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",

@@ -19,7 +19,28 @@ tuning      :
     # "ld.lld: error: Expected at most one ThinLTO module per bitcode file".
     - lto: false
 builddeps   :
+    # --enable-unit makes configure hard-require the abrmd binary and a TPM
+    # simulator before it will complete, which is why this package had no check
+    # phase at all until tpm2-abrmd was packaged. swtpm was already available.
+    # The rest of this list exists only to get past configure. Enabling unit
+    # tests makes it demand every program its *system* tests would use, even
+    # though those are excluded from the check phase below. They are small, and
+    # declaring them honestly beats lying to configure with cache variables.
+    # pandoc is not optional in practice: Makefile.am hooks the check target to
+    # fail without it, and without it the package also ships no man pages,
+    # since configure quietly downgrades those to "will not be built".
+    - binary(pandoc)
+    - binary(expect)
+    - binary(openssl)
+    - binary(python)
+    - binary(xxd)
+    - perl
+    - python-pyyaml
+    - sysbinary(ss)
+    - binary(swtpm)
+    - pkgconfig(cmocka)
     - pkgconfig(libcrypto)
+    - sysbinary(tpm2-abrmd)
     - pkgconfig(libcurl)
     - pkgconfig(tss2-esys)
     - pkgconfig(tss2-fapi)
@@ -31,14 +52,22 @@ setup       : |
     # --with-bashcompdir is set explicitly rather than left to the
     # bash-completion pkgconfig probe, so the install location does not depend
     # on whether bash-completion happens to be in the build environment.
+    # The build container's PATH is /usr/bin:/bin only, and tpm2-abrmd installs
+    # to /usr/sbin, so configure's AC_CHECK_PROG cannot see it without help.
+    export PATH="$PATH:%(sbindir)"
+
     %configure \
+        --enable-unit \
         --with-bashcompdir=%(bashcompletionsdir)
 build       : |
     %make
 install     : |
     %make_install
-# No check phase. The cmocka unit tests are gated behind --enable-unit, and that
-# switch makes configure hard-require tpm2-abrmd plus a TPM simulator (swtpm or
-# tpm_server) before it will even complete, none of which AerynOS packages. With
-# unit tests off, TESTS is empty and `make check` passes without running
-# anything, so a check phase here would assert nothing at all.
+check       : |
+    # Enabling unit tests also appends the system and FAPI suites to TESTS, and
+    # those drive a live simulator over a socket rather than just linking
+    # against cmocka. Override TESTS with the cmocka binaries so the check
+    # phase is the unit suite only. The single quotes matter: make has to
+    # receive the variable reference intact and expand it itself, rather than
+    # the shell trying to run it.
+    %make check TESTS='$(check_PROGRAMS)'

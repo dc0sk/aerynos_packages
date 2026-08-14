@@ -22,7 +22,12 @@ builddeps   :
     - python(cython)
     - python-build
     - python-installer
+    - python-hypothesis
     - python-meson-python
+    - python-pytest
+    # hypothesis imports sortedcontainers at module scope, and rundeps of a
+    # builddep are not installed into the container.
+    - python-sortedcontainers
 build       : |
     %pyproject_build
 install     : |
@@ -36,3 +41,8 @@ check       : |
     cd %(installroot)
     PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
         python3 %(pkgdir)/smoke-test.py
+    # %(installroot)%(bindir) on PATH: the suite shells out to the installed
+    # CLI tools, which live in the staged install rather than on the system.
+    PATH="%(installroot)%(bindir):$PATH" \
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 -c "import numpy, sys; sys.exit(0 if numpy.test('fast', verbose=1) else 1)"

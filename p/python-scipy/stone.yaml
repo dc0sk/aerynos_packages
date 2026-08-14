@@ -35,7 +35,10 @@ builddeps   :
     - python(cython)
     - python-build
     - python-installer
+    - python-hypothesis
     - python-meson-python
+    - python-pytest
+    - python-sortedcontainers
     - python-numpy
 build       : |
     # use-pythran=false: scipy accelerates a handful of modules by compiling
@@ -53,14 +56,18 @@ install     : |
     %pyproject_install
     %python_compile
 check       : |
-    # scipy.test() wants pytest and hypothesis, neither of which is packaged
-    # here, so this checks what packaging is most likely to break instead: that
-    # the compiled extensions import, that the Fortran-backed linear algebra
-    # and the ODE, optimize and FFT paths compute correct answers, and that it
-    # is using the same openblas numpy was built against.
+    # Two gates. The smoke test first, because it asserts what the upstream
+    # suite does not: that a real BLAS is linked rather than "unknown". Then
+    # scipy's own suite, now that hypothesis is packaged. PytestTester only
+    # reaches for xdist or coverage when asked, so plain pytest is enough.
     #
     # Run from installroot: %(workdir) is the scipy source tree and an import
     # from there picks up unbuilt sources.
     cd %(installroot)
     PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
         python3 %(pkgdir)/smoke-test.py
+    # %(installroot)%(bindir) on PATH: the suite shells out to the installed
+    # CLI tools, which live in the staged install rather than on the system.
+    PATH="%(installroot)%(bindir):$PATH" \
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 %(pkgdir)/run-suite.py
