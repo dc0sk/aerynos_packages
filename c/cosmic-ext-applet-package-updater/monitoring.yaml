@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # Not registered with release-monitoring.org, and the packaged branch is
+  # ahead of anything tagged, so an autoupdate would move this backwards.
+  id: ~
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260820

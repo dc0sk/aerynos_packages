@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : cosmic-ext-applet-package-updater
+version     : "1.0.0+git.2b2bc38"
+release     : 1
+homepage    : https://github.com/dc0sk/cosmic-applet-package-updater
+upstreams   :
+    # Pinned to the head of the feat/aerynos-moss-support branch: the moss
+    # support is not on master and there is no tag carrying it. 1.0.0 is the
+    # version the crate declares.
+    - https://github.com/dc0sk/cosmic-applet-package-updater/archive/2b2bc38a8db15398a56c9baec4c21319fb32bbb7.tar.gz : eee8275a7a43ffc771f6eba6165e5e40de797c3258e74d3c130ce050673d00dd
+summary     : Package update notifier applet for the COSMIC desktop
+description : |
+    A COSMIC panel applet that watches for available package updates and
+    notifies about them. This build carries the moss backend, so it reports
+    updates from the AerynOS package manager rather than only the Arch and
+    Debian family managers upstream supports.
+license     : GPL-3.0-only
+builddeps   :
+    # The set the distribution's own cosmic-applets recipe uses, less the
+    # pipewire and pulse ones its audio applet needs; libcosmic pulls the rest
+    # in through winit and the wayland client stack.
+    - pkgconfig(dbus-1)
+    - pkgconfig(libinput)
+    - pkgconfig(libudev)
+    - pkgconfig(xkbcommon)
+# libcosmic and cosmic-config are git dependencies rather than crates.io ones,
+# so the fetch needs the network even though Cargo.lock pins them.
+networking  : true
+setup       : |
+    %cargo_fetch
+build       : |
+    %cargo_build
+install     : |
+    # Not `just install`: the justfile looks for the binary at target/release,
+    # while %cargo_build puts it under target/<triple>/release, so the recipe
+    # places the files itself.
+    %install_exe %(cargo_target_dir)/%(name) %(installroot)%(bindir)/%(name)
+
+    %install_file res/com.github.cosmic_ext.PackageUpdater.desktop \
+        %(installroot)%(datadir)/applications/com.github.cosmic_ext.PackageUpdater.desktop
+    %install_file res/com.github.cosmic_ext.PackageUpdater.metainfo.xml \
+        %(installroot)%(datadir)/metainfo/com.github.cosmic_ext.PackageUpdater.metainfo.xml
+
+    # Installed by discovery so a new icon size is picked up on its own. Note
+    # res/ also carries a stray com.cosmic.MusicPlayer.metainfo.xml left over
+    # from the template this project started from; it is deliberately not
+    # installed.
+    for src in res/icons/hicolor/*/apps/*.svg; do
+        %install_file "$src" %(installroot)%(datadir)/icons/"${src#res/icons/}"
+    done
+check       : |
+    %cargo_test

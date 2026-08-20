@@ -7,6 +7,7 @@ repository.
 | Package | Version | Summary |
 | --- | --- | --- |
 | [`apparmor`](a/apparmor) | 5.0.2 | Mandatory access control based on per-program profiles |
+| [`cosmic-ext-applet-package-updater`](c/cosmic-ext-applet-package-updater) | 1.0.0+git | COSMIC panel applet notifying about package updates, with moss support |
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
