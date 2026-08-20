@@ -1,0 +1,76 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"passim": {
+			"build-depends": [
+				"pkgconfig(gio-unix-2.0)",
+				"pkgconfig(gnutls)",
+				"pkgconfig(libsoup-3.0)",
+				"pkgconfig(systemd)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libgio-2.0.so.0(x86_64))",
+				"soname(libglib-2.0.so.0(x86_64))",
+				"soname(libgnutls.so.30(x86_64))",
+				"soname(libgobject-2.0.so.0(x86_64))",
+				"soname(libsoup-3.0.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/bin/passim",
+				"/usr/lib/libpassim.so.1",
+				"/usr/lib/libpassim.so.1.0.0",
+				"/usr/lib/passim/passimd",
+				"/usr/lib/systemd/system/passim.service",
+				"/usr/lib/sysusers.d/passim.conf",
+				"/usr/lib/tmpfiles.d/passim.conf",
+				"/usr/share/dbus-1/interfaces/org.freedesktop.Passim.xml",
+				"/usr/share/dbus-1/system-services/org.freedesktop.Passim.service",
+				"/usr/share/dbus-1/system.d/org.freedesktop.Passim.conf",
+				"/usr/share/defaults/passim/passim.conf",
+				"/usr/share/icons/hicolor/256x256/apps/org.freedesktop.Passim.png",
+				"/usr/share/icons/hicolor/scalable/apps/org.freedesktop.Passim.svg",
+				"/usr/share/man/man1/passim.1",
+				"/usr/share/metainfo/org.freedesktop.Passim.metainfo.xml",
+				"/usr/share/passim/favicon.ico",
+				"/usr/share/passim/style.css"
+			],
+			"name": "passim",
+			"provides": [
+				"binary(passim)",
+				"soname(libpassim.so.1(x86_64))"
+			]
+		},
+		"passim-devel": {
+			"build-depends": [
+				"pkgconfig(gio-unix-2.0)",
+				"pkgconfig(gnutls)",
+				"pkgconfig(libsoup-3.0)",
+				"pkgconfig(systemd)"
+			],
+			"depends": [
+				"passim",
+				"pkgconfig(gio-2.0)",
+				"pkgconfig(gio-unix-2.0)"
+			],
+			"files": [
+				"/usr/include/passim-1/passim-client.h",
+				"/usr/include/passim-1/passim-item.h",
+				"/usr/include/passim-1/passim-version.h",
+				"/usr/include/passim-1/passim.h",
+				"/usr/lib/libpassim.so",
+				"/usr/lib/pkgconfig/passim.pc"
+			],
+			"name": "passim-devel",
+			"provides": [
+				"pkgconfig(passim)"
+			]
+		}
+	},
+	"source-name": "passim",
+	"source-release": "1",
+	"source-version": "0.1.12"
+}

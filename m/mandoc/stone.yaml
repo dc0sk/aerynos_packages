@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : mandoc
+version     : "1.14.6"
+release     : 1
+homepage    : https://mandoc.bsd.lv/
+upstreams   :
+    - https://mandoc.bsd.lv/snapshots/mandoc-1.14.6.tar.gz : 8bf0d570f01e70a6e124884088870cbed7537f36328d512909eb10cd53179d9c
+summary     : Compact suite of tools for BSD mdoc and man documentation
+description : |
+    mandoc formats and validates manual pages written in the mdoc and man
+    macro languages, and converts between them. Packaged here for the
+    conversion step: efivar generates one of its manual pages by running
+    mandoc over an mdoc source.
+
+    Only the formatter and its helpers are installed. mandoc can also stand in
+    as the system man, apropos and whatis, but AerynOS uses man-db for those,
+    so the install phase drops the competing entry points rather than fighting
+    it for /usr/bin/man.
+license     : ISC
+builddeps   :
+    # mandoc reads gzipped manual pages, so read.c includes zlib.h; its
+    # hand-written configure probes for it and carries on without, which shows
+    # up as a compile error rather than a configure failure.
+    - pkgconfig(zlib)
+setup       : |
+    # A hand-written configure that reads its settings from configure.local
+    # rather than taking the usual autotools arguments.
+    # AR is set here because the Makefile archives libmandoc.a with $(AR),
+    # which configure defaults to plain "ar" at line 44 - before it reads this
+    # file, so the setting wins. The build environment is LLVM-only and has
+    # llvm-ar rather than GNU ar, and pulling in binutils just for the archiver
+    # would be the heavier fix.
+    cat > configure.local <<EOF
+    AR=llvm-ar
+    PREFIX=%(prefix)
+    BINDIR=%(bindir)
+    SBINDIR=%(sbindir)
+    MANDIR=%(mandir)
+    INSTALL_PROGRAM="install -D -m 0755"
+    INSTALL_MAN="install -D -m 0644"
+    EOF
+    ./configure
+build       : |
+    %make
+install     : |
+    # base-install, not install: the latter adds the cgi and catman pieces.
+    %make base-install DESTDIR=%(installroot)
+
+    # man-db owns binary(man), binary(apropos) and binary(whatis) on AerynOS,
+    # and mandoc's base-install links all three to itself, so remove them along
+    # with the makewhatis link and the manual pages that document them. What is
+    # left is mandoc, demandoc and soelim, which is what this package is for.
+    rm -f %(installroot)%(bindir)/man \
+          %(installroot)%(bindir)/apropos \
+          %(installroot)%(bindir)/whatis \
+          %(installroot)%(sbindir)/makewhatis
+    rm -f %(installroot)%(mandir)/man1/man.1 \
+          %(installroot)%(mandir)/man1/apropos.1 \
+          %(installroot)%(mandir)/man1/whatis.1 \
+          %(installroot)%(mandir)/man8/makewhatis.8
+    rmdir %(installroot)%(sbindir) 2>/dev/null || true
+check       : |
+    # Convert an mdoc page to man macros, which is exactly what efivar needs it
+    # for, and confirm something came out the other side.
+    ./mandoc -mdoc -Tman -Ios=Linux mandoc.1 > /tmp/mandoc-check.out
+    test -s /tmp/mandoc-check.out
+    grep -q '^\.TH' /tmp/mandoc-check.out
+    echo "mandoc converted mdoc to man macros"

@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : modemmanager
+version     : "1.24.2"
+release     : 1
+homepage    : https://modemmanager.org/
+upstreams   :
+    - https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/archive/1.24.2/ModemManager-1.24.2.tar.gz : fbc75adcc0d7b0565f256e7ff4e8872b0a37c4413ff576665f7470932d9c1b68
+summary     : Mobile broadband modem management daemon
+description : |
+    ModemManager is a system daemon that drives mobile broadband modems,
+    whether they speak QMI, MBIM, QRTR or plain AT commands, and exposes them
+    over D-Bus for NetworkManager and similar to use. fwupd also talks to it
+    to update modem firmware.
+
+    1.24.2 is the newest stable tag; everything above it is a -dev tag.
+license     :
+    - GPL-2.0-or-later
+    - LGPL-2.1-or-later
+builddeps   :
+    - binary(gdbus-codegen)
+    - binary(help2man)
+    # Translations go through i18n.gettext, and include/meson.build generates
+    # the D-Bus interface headers with an XSLT stylesheet - neither is optional
+    # and meson looks both up by program name.
+    - binary(msgfmt)
+    - binary(xsltproc)
+    # meson looks bash-completion up through pkg-config to find its
+    # completionsdir, so the -devel package is what is needed, not the tool.
+    - pkgconfig(bash-completion)
+    - pkgconfig(dbus-1)
+    - pkgconfig(gio-unix-2.0)
+    - pkgconfig(glib-2.0)
+    - pkgconfig(gobject-introspection-1.0)
+    - pkgconfig(gudev-1.0)
+    - pkgconfig(mbim-glib)
+    - pkgconfig(polkit-gobject-1)
+    - pkgconfig(qmi-glib)
+    - pkgconfig(qrtr-glib)
+    - pkgconfig(systemd)
+    # The stub test starts tools/test-modemmanager-service.py over D-Bus, which
+    # imports gi and dbus. Without them the bus activates the service and it
+    # exits 1, which surfaces only as a StartServiceByName failure in the test.
+    - python-dbus
+    - python-pygobject
+setup       : |
+    # dbus_policy_dir defaults to empty, which lands the policy under
+    # sysconfdir; boulder discards anything outside /usr/, and dbus has read
+    # policy from datadir for years, so point it there instead.
+    %meson \
+        -Ddbus_policy_dir=%(datadir)/dbus-1/system.d \
+        -Dsystemdsystemunitdir=%(libdir)/systemd/system \
+        -Dudevdir=%(libdir)/udev \
+        -Dgtk_doc=false \
+        -Dtests=true
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    %meson_test

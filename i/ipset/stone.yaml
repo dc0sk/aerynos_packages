@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : ipset
+version     : "7.24"
+release     : 1
+homepage    : https://ipset.netfilter.org/
+upstreams   :
+    - https://ipset.netfilter.org/ipset-7.24.tar.bz2 : fbe3424dff222c1cb5e5c34d38b64524b2217ce80226c14fdcbb13b29ea36112
+summary     : Administration tool for IP sets
+description : |
+    ipset manages the kernel's IP set framework, which stores collections of
+    addresses, networks, ports and MACs that iptables and nftables rules can
+    match against in one step. The kernel side is in the mainline kernel; this
+    package is the userspace tool and libipset.
+license     : GPL-2.0-only
+builddeps   :
+    - pkgconfig(libmnl)
+setup       : |
+    # --with-kmod=no: the kernel modules come from the kernel, not from here.
+    %configure \
+        --with-kmod=no \
+        --enable-bashcompl \
+        --with-bashcompdir=%(bashcompletionsdir)
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase: upstream's tests load kernel modules and manipulate live IP
+# sets, which needs a privileged container and a matching kernel; neither is
+# available to the build.

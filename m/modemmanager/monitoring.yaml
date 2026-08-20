@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/7306/ (GitLab backend). Upstream
+  # tags -dev releases alongside stable ones, so check before taking a bump.
+  id: 7306
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260820

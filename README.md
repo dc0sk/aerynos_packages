@@ -13,7 +13,11 @@ repository.
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
 | [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
+| [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
+| [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
+| [`modemmanager`](m/modemmanager) | 1.24.2 | Mobile broadband modem management daemon |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
+| [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
 | [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
 | [`python-gast`](p/python-gast) | 0.6.0 | Version-agnostic Python AST, needed by pythran |
 | [`python-hypothesis`](p/python-hypothesis) | 6.165.5 | Property-based testing for Python, needed by the numpy and scipy suites |

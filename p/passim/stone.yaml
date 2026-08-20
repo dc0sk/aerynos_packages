@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : passim
+version     : "0.1.12"
+release     : 1
+homepage    : https://github.com/hughsie/passim
+upstreams   :
+    - https://github.com/hughsie/passim/archive/refs/tags/0.1.12.tar.gz : b362a05f81f5d3efc05d062ae0ecd6c24a8285f93260a76efc32f6af5d6dd1d1
+summary     : Local caching server for shared metadata
+description : |
+    passim shares files that several machines on a network would otherwise
+    each fetch from the internet, announcing them over mDNS so a local peer can
+    serve them instead. fwupd uses it to share its metadata rather than every
+    machine pulling the same file from the LVFS.
+license     : LGPL-2.1-or-later
+builddeps   :
+    - pkgconfig(gio-unix-2.0)
+    - pkgconfig(gnutls)
+    - pkgconfig(libsoup-3.0)
+    - pkgconfig(systemd)
+setup       : |
+    %meson \
+        -Dintrospection=disabled \
+        -Dinstalled_tests=false
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+
+    # AerynOS is stateless/hermetic-usr and boulder discards anything outside
+    # /usr/, so passim.conf is relocated to the vendor tree and seeded into
+    # /etc on first boot, never overwriting an edited copy.
+    %install_dir %(installroot)%(vendordir)/%(name)
+    mv %(installroot)%(sysconfdir)/passim.conf \
+       %(installroot)%(vendordir)/%(name)/passim.conf
+    rm -rf %(installroot)%(sysconfdir)
+
+    %tmpfiles "C /etc/passim.conf 0644 root root - %(vendordir)/%(name)/passim.conf"
+check       : |
+    %meson_test

@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/377308/ (GitHub backend)
+  id: 377308
+  rss: https://github.com/hughsie/passim/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260820

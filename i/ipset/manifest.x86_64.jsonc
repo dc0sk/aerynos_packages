@@ -1,0 +1,71 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"ipset": {
+			"build-depends": [
+				"pkgconfig(libmnl)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libmnl.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/lib/libipset.so.13",
+				"/usr/lib/libipset.so.13.4.0",
+				"/usr/sbin/ipset",
+				"/usr/sbin/ipset-translate",
+				"/usr/share/man/man8/ipset-translate.8",
+				"/usr/share/man/man8/ipset.8"
+			],
+			"name": "ipset",
+			"provides": [
+				"soname(libipset.so.13(x86_64))",
+				"sysbinary(ipset)",
+				"sysbinary(ipset-translate)"
+			]
+		},
+		"ipset-devel": {
+			"build-depends": [
+				"pkgconfig(libmnl)"
+			],
+			"depends": [
+				"ipset",
+				"pkgconfig(libmnl)"
+			],
+			"files": [
+				"/usr/include/libipset/args.h",
+				"/usr/include/libipset/data.h",
+				"/usr/include/libipset/errcode.h",
+				"/usr/include/libipset/ipset.h",
+				"/usr/include/libipset/linux_ip_set.h",
+				"/usr/include/libipset/linux_ip_set_bitmap.h",
+				"/usr/include/libipset/linux_ip_set_hash.h",
+				"/usr/include/libipset/linux_ip_set_list.h",
+				"/usr/include/libipset/mnl.h",
+				"/usr/include/libipset/nf_inet_addr.h",
+				"/usr/include/libipset/nfproto.h",
+				"/usr/include/libipset/parse.h",
+				"/usr/include/libipset/pfxlen.h",
+				"/usr/include/libipset/print.h",
+				"/usr/include/libipset/session.h",
+				"/usr/include/libipset/transport.h",
+				"/usr/include/libipset/types.h",
+				"/usr/include/libipset/utils.h",
+				"/usr/include/libipset/xlate.h",
+				"/usr/lib/libipset.a",
+				"/usr/lib/libipset.so",
+				"/usr/lib/pkgconfig/libipset.pc",
+				"/usr/share/man/man3/libipset.3"
+			],
+			"name": "ipset-devel",
+			"provides": [
+				"pkgconfig(libipset)"
+			]
+		}
+	},
+	"source-name": "ipset",
+	"source-release": "1",
+	"source-version": "7.24"
+}
