@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/91782/ (PyPI backend). Note that an
+  # autoupdate here would break pythran, which pins to an older series; see the
+  # description in stone.yaml.
+  id: 91782
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260820

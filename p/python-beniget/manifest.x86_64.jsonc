@@ -1,0 +1,44 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"python-beniget": {
+			"build-depends": [
+				"python-gast",
+				"python-setuptools"
+			],
+			"depends": [
+				"python(gast)"
+			],
+			"files": [
+				"/usr/lib/python3.14/site-packages/beniget-0.4.2.post1.dist-info/METADATA",
+				"/usr/lib/python3.14/site-packages/beniget-0.4.2.post1.dist-info/RECORD",
+				"/usr/lib/python3.14/site-packages/beniget-0.4.2.post1.dist-info/WHEEL",
+				"/usr/lib/python3.14/site-packages/beniget-0.4.2.post1.dist-info/licenses/LICENSE",
+				"/usr/lib/python3.14/site-packages/beniget-0.4.2.post1.dist-info/top_level.txt",
+				"/usr/lib/python3.14/site-packages/beniget/__init__.py",
+				"/usr/lib/python3.14/site-packages/beniget/__main__.py",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/__init__.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/__init__.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/__main__.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/__main__.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/beniget.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/beniget.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/ordered_set.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/ordered_set.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/version.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/__pycache__/version.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/beniget/beniget.py",
+				"/usr/lib/python3.14/site-packages/beniget/ordered_set.py",
+				"/usr/lib/python3.14/site-packages/beniget/version.py"
+			],
+			"name": "python-beniget",
+			"provides": [
+				"python(beniget)"
+			]
+		}
+	},
+	"source-name": "python-beniget",
+	"source-release": "1",
+	"source-version": "0.4.2.post1"
+}

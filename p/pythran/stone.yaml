@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : pythran
+version     : "0.18.1"
+release     : 1
+homepage    : https://pythran.readthedocs.io/
+upstreams   :
+    - https://files.pythonhosted.org/packages/d4/84/17c4c44a24f5ec709991e603e601bf316d09c4fe915fbe348c689dede998/pythran-0.18.1.tar.gz : 8803ed948bf841a11bbbb10472a8ff6ea24ebd70e67c3f77b77be3db900eccfe
+summary     : Ahead of time compiler for numeric Python kernels
+description : |
+    pythran compiles annotated Python numeric kernels into native extension
+    modules, translating them to C++ and building them against its own header
+    library. scipy uses it to build a handful of its modules ahead of time.
+
+    0.18.1 is chosen to satisfy scipy, which requires pythran >=0.18.1 and
+    <0.19.0.
+license     : BSD-3-Clause
+builddeps   :
+    # pyconfig.h, without which the generated C++ will not compile. The smoke
+    # test below is what catches this: pythran imports and reports its version
+    # quite happily without the python headers, and only fails when asked to
+    # actually build something.
+    - python-devel
+    - python-beniget
+    - python-gast
+    - python-numpy
+    - python-ply
+    - python-setuptools
+rundeps     :
+    # pythran generates C++ and invokes a compiler at run time, so the
+    # toolchain and its own headers are needed by the installed package, not
+    # just to build it.
+    - binary(clang)
+    # Not just a build dependency: every kernel a user compiles needs pyconfig.h
+    # too, so the headers have to be on the installed system.
+    - python-devel
+    - python(beniget)
+    - python(gast)
+    - python(numpy)
+    - python(ply)
+build       : |
+    %pyproject_build
+install     : |
+    %pyproject_install
+    %python_compile
+check       : |
+    # Compile and run an actual kernel rather than just importing the module:
+    # that is the only way to exercise the path that matters - gast and beniget
+    # parsing, the C++ code generation, and the compile against pythran's own
+    # headers - which is also where a packaging mistake would show up.
+    cd %(installroot)
+    PATH="%(installroot)%(bindir):$PATH" \
+    PYTHONPATH="$(ls -d %(installroot)%(libdir)/python3.*/site-packages)" \
+        python3 %(pkgdir)/smoke-test.py

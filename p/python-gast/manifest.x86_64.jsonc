@@ -1,0 +1,46 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"python-gast": {
+			"build-depends": [
+				"python-setuptools"
+			],
+			"files": [
+				"/usr/lib/python3.14/site-packages/gast-0.6.0.dist-info/METADATA",
+				"/usr/lib/python3.14/site-packages/gast-0.6.0.dist-info/RECORD",
+				"/usr/lib/python3.14/site-packages/gast-0.6.0.dist-info/WHEEL",
+				"/usr/lib/python3.14/site-packages/gast-0.6.0.dist-info/licenses/LICENSE",
+				"/usr/lib/python3.14/site-packages/gast-0.6.0.dist-info/top_level.txt",
+				"/usr/lib/python3.14/site-packages/gast/__init__.py",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/__init__.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/__init__.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/ast2.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/ast2.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/ast3.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/ast3.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/astn.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/astn.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/gast.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/gast.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/unparser.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/unparser.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/version.cpython-314.opt-1.pyc",
+				"/usr/lib/python3.14/site-packages/gast/__pycache__/version.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/gast/ast2.py",
+				"/usr/lib/python3.14/site-packages/gast/ast3.py",
+				"/usr/lib/python3.14/site-packages/gast/astn.py",
+				"/usr/lib/python3.14/site-packages/gast/gast.py",
+				"/usr/lib/python3.14/site-packages/gast/unparser.py",
+				"/usr/lib/python3.14/site-packages/gast/version.py"
+			],
+			"name": "python-gast",
+			"provides": [
+				"python(gast)"
+			]
+		}
+	},
+	"source-name": "python-gast",
+	"source-release": "1",
+	"source-version": "0.6.0"
+}
