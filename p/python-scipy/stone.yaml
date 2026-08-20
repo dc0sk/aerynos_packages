@@ -40,18 +40,17 @@ builddeps   :
     - python-pytest
     - python-sortedcontainers
     - python-numpy
+    # scipy compiles several modules ahead of time with pythran; its
+    # build-system.requires pins pythran >=0.18.1,<0.19.0, which 0.18.1 meets.
+    - pythran
 build       : |
-    # use-pythran=false: scipy accelerates a handful of modules by compiling
-    # them with pythran, which AerynOS does not package. Upstream supports
-    # building without it and the affected code falls back to its plain python
-    # or cython implementations.
-    #
-    # --skip-dependency-check is needed alongside it because scipy lists
-    # pythran unconditionally in build-system.requires, and pypa/build enforces
-    # that list before meson ever sees use-pythran=false. With the option off
-    # pythran genuinely is not invoked, so the declared requirement is the only
-    # thing standing in the way.
-    %pyproject_build --skip-dependency-check -Csetup-args=-Duse-pythran=false
+    # Built with pythran, so the modules upstream expects to be compiled ahead
+    # of time actually are. This previously carried -Duse-pythran=false because
+    # pythran was not packaged, plus --skip-dependency-check to get past the
+    # unconditional pythran entry in build-system.requires; both are gone now
+    # that pythran 0.18.1 is available, which means the dependency check is
+    # doing its job again rather than being bypassed.
+    %pyproject_build
 install     : |
     %pyproject_install
     %python_compile

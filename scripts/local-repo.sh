@@ -64,6 +64,21 @@ fi
 echo ":: Indexing ${outdir}"
 moss index "${outdir}"
 
+# Refresh any boulder profile that carries this index. boulder caches the repo
+# contents, so a freshly indexed package stays invisible to builds until the
+# profile is updated - which shows up as a baffling "no package found" for
+# something that is plainly sitting in local/.
+# `boulder profile list` prints a profile name on its own line followed by its
+# indented repositories, so track the current heading and report only profiles
+# whose own repo lines mention this index.
+boulder profile list 2>/dev/null | awk -v idx="${outdir}/stone.index" '
+    /^[^[:space:]]/ { profile = $0; sub(/:$/, "", profile); next }
+    index($0, idx) && profile { print profile; profile = "" }
+' | while read -r profile; do
+    echo ":: Refreshing boulder profile ${profile}"
+    boulder profile update -y -p "${profile}" >/dev/null
+done
+
 cat <<EOF
 
 Local repository ready: ${outdir}/stone.index
