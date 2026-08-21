@@ -3,7 +3,7 @@
 
 name        : reaction
 version     : "2.5.1"
-release     : 2
+release     : 3
 homepage    : https://reaction.ppom.me
 upstreams   :
     - https://framagit.org/ppom/reaction/-/archive/v2.5.1/reaction-v2.5.1.tar.gz : ef333bad9b0c4a99acb2a4e50e5b1d0c70811941b765201165de358f44768eb0
@@ -14,6 +14,11 @@ description : |
     that cause multiple authentication errors. reaction aims at being a
     successor to fail2ban.
 license     : AGPL-3.0-only
+builddeps   :
+    # The nftables plugin binds libnftables, which was not packaged when this
+    # recipe was first written - that, plus the ipset plugin, is why the build
+    # and the check phase used to be scoped to the reaction crate alone.
+    - nftables-devel
 rundeps     :
     # The shipped default configuration bans via a dedicated iptables chain.
     - sysbinary(iptables)
@@ -22,9 +27,34 @@ networking  : true
 setup       : |
     %cargo_fetch
 build       : |
-    %cargo_build -p reaction
+    # --workspace is required, not implied: the root Cargo.toml is both a
+    # package and the workspace root, so a plain `cargo build` there builds only
+    # the reaction crate and the plugin binaries never appear.
+    #
+    # reaction-plugin-ipset is excluded, and packaging libipset did not change
+    # that. The blocker simply moved: the ipset crate 0.9.0 generates its
+    # bindings with bindgen against libipset 7.24 and the generated layout
+    # assertions do not hold - size_of::<_IO_FILE>() comes out as 1 rather than
+    # 216, which is bindgen's signature for a struct it ended up treating as
+    # opaque - so the crate fails to compile with a handful of E0080 errors.
+    # That is a mismatch between the crate and this libipset, not something the
+    # recipe can set right.
+    #
+    # reaction-plugin-cluster stays in the build graph even though it is not
+    # shipped. Excluding a member does not merely drop it: cargo unifies
+    # features across the graph, and cluster pulls treedb in alongside reaction,
+    # so removing it changes which treedb features reaction itself is compiled
+    # with. Doing that made the filter_struct persistence test fail
+    # reproducibly, its replay step finding an empty file. Its unusable tests
+    # are skipped by name in the check phase instead.
+    %cargo_build --workspace --exclude reaction-plugin-ipset
 install     : |
-    %cargo_install reaction
+    # reaction plus the nftables backend. reaction-plugin-cluster and
+    # reaction-plugin-virtual are left out deliberately: cluster's own tests are
+    # marked "failing for now" upstream, and virtual exists to support the test
+    # suite rather than to be deployed. reaction-plugin-ipset cannot be built at
+    # all; see the build phase.
+    %cargo_install reaction reaction-plugin-nftables
 
     %install_dir %(installroot)%(mandir)/man1
     cp %(cargo_target_dir)/*.1 %(installroot)%(mandir)/man1/.
@@ -51,14 +81,28 @@ install     : |
     %tmpfiles "d /etc/reaction 0755 root root -"
     %tmpfiles "C /etc/reaction/reaction.yml 0644 root root - %(vendordir)/%(name)/reaction.yml"
 check       : |
-    # Not %cargo_test: that macro hardcodes --workspace, which overrides any -p and
-    # drags in reaction-plugin-ipset. That plugin needs libipset headers, which AerynOS
-    # does not package at all, so the workspace cannot build here - and we ship only
-    # the `reaction` binary anyway. Test exactly what we ship.
+    # Not %cargo_test, which hardcodes a bare --workspace and would pull in
+    # reaction-plugin-ipset; the exclusion has to be spelled out. This is still
+    # far wider than the reaction crate alone that used to be tested.
     #
     # plugin_virtual is skipped: that upstream test shells out to a nested
     # `cargo build -p reaction-plugin-virtual` and then copies target/debug/, which
     # cannot work inside an offline --frozen build of a --release --target tree. It
     # times out rather than failing fast. That is a test-harness assumption, not a
     # defect in reaction; every other test runs for real.
-    cargo test %(options_cargo_release) -p reaction -- --skip plugin_virtual
+    # The cluster tests are skipped by name rather than by excluding the crate,
+    # which would change feature unification and with it reaction's own build.
+    # secret_key_get asserts that writing to /root/non_existent fails, which it
+    # does not when the build runs as root. The rest - the e2e pair, run_with_self
+    # and conf_stream - all end up constructing a cluster endpoint, which fails
+    # with "Missing or incompatible rustls crypto provider configured" in this
+    # dependency graph. Upstream already marks the equivalent top-level cluster
+    # tests "failing for now".
+    cargo test %(options_cargo_release) --workspace \
+        --exclude reaction-plugin-ipset \
+        -- --skip plugin_virtual \
+           --skip secret_key_get \
+           --skip two_nodes_simultaneous_startup \
+           --skip n_nodes_simultaneous_startup \
+           --skip run_with_self \
+           --skip conf_stream

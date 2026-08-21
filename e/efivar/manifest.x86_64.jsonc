@@ -3,6 +3,9 @@
 	"manifest-version": "0.2",
 	"packages": {
 		"efivar": {
+			"build-depends": [
+				"binary(mandoc)"
+			],
 			"depends": [
 				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
 				"soname(libc.so.6(x86_64))"
@@ -29,6 +32,9 @@
 			]
 		},
 		"efivar-devel": {
+			"build-depends": [
+				"binary(mandoc)"
+			],
 			"depends": [
 				"efivar"
 			],

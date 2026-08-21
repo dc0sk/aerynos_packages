@@ -14,15 +14,12 @@ description : |
     editing the UEFI Secure Boot signature databases. It is the base that
     efibootmgr and mokutil are built on.
 license     : LGPL-2.1-or-later
-setup       : |
-    # docs/ holds thirty-odd ready-made man pages plus efisecdb.1.mdoc, which
-    # upstream converts with mandoc. AerynOS does not package mandoc, and
-    # turning docs off to avoid it would throw away every other page too.
-    # mdoc is a man macro package in its own right and groff renders it
-    # natively, so install the source as the page and stamp it newer than its
-    # input, which leaves make with nothing to convert.
-    cp docs/efisecdb.1.mdoc docs/efisecdb.1
-    touch docs/efisecdb.1
+builddeps   :
+    # docs/efisecdb.1 is generated from efisecdb.1.mdoc with mandoc. This used
+    # to be worked around by installing the mdoc source as the page, since
+    # AerynOS had no mandoc; it is packaged now, so upstream's own conversion
+    # runs instead.
+    - binary(mandoc)
 build       : |
     # Plain makefiles, no configure. LIBDIR has to be set because upstream
     # defaults it to $(PREFIX)/lib64, which is not where AerynOS puts libraries.

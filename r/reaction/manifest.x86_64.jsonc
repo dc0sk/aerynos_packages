@@ -3,17 +3,22 @@
 	"manifest-version": "0.2",
 	"packages": {
 		"reaction": {
+			"build-depends": [
+				"nftables-devel"
+			],
 			"depends": [
 				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
 				"soname(ld-linux-x86-64.so.2(x86_64))",
 				"soname(libc.so.6(x86_64))",
 				"soname(libgcc_s.so.1(x86_64))",
 				"soname(libm.so.6(x86_64))",
+				"soname(libnftables.so.1(x86_64))",
 				"sysbinary(ip6tables)",
 				"sysbinary(iptables)"
 			],
 			"files": [
 				"/usr/bin/reaction",
+				"/usr/bin/reaction-plugin-nftables",
 				"/usr/lib/systemd/system/reaction.service",
 				"/usr/lib/systemd/system/system-reaction.slice",
 				"/usr/lib/tmpfiles.d/reaction.conf",
@@ -34,11 +39,12 @@
 			],
 			"name": "reaction",
 			"provides": [
-				"binary(reaction)"
+				"binary(reaction)",
+				"binary(reaction-plugin-nftables)"
 			]
 		}
 	},
 	"source-name": "reaction",
-	"source-release": "2",
+	"source-release": "3",
 	"source-version": "2.5.1"
 }
