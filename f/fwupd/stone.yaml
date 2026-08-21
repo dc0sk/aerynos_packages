@@ -42,6 +42,15 @@ builddeps   :
     # For /usr/share/hwdata/usb.ids, which fwupd probes for at configure time
     # and reads at runtime to name device vendors.
     - hwdata
+    # The modem-manager plugin builds against libmm-glib, and passim provides
+    # the peer-to-peer metadata sharing fwupd optionally uses. Both come from
+    # this repository.
+    # The plugin needs all three of these directly, not just mm-glib: it drives
+    # QMI and MBIM modems through their own libraries.
+    - pkgconfig(mbim-glib)
+    - pkgconfig(mm-glib)
+    - pkgconfig(passim)
+    - pkgconfig(qmi-glib)
     - pkgconfig(blkid)
     - pkgconfig(gio-unix-2.0)
     - pkgconfig(glib-2.0)
@@ -67,16 +76,16 @@ rundeps     :
 setup       : |
     # docs: the gi-docgen API documentation is not shipped; man pages are a
     #   separate option and are still built.
-    # passim and plugin_modem_manager: neither passim nor ModemManager is
-    #   packaged for AerynOS, so pin them off rather than leaving them to an
-    #   autodetect that would silently vary with the build environment.
+    # passim and plugin_modem_manager: both are packaged now, and are enabled
+    #   explicitly rather than left to autodetect, so that the build fails
+    #   loudly if either goes missing instead of quietly dropping a feature.
     # vendor_ids_dir: upstream walks a list of candidate paths looking for
     #   usb.ids and hard errors if none matches. Point it at hwdata directly so
     #   the result does not depend on probe order.
     %meson \
         -Ddocs=disabled \
-        -Dpassim=disabled \
-        -Dplugin_modem_manager=disabled \
+        -Dpassim=enabled \
+        -Dplugin_modem_manager=enabled \
         -Dvendor_ids_dir=%(datadir)/hwdata
 build       : |
     %meson_build
@@ -117,6 +126,15 @@ install     : |
 
     rm -rf %(installroot)%(sysconfdir)
 check       : |
+    # GIO_USE_PROXY_RESOLVER=dummy keeps glib-networking's GNOME proxy resolver
+    # out of the way. libfwupd resolves proxies through GProxyResolver, and
+    # enabling passim brings libsoup and with it glib-networking, whose resolver
+    # module reads GSettings the moment GIO loads it. A build container has no
+    # compiled schemas, so five tests aborted outright with "No GSettings
+    # schemas are installed on the system". This only affects how the tests
+    # reach the network stack; nothing about the installed package changes.
+    export GIO_USE_PROXY_RESOLVER=dummy
+
     # Deliberately not the meson_test macro, which passes --no-rebuild. The
     # fwupd-exported-api test diffs the committed libfwupd/fwupd.map against a
     # copy regenerated from the GIR, and that generated file is built only as a
