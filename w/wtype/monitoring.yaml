@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # Not registered on release-monitoring.org. Last checked 20260822.
+  id: ~
+  rss: https://github.com/atx/wtype/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260822

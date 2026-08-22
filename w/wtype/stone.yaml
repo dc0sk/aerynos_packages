@@ -1,0 +1,121 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : wtype
+version     : "0.4"
+release     : 1
+homepage    : https://github.com/atx/wtype
+upstreams   :
+    - https://github.com/atx/wtype/archive/refs/tags/v0.4.tar.gz : da91786d828b6a6e29b884bc510473939eda052658ebef87d7bdeafa6a8746f9
+summary     : xdotool type for Wayland
+description : |
+    wtype types text into a Wayland compositor, the way `xdotool type` does
+    under X11. It builds a keymap covering whatever characters it was asked to
+    type, hands that to the compositor over the virtual-keyboard protocol, and
+    then sends the key events, so arbitrary Unicode works without the text
+    having to be reachable on the current layout. Modifiers, key press and
+    release, delays and reading from stdin are all supported.
+
+    The compositor has to implement zwp_virtual_keyboard_manager_v1. wlroots
+    based compositors do, so sway, river, Wayfire, labwc and cage all work, as
+    does COSMIC. GNOME does not.
+license     : MIT
+builddeps   :
+    # meson.build asks for wayland-cursor even though main.c never includes
+    # wayland-cursor.h and nothing calls into it - it looks like leftovers from
+    # whatever this was templated off. It is required here regardless, because
+    # meson resolves the dependency at configure time and stops if it is
+    # missing. --as-needed then drops it from the link.
+    - pkgconfig(wayland-client)
+    - pkgconfig(wayland-cursor)
+    - pkgconfig(xkbcommon)
+    # For generating the client stubs. Note that the wayland-protocols package
+    # is *not* needed: virtual-keyboard-unstable-v1 is a wlroots protocol
+    # rather than an upstream one, and wtype carries its own copy of the XML in
+    # protocol/, so only the scanner itself is required.
+    - binary(wayland-scanner)
+    # Check phase only. cage is a wlroots kiosk compositor, and wlroots is what
+    # implements the virtual keyboard protocol; see the check phase.
+    - binary(cage)
+setup       : |
+    # meson.build runs `git describe` when git is present to build a VERSION
+    # define containing __DATE__. That would be worth suppressing for the sake
+    # of reproducible builds, except that VERSION is not referenced by a single
+    # line of wtype - not main.c, not the man page - so the define is dead and
+    # there is nothing to suppress.
+    %meson
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    # Upstream ships no tests. wtype is small enough to test properly anyway:
+    # its whole job is to connect to a compositor, bind
+    # zwp_virtual_keyboard_manager_v1, upload a generated keymap and send key
+    # events, so running it against a real compositor covers essentially all of
+    # it.
+    #
+    # weston is no use here. The virtual keyboard protocol is a wlroots
+    # protocol, not an upstream wayland-protocols one, and weston does not
+    # implement it - wtype would exit on "Compositor does not support the
+    # virtual keyboard protocol" no matter how healthy the build was. cage is a
+    # wlroots compositor and wlroots has a headless backend, which is what
+    # WLR_BACKENDS selects below.
+    #
+    # Exit status is a real signal rather than a formality: run_commands() calls
+    # wl_display_roundtrip() after every keymap upload and every key event, so
+    # the compositor has processed each one by the time wtype returns. A
+    # malformed keymap or a bad key event raises a protocol error, and
+    # libwayland aborts the client on those.
+    export XDG_RUNTIME_DIR="%(workdir)/xdg-runtime"
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 0700 "$XDG_RUNTIME_DIR"
+    export WLR_BACKENDS=headless
+    export WLR_LIBINPUT_NO_DEVICES=1
+
+    # The binary under test is the one just built, not one on PATH. Exported so
+    # that it reaches the shell cage starts as its child.
+    export WTYPE="%(workdir)/%(builddir)/wtype"
+
+    # Deliberately awkward text: characters from outside any single keyboard
+    # layout, which is the case wtype exists for. If keymap generation is
+    # broken this is what catches it. The other lines cover each command form
+    # the man page documents - type, press, release, modifiers, delays, stdin.
+    #
+    # Note -P/-p take a key name that libxkbcommon has to resolve, so the
+    # modifier key is Shift_L; the bare modifier names like "shift" belong to
+    # -M/-m instead. Getting that wrong fails the check rather than passing
+    # quietly, which is the point.
+    cage -- sh -c '
+        set -e
+        "$WTYPE" "hello world"
+        "$WTYPE" "Ünïcödé — 日本語 — ☺"
+        "$WTYPE" -M ctrl -k c -m ctrl
+        "$WTYPE" -P Shift_L -k a -p Shift_L
+        "$WTYPE" -d 1 -s 1 -k Return
+        printf "from stdin" | "$WTYPE" -
+    ' </dev/null
+    echo "check: wtype drove a real compositor through every command form"
+
+    # Negative cases, to be sure the run above passed for the right reason.
+    # Without a compositor wtype must fail rather than quietly do nothing. This
+    # gets its own empty XDG_RUNTIME_DIR so that wl_display_connect(NULL) cannot
+    # fall back onto a socket cage left behind.
+    XDG_RUNTIME_DIR="%(workdir)/xdg-empty"
+    export XDG_RUNTIME_DIR
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 0700 "$XDG_RUNTIME_DIR"
+    unset WAYLAND_DISPLAY
+    if "$WTYPE" "should not work" 2>/dev/null; then
+        echo "check: wtype exited 0 with no compositor to connect to"
+        exit 1
+    fi
+
+    # And an unrecognised key name must be rejected, not typed literally.
+    XDG_RUNTIME_DIR="%(workdir)/xdg-runtime"
+    export XDG_RUNTIME_DIR
+    if cage -- sh -c '"$WTYPE" -k ThisIsNotAKeyName' </dev/null 2>/dev/null; then
+        echo "check: wtype accepted a key name that does not exist"
+        exit 1
+    fi
+    echo "check: wtype fails as expected with no compositor and on a bad key name"

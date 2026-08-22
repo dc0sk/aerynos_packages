@@ -37,6 +37,7 @@ repository.
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |
+| [`wtype`](w/wtype) | 0.4 | xdotool type for Wayland |
 | [`xnec2c`](x/xnec2c) | 4.4.18 | Graphical NEC2 antenna simulator |
 
 Deliberately *not* here: `wine`. AerynOS already ships it, currently 11.15, and
