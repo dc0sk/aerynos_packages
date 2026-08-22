@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : nec2c
+version     : "1.3.3"
+release     : 1
+homepage    : https://github.com/KJ7LNW/nec2c
+upstreams   :
+    # boulder emits a harmless "'version' and first parsed upstream version do
+    # not match" warning here: the tag is just "v1.3.3", so the tarball is named
+    # v1.3.3.tar.gz with no project name for boulder to split off. Setting
+    # `rename:` does not silence it, as the check is made against the URL rather
+    # than the fetched file.
+    - https://github.com/KJ7LNW/nec2c/archive/refs/tags/v1.3.3.tar.gz : 73cb820c2d00abb97e5d43819a12ebc49729df639557e911fb65df0c094d9231
+summary     : NEC2 antenna modelling engine translated to C
+description : |
+    nec2c is a translation of the NEC2 antenna modelling FORTRAN code to C,
+    originally by Neoklis Kyriazis 5B4AZ and now maintained by Eric Wheeler
+    KJ7LNW. It reads a NEC card deck describing a wire or patch structure and
+    computes currents, impedances, near and far fields, with the SOMNEC
+    Sommerfeld ground solver built in. The fixed array limits of the FORTRAN
+    original are gone, so structure size is bounded only by memory.
+# The README is explicit under "7. License": "nec2c is Public Domain, same as
+# the original FORTRAN source." A GPLv3 COPYING sits in the tree, but nothing
+# else in the project supports it - there is not one GPL notice in any source
+# file - and that is exactly the file `automake --add-missing` drops in by
+# default, so it is autotools boilerplate rather than a licensing decision.
+# CC-PDDC is SPDX's identifier for a bare public domain declaration of this
+# kind. The underlying NEC2 FORTRAN really is a US Government work.
+license     : CC-PDDC
+builddeps   :
+    # For the check phase only; nec2c itself is plain C against libm.
+    - binary(python)
+setup       : |
+    # Only autogen.sh and configure.ac are committed, no configure script.
+    #
+    # Note that AC_INIT still declares 1.3, so `nec2c -v` reports the version
+    # three point releases behind the tag this builds. That is upstream's own
+    # oversight and is left alone rather than patched, so the source stays
+    # byte-identical to the release tarball.
+    %reconfigure
+build       : |
+    %make
+install     : |
+    %make_install
+
+    # The reference card decks are not installed by upstream's Makefile, but
+    # they are the most useful part of the tarball for anyone learning the NEC
+    # input format: a hundred-odd worked antenna models, several of them the
+    # classic decks from the NEC2 manual. They are also what the check phase
+    # runs against, so shipping them lets a user reproduce it.
+    %install_dir %(installroot)%(datadir)/%(name)/examples
+    install -m 0644 Input/* %(installroot)%(datadir)/%(name)/examples/
+check       : |
+    # Upstream ships no test suite at all, so this is one written for the
+    # package. It does a physics check against textbook antenna theory and then
+    # sweeps every reference deck; see pkg/check-nec2c.py for what each part
+    # establishes and why the six rejected decks are expected to be rejected.
+    python3 %(pkgdir)/check-nec2c.py \
+        %(workdir)/nec2c \
+        %(pkgdir)/dipole-sweep.nec \
+        %(workdir)/Input \
+        %(workdir)/check-work

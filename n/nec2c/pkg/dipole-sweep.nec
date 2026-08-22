@@ -1,0 +1,18 @@
+CM Half-wave dipole in free space, swept through resonance.
+CM
+CM A 0.5 m long wire of radius 1 mm, 21 segments, driven at the centre
+CM segment by a 1 V source, swept from 265 to 305 MHz in 2 MHz steps.
+CM
+CM This is the textbook case: a thin resonant dipole is a little shorter
+CM than half a wavelength, and its feedpoint resistance at resonance is
+CM around 70 ohms. check-nec2c.py finds where the reactance crosses zero
+CM and checks both numbers, which exercises the whole NEC2 core - geometry
+CM parsing, the interaction matrix, the LU solve and the field integrals -
+CM against a result that does not come from nec2c itself.
+CE
+GW 1 21 0.0 0.0 -0.25 0.0 0.0 0.25 0.001
+GE 0
+EX 0 1 11 0 1.0 0.0
+FR 0 21 0 0 265.0 2.0
+XQ
+EN

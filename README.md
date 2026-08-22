@@ -16,6 +16,7 @@ repository.
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
 | [`modemmanager`](m/modemmanager) | 1.24.2 | Mobile broadband modem management daemon |
+| [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
 | [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
@@ -36,6 +37,15 @@ repository.
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |
+| [`xnec2c`](x/xnec2c) | 4.4.18 | Graphical NEC2 antenna simulator |
+
+Deliberately *not* here: `wine`. AerynOS already ships it, currently 11.15, and
+already builds it with new WoW64 (`--enable-archs=i386,x86_64`) so it runs
+32-bit Windows programs without 32-bit host libraries. A recipe under this
+repository would install at priority 10 and shadow the distribution's, which
+means hand-maintaining a version bump roughly every fortnight to stay level with
+it. If a genuinely different build is ever wanted, `wine-staging` is the thing
+to package, under its own name so that it coexists rather than shadows.
 
 ## Layout
 

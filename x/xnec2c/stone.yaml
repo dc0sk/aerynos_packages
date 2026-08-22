@@ -1,0 +1,113 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : xnec2c
+version     : "4.4.18"
+release     : 1
+homepage    : https://www.xnec2c.org
+upstreams   :
+    # As with nec2c, boulder warns that the parsed upstream version does not
+    # match: the tag is "v4.4.18" so the tarball carries no project name for it
+    # to split off. Harmless.
+    - https://github.com/KJ7LNW/xnec2c/archive/refs/tags/v4.4.18.tar.gz : c4b7eaf4d45242a805b6d697136ad13b1ff751db1d5854d31a755da7f1973045
+summary     : Graphical NEC2 antenna simulator
+description : |
+    xnec2c is a GTK3 antenna modelling package built on the NEC2
+    electromagnetics engine. It plots near and far field radiation patterns,
+    currents, VSWR and impedance against frequency, and re-runs the simulation
+    as the input file changes so a geometry can be tuned interactively. It also
+    runs headless, writing CSV, s1p and s2p Touchstone output for a whole
+    frequency sweep.
+# Upstream's own xnec2c.spec.in declares "License: GPLv2+", matching the
+# per-file notices in src/. The COPYING file in the tree is GPLv3.
+license     : GPL-2.0-or-later
+builddeps   :
+    - binary(glib-compile-resources)
+    - binary(sed)
+    # For the check phase's CSV comparison.
+    - binary(python)
+    - gettext-devel
+    - pkgconfig(gio-2.0)
+    - pkgconfig(gmodule-2.0)
+    - pkgconfig(gtk+-3.0)
+    # configure runs AC_OPENMP, and xnec2c parallelises its frequency loop with
+    # it. clang needs the LLVM OpenMP runtime for -fopenmp to work.
+    - openmp-devel
+    # For cblas.h and lapacke.h. These are only used to type the function
+    # pointers; nothing is linked against OpenBLAS. See the rundep below.
+    # Note that configure looks for these under five different names and takes
+    # whichever it finds - on AerynOS it is openblas/cblas.h and
+    # openblas/lapacke.h that exist, not the bare cblas.h and lapacke.h.
+    - openblas-devel
+    # Not needed to compile anything. It is here so the check phase can confirm
+    # that the runtime dlopen() of the accelerated solver actually succeeds
+    # against the soname AerynOS ships, rather than the recipe merely asserting
+    # a rundep and hoping. Build containers do not get rundeps installed.
+    - openblas
+    # xnec2c calls gtk_init() unconditionally at the top of main(), before it
+    # parses --batch, so even a headless run needs a display to talk to. weston
+    # has a headless backend and GTK speaks Wayland natively, so the check phase
+    # runs one rather than dragging in an X server.
+    - binary(weston)
+rundeps     :
+    # xnec2c does not link any linear algebra library. mathlib.c dlopen()s one
+    # at runtime from a table of known sonames so the user can switch between
+    # implementations, and benchmark them, from the File menu without a
+    # rebuild. That means the dependency is invisible to boulder's soname
+    # scanner and has to be declared here or the package ships with nothing but
+    # the slow built-in NEC2 Gaussian elimination.
+    #
+    # AerynOS's openblas provides libopenblas.so.0, which is the first name in
+    # mathlib.c's OpenBLAS entry. Note that the PACKAGING file in the tarball
+    # lists an older set of sonames that does not include it; the table in
+    # src/mathlib.c is the one that is actually used.
+    - openblas
+setup       : |
+    # Only configure.ac is committed, no configure script. AC_CONFIG_AUX_DIR
+    # names a directory that is not in the tree, and automake wants it to exist
+    # before it will populate it.
+    mkdir -p auto-aux
+
+    %reconfigure
+build       : |
+    %make
+install     : |
+    %make_install
+check       : |
+    # Upstream's `make check` only diffs the examples list in Makefile.am
+    # against the examples/ directory. It runs no simulation and finishes in
+    # under a fifth of a second, so it is run for what it is worth and then the
+    # real work happens below.
+    %make check
+
+    # xnec2c is a GTK program that calls gtk_init() before it looks at its
+    # arguments, so it needs a display even to run a batch job. Bring up a
+    # headless weston for it to connect to.
+    export XDG_RUNTIME_DIR="%(workdir)/xdg-runtime"
+    mkdir -p "$XDG_RUNTIME_DIR"
+    chmod 0700 "$XDG_RUNTIME_DIR"
+
+    weston --backend=headless --socket=xnec2c-check --idle-time=0 \
+        --log="%(workdir)/weston.log" &
+    weston_pid=$!
+    trap 'kill "$weston_pid" 2>/dev/null' EXIT
+
+    # Wait for the socket rather than sleeping a fixed interval.
+    for _ in $(seq 100); do
+        test -S "$XDG_RUNTIME_DIR/xnec2c-check" && break
+        sleep 0.1
+    done
+    if ! test -S "$XDG_RUNTIME_DIR/xnec2c-check"; then
+        echo "check: headless weston never created its socket"
+        cat "%(workdir)/weston.log" || true
+        exit 1
+    fi
+
+    export WAYLAND_DISPLAY=xnec2c-check
+    export GDK_BACKEND=wayland
+
+    python3 %(pkgdir)/check-xnec2c.py \
+        %(workdir)/src/xnec2c \
+        %(workdir)/examples \
+        %(workdir)/check-work \
+        "%(jobs)"
