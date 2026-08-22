@@ -76,12 +76,23 @@ profile that also carries the local index:
 
 ```sh
 boulder profile add local-x86_64 \
-    --repo name=volatile,base-uri=https://cdn.aerynos.dev/,channel=main,version=stream/volatile,priority=0 \
+    --repo name=unstable,base-uri=https://cdn.aerynos.dev/,channel=main,version=stream/unstable,priority=0 \
     --repo name=local,uri=file:///home/dc0sk/git/aerynos_packages/local/x86_64/stone.index,priority=10
 
 scripts/local-repo.sh p/python-jinja2       # build and index the dependency first
 boulder build -p local-x86_64 f/fwupd/stone.yaml
 ```
+
+The stock repository in that profile should name the same stream the machine
+itself is subscribed to, which `moss repo list` will report. They are separate
+settings and nothing warns when they drift: builds would resolve against one set
+of packages while the system runs another. boulder's own `default-x86_64`
+profile is on `stream/volatile`, so it is not a safe thing to copy blindly.
+
+boulder has no command to edit or remove a profile once created - `profile
+update` only refetches what a profile already points at. To change one, edit
+`~/.config/boulder/profile.d/<name>.kdl` directly and then run `boulder profile
+update -y -p <name>`.
 
 The profile reads the index from disk each time, so re-running
 `scripts/local-repo.sh` is enough to refresh what a build can see.
