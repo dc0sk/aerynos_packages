@@ -36,6 +36,6 @@
 		}
 	},
 	"source-name": "cosmic-ext-applet-package-updater",
-	"source-release": "1",
-	"source-version": "1.0.0+git.2b2bc38"
+	"source-release": "2",
+	"source-version": "1.0.0+git.e67fa8f"
 }

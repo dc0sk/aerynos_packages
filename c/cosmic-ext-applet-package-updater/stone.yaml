@@ -2,14 +2,14 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : cosmic-ext-applet-package-updater
-version     : "1.0.0+git.2b2bc38"
-release     : 1
+version     : "1.0.0+git.e67fa8f"
+release     : 2
 homepage    : https://github.com/dc0sk/cosmic-applet-package-updater
 upstreams   :
     # Pinned to the head of the feat/aerynos-moss-support branch: the moss
     # support is not on master and there is no tag carrying it. 1.0.0 is the
     # version the crate declares.
-    - https://github.com/dc0sk/cosmic-applet-package-updater/archive/2b2bc38a8db15398a56c9baec4c21319fb32bbb7.tar.gz : eee8275a7a43ffc771f6eba6165e5e40de797c3258e74d3c130ce050673d00dd
+    - https://github.com/dc0sk/cosmic-applet-package-updater/archive/e67fa8f3acc29ab17007b20ecd5186fa727585bc.tar.gz : ccb1dbd036891bf9fd43692e7403ad3d452b68aaa1ee12325883e3c9586968ee
 summary     : Package update notifier applet for the COSMIC desktop
 description : |
     A COSMIC panel applet that watches for available package updates and
