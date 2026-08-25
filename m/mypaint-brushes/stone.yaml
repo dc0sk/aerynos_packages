@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : mypaint-brushes
+version     : "2.0.2"
+release     : 1
+homepage    : https://github.com/mypaint/mypaint-brushes
+upstreams   :
+    - https://github.com/mypaint/mypaint-brushes/archive/refs/tags/v2.0.2.tar.gz : 01032550dd817bb0f8e85d83a632ed2e50bc16e0735630839e6c508f02f800ac
+summary     : Brush presets for libmypaint-based painting applications
+description : |
+    The default set of MyPaint brush presets (.myb files and preview images),
+    installed under a data-only pkg-config file that names their install
+    directory. MyPaint and GIMP (from 2.10 onward, for its MyPaint brush
+    tool) both use it; it is being packaged here as a build dependency for
+    GIMP.
+license     :
+    - CC0-1.0
+    - GPL-2.0-or-later
+builddeps   :
+    - binary(autoconf)
+    - binary(automake)
+setup       : |
+    # No configure script is committed, so autoreconf has to run first.
+    %reconfigure
+build       : |
+    %make
+install     : |
+    %make_install
+# No check phase: this package is brush preset data plus a pkg-config file
+# naming their install directory - there is nothing upstream provides to
+# exercise, and %make check is not a target this Makefile.am defines.

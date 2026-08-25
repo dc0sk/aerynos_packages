@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # release-monitoring.org has a babl project, but its page sits behind an
+  # anti-bot challenge that could not be cleared to read off the numeric id.
+  # Last checked 20260825.
+  id: ~
+  rss: https://gitlab.gnome.org/GNOME/babl/-/tags?format=atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260825

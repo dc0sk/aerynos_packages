@@ -1,0 +1,177 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : gimp
+version     : "3.2.4"
+release     : 1
+homepage    : https://www.gimp.org/
+upstreams   :
+    - https://download.gimp.org/gimp/v3.2/gimp-3.2.4.tar.xz : 7312bc53e9c6d2d0056ca7b93f1c6b98707946dd934f714c21b8746ecb601588
+summary     : GNU Image Manipulation Program
+description : |
+    GIMP is a general-purpose raster and vector graphics editor: photo
+    retouching, compositing, and painting, with GEGL as its editing engine
+    (non-destructive, high bit depth) and libmypaint backing its natural
+    painting tools. This build needs babl, gegl, libmypaint and
+    mypaint-brushes, none of which are (yet) in AerynOS's own repositories,
+    so all four are packaged alongside it in this one.
+    It also needs gexiv2-legacy - see that recipe for why GIMP cannot use
+    AerynOS's real gexiv2 package.
+license     :
+    - GPL-3.0-or-later
+    - LGPL-3.0-or-later
+    - CC-BY-SA-3.0
+    - CC-BY-SA-4.0
+    - CC0-1.0
+builddeps   :
+    - pkgconfig(atk)
+    - pkgconfig(babl-0.1)
+    - pkgconfig(cairo)
+    - pkgconfig(cairo-pdf)
+    - pkgconfig(fontconfig)
+    - pkgconfig(freetype2)
+    - pkgconfig(gdk-pixbuf-2.0)
+    - pkgconfig(gegl-0.4)
+    - pkgconfig(exiv2)
+    - pkgconfig(gexiv2)
+    - pkgconfig(gio-2.0)
+    - pkgconfig(gio-unix-2.0)
+    - pkgconfig(glib-2.0)
+    - pkgconfig(gobject-introspection-1.0)
+    - pkgconfig(gobject-2.0)
+    - pkgconfig(gmodule-no-export-2.0)
+    - pkgconfig(gtk+-3.0)
+    - pkgconfig(gdk-3.0)
+    - pkgconfig(harfbuzz)
+    - pkgconfig(json-glib-1.0)
+    - pkgconfig(lcms2)
+    - pkgconfig(libmypaint)
+    - pkgconfig(mypaint-brushes-2.0)
+    - pkgconfig(pango)
+    - pkgconfig(pangocairo)
+    - pkgconfig(pangoft2)
+    - pkgconfig(librsvg-2.0)
+    - pkgconfig(appstream)
+    - pkgconfig(libarchive)
+    # GIMP checks the gtk+-3.0.pc "targets" variable at configure time and
+    # only then asks for these X11 libraries; AerynOS's GTK3 build supports
+    # both X11 and Wayland targets, so it does ask.
+    - pkgconfig(x11)
+    - pkgconfig(xmu)
+    - pkgconfig(xext)
+    - pkgconfig(xfixes)
+    - pkgconfig(xcursor)
+    - pkgconfig(libtiff-4)
+    - pkgconfig(libjpeg)
+    - pkgconfig(zlib)
+    - pkgconfig(bzip2)
+    - pkgconfig(liblzma)
+    - pkgconfig(libpng)
+    - pkgconfig(xpm)
+    - pkgconfig(OpenEXR)
+    - pkgconfig(libwebp)
+    - pkgconfig(libwebpmux)
+    - pkgconfig(libwebpdemux)
+    - pkgconfig(libheif)
+    - pkgconfig(poppler-glib)
+    - pkgconfig(poppler-data)
+    - pkgconfig(libopenjp2)
+    - pkgconfig(libjxl)
+    - pkgconfig(libjxl_threads)
+    - pkgconfig(alsa)
+    - pkgconfig(gudev-1.0)
+    # cc.find_library('gs', ...) for Postscript/EPS import - not a
+    # pkg-config lookup, so there is no matching pkgconfig() provider name;
+    # ghostscript-devel is what carries the unversioned libgs.so symlink.
+    - ghostscript-devel
+    - iso-codes
+    - shared-mime-info
+    - binary(appstreamcli)
+    - binary(desktop-file-validate)
+    - binary(dbus-run-session)
+    # gjs is looked up as a plain program, not a pkg-config dependency: this
+    # is what installs GIMP's Javascript plug-in support.
+    - binary(gjs)
+    - binary(git)
+    - binary(msgfmt)
+    - binary(perl)
+    - binary(xdg-email)
+    - binary(xsltproc)
+    # Python-Fu (Python plug-in support): meson.build hard-requires a Python 3
+    # with both the gi and cairo modules, and additionally requires that
+    # `import gi.repository.GExiv2` succeed against whatever GExiv2 typelib
+    # is on GI_TYPELIB_PATH - which resolves to gexiv2-legacy's, the only
+    # unversioned "GExiv2-0.10" typelib on the system (AerynOS's own gexiv2
+    # installs its typelib under its own API-versioned GIR namespace).
+    - python-cairo
+    - python-pygobject
+rundeps     :
+    # None of these are linked at the ELF level - they are invoked as
+    # external interpreters (a shebang/env line, or gi.require_version() at
+    # Python import time) - so boulder's automatic soname-based dependency
+    # analysis cannot see that GIMP needs them at runtime; they have to be
+    # declared explicitly, on top of whatever it does auto-detect.
+    # Without python-pygobject actually installed, Python's import machinery
+    # still resolves `import gi` to *something*: the empty gi/overrides/
+    # namespace directory this very package installs its own Gimp binding
+    # override into (see libgimp/meson.build's python overrides install),
+    # rather than failing outright - which is what turns into the
+    # `AttributeError: module 'gi' has no attribute 'require_version'` every
+    # Python-Fu plug-in throws without this.
+    - python-cairo
+    - python-pygobject
+    # Javascript plug-in support (gjs is looked up as a plain program at
+    # runtime, same as at build time).
+    - binary(gjs)
+setup       : |
+    # vala off: building it would need gexiv2-legacy's .vapi, which that
+    # recipe deliberately does not build (see its own -Dvapi=false comment).
+    # Vala plug-in bindings are a small niche feature not worth carrying a
+    # second, vapi-enabled gexiv2 build for.
+    # gi-docgen off: no doc toolchain pulled in for developer reference docs
+    # nobody browses from a locally built package.
+    # check-update no: a personal build shouldn't phone home by default;
+    # this only sets the shipped default, Edit > Preferences still exposes
+    # the toggle at runtime.
+    # mng/aa/ilbm/wmf/fits/webkit-unmaintained/twain-unmaintained/lua left on
+    # their defaults (off): none of those libraries (libmng, libaa, libiff,
+    # libilbm, libwmf, cfitsio) are packaged anywhere in reach, and the
+    # unmaintained/experimental options default off already.
+    %meson \
+        -Dvala=disabled \
+        -Dgi-docgen=disabled \
+        -Dcheck-update=no \
+        -Dalsa=enabled \
+        -Dappdata-test=disabled \
+        -Dcairo-pdf=enabled \
+        -Dghostscript=enabled \
+        -Dgudev=enabled \
+        -Dheif=enabled \
+        -Djpeg2000=enabled \
+        -Djpeg-xl=enabled \
+        -Dwebp=enabled \
+        -Dxcursor=enabled \
+        -Dxpm=enabled \
+        -Dopenexr=enabled \
+        -Dopenmp=enabled \
+        -Djavascript=enabled
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    # headless-tests is left on its default 'auto': it drives UI-dependent
+    # tests through xvfb-run, which is not packaged anywhere in reach either
+    # (AerynOS ships no Xvfb), so meson silently skips that portion. The
+    # tests that do not need a display or an X/Wayland server still run for
+    # real, dbus-run-session is present for the ones that need a session
+    # bus.
+    #
+    # appdata-test is explicitly disabled (its 'auto' default resolves to
+    # enabled here, since appstreamcli is present): it runs `appstreamcli
+    # validate` against org.gimp.GIMP.appdata.xml.in, which tries to confirm
+    # every URL it references - the bug tracker, the donate and docs pages,
+    # several screenshots - actually resolves over the network. boulder's
+    # build sandbox has none, so this specific check can never pass here
+    # regardless of whether the metadata is actually correct.
+    %meson_test

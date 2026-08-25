@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # Deliberately not tracked for autoupdate: this package must stay on the
+  # 0.14.x line for GIMP (see stone.yaml) and must never follow gexiv2's own
+  # latest release the way a normal package would.
+  id: ~
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260825

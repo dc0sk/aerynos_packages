@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : gexiv2-legacy
+version     : "0.14.7"
+release     : 1
+homepage    : https://gitlab.gnome.org/GNOME/gexiv2
+upstreams   :
+    - https://gitlab.gnome.org/GNOME/gexiv2/-/archive/gexiv2-0.14.7/gexiv2-gexiv2-0.14.7.tar.gz : fdf961f27ee56e481dd2281a83f8b83b0ad53e6023f7450304762e4ee09e0766
+summary     : GObject wrapper around Exiv2 (0.14.x compatibility line)
+description : |
+    gexiv2-legacy exists for one reason: GIMP (from 2.10 onward) requires
+    gexiv2 in the narrow range >=0.14.0, <0.15.0, because gexiv2 0.15 made
+    real breaking API changes - it dropped functions still in use in GIMP's
+    current release, changed several calls from emitting warnings to
+    returning GError, and raised its own minimum exiv2 to 0.28. AerynOS's own
+    gexiv2 package is 0.16.2, past that break, and GIMP upstream's adaptation
+    to it (gitlab.gnome.org/GNOME/gimp/-/issues/5863) is unmerged as of
+    GIMP 3.2.4.
+    This package does not conflict with AerynOS's gexiv2: since 0.15.2,
+    upstream ships its pkg-config file, headers and shared library under
+    API-versioned names (gexiv2-0.16.pc, libgexiv2-0.16.so.4), which is
+    exactly what lets this unversioned 0.14 build - gexiv2.pc,
+    libgexiv2.so.2 - install alongside it rather than fight over the same
+    paths. Nothing but GIMP should ever depend on this package; anything
+    else on AerynOS wanting gexiv2 should keep using the real one.
+license     : GPL-2.0-or-later
+builddeps   :
+    - pkgconfig(exiv2)
+    - pkgconfig(gio-2.0)
+    - pkgconfig(gobject-introspection-1.0)
+setup       : |
+    # vapi off: needs valac, and nothing in this repository builds Vala
+    # bindings against gexiv2 - GIMP's own -Dvala is turned off for the same
+    # reason (see gimp/stone.yaml).
+    # tools/tests(python3) off: the CLI tools and Python bindings are not
+    # what GIMP links against, only the library, headers and .pc file.
+    %meson \
+        -Dvapi=false \
+        -Dtools=false \
+        -Dpython3=false \
+        -Dgtk_doc=false \
+        -Dtests=true
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    %meson_test

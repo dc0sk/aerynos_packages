@@ -7,15 +7,21 @@ repository.
 | Package | Version | Summary |
 | --- | --- | --- |
 | [`apparmor`](a/apparmor) | 5.0.2 | Mandatory access control based on per-program profiles |
+| [`babl`](g/babl) | 0.1.128 | Pixel format conversion library, needed by GEGL and GIMP |
 | [`cosmic-ext-applet-package-updater`](c/cosmic-ext-applet-package-updater) | 1.0.0+git | COSMIC panel applet notifying about package updates, with moss support |
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
 | [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
+| [`gegl`](g/gegl) | 0.4.70 | Graph based image processing framework, needed by GIMP |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
+| [`gexiv2-legacy`](g/gexiv2-legacy) | 0.14.7 | GObject wrapper around Exiv2, the 0.14.x line GIMP needs |
+| [`gimp`](g/gimp) | 3.2.4 | GNU Image Manipulation Program |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
+| [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
 | [`modemmanager`](m/modemmanager) | 1.24.2 | Mobile broadband modem management daemon |
+| [`mypaint-brushes`](m/mypaint-brushes) | 2.0.2 | Brush presets for libmypaint-based applications, needed by GIMP |
 | [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
@@ -97,6 +103,30 @@ update -y -p <name>`.
 
 The profile reads the index from disk each time, so re-running
 `scripts/local-repo.sh` is enough to refresh what a build can see.
+
+When a dependency chain runs deeper than one level - `gimp` needs `babl`,
+`gegl`, `gexiv2-legacy`, `libmypaint` and `mypaint-brushes`, and `gegl` itself
+needs `babl` - `scripts/local-repo.sh <pkg>` isn't enough on its own: it always
+builds with the *default* profile, which cannot see anything in `local/`, so
+it fails immediately on any package that needs another package from here just
+to configure. Build each link in the chain directly with boulder instead, and
+feed the result into the index yourself, bottom-up:
+
+```sh
+( cd g/babl && boulder build -p local-x86_64 stone.yaml )
+mv g/babl/*.stone local/x86_64/
+scripts/local-repo.sh --index-only    # babl is now visible to the next build
+
+( cd g/gegl && boulder build -p local-x86_64 stone.yaml )
+mv g/gegl/*.stone local/x86_64/
+scripts/local-repo.sh --index-only
+
+# ...and so on up the chain, ending with gimp itself.
+```
+
+`boulder build`'s manifest refresh only happens when building from inside the
+package's own directory (see the comment in `local-repo.sh`), which is why
+this stays a `cd` and a plain `boulder build`, not `boulder build -o ...`.
 
 ## Using these as a local repository
 

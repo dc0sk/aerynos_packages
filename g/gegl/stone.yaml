@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : gegl
+version     : "0.4.70"
+release     : 1
+homepage    : https://gegl.org/
+upstreams   :
+    - https://gitlab.gnome.org/GNOME/gegl/-/archive/GEGL_0_4_70/gegl-GEGL_0_4_70.tar.gz : 0bd31cc39243be1e90ab01680c69ff555bec7d42b3b50688d606f7226b3ada87
+summary     : Graph based image processing framework
+description : |
+    GEGL applies a graph of image operations to a buffer, tracking regions of
+    interest so that only the parts of an image an edit actually touches are
+    recomputed, on data no more precise than the operations in play need. It
+    is GIMP's editing engine from 2.10 onward; it is being packaged here as a
+    build dependency for GIMP.
+license     :
+    - GPL-3.0-or-later
+    - LGPL-3.0-or-later
+builddeps   :
+    - pkgconfig(babl-0.1)
+    - pkgconfig(cairo)
+    - pkgconfig(gdk-pixbuf-2.0)
+    - pkgconfig(glib-2.0)
+    - pkgconfig(gobject-introspection-1.0)
+    - pkgconfig(json-glib-1.0)
+    - pkgconfig(lcms2)
+    - pkgconfig(libjpeg)
+    - pkgconfig(librsvg-2.0)
+    - pkgconfig(libtiff-4)
+    - pkgconfig(libwebp)
+    - pkgconfig(OpenEXR)
+    - pkgconfig(pango)
+    - pkgconfig(pangocairo)
+    - pkgconfig(poppler-glib)
+    # poly2tri-c and libnsgif are optional dependencies GEGL can also fetch as
+    # meson subprojects; the tarball vendors both fully rather than as wrap
+    # stubs, so no network access is needed for them.
+setup       : |
+    # introspection on: GIMP's own libgimp GIR generation includes Gegl-0.4.gir,
+    # so this is a real build dependency of GIMP. vapigen stays off: nothing
+    # in this repository builds Vala bindings.
+    # docs/gtk-doc/gi-docgen off: no doc toolchain is pulled in for a build
+    # dependency nobody browses reference docs for.
+    # workshop off: those are upstream's own experimental, unstable operations.
+    # sdl1/sdl2, libav, libv4l/libv4l2, lua, mrg, graphviz, jasper, lensfun,
+    # libspiro, maxflow, umfpack, pygobject: left on their 'auto' default
+    # (effectively off, since none of those libraries are build dependencies
+    # here) - none are needed by GIMP, which talks to GEGL's C API directly.
+    # gexiv2 also left on 'auto': GEGL's meson.build looks it up as the
+    # unversioned pkg-config name "gexiv2", but AerynOS's gexiv2-devel only
+    # ships "gexiv2-0.16.pc" (no compatibility alias), so an explicit
+    # -Dgexiv2=enabled would just fail the configure step outright.
+    # libraw likewise left off (not on 'auto' - explicitly disabled): it does
+    # find AerynOS's libraw, but the resulting raw-load.so fails to dlopen at
+    # runtime ("undefined symbol: __kmpc_global_thread_num" from
+    # /usr/lib/libraw.so.25) because that build of libraw calls into OpenMP
+    # without linking libomp itself, leaving it to whatever loads it - which
+    # a GEGL operation module has no mechanism to do. Shipping the operation
+    # in this state would just mean gegl:raw-load silently doesn't work.
+    %meson \
+        -Dintrospection=true \
+        -Dvapigen=disabled \
+        -Ddocs=false \
+        -Dgtk-doc=false \
+        -Dgi-docgen=disabled \
+        -Dworkshop=false \
+        -Dcairo=enabled \
+        -Dgdk-pixbuf=enabled \
+        -Dlcms=enabled \
+        -Dlibraw=disabled \
+        -Dlibrsvg=enabled \
+        -Dlibtiff=enabled \
+        -Dopenexr=enabled \
+        -Dopenmp=enabled \
+        -Dpango=enabled \
+        -Dpangocairo=enabled \
+        -Dpoppler=enabled \
+        -Dwebp=enabled
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    %meson_test

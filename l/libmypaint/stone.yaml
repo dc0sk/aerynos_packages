@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : libmypaint
+version     : "1.6.0"
+release     : 1
+homepage    : https://github.com/mypaint/libmypaint
+upstreams   :
+    # Not GitHub's own archive/refs/tags/ snapshot: that is a raw git tree,
+    # and libmypaint's build needs two things only the maintainers generate
+    # at release time and check into neither git nor the snapshot - the
+    # ./configure script, and mypaint-brush-settings-gen.h (generated from
+    # brushsettings.json by generate.py, and required by a header the rest of
+    # the library includes). This is upstream's own dist tarball instead,
+    # published as a GitHub release asset, which carries both.
+    - https://github.com/mypaint/libmypaint/releases/download/v1.6.0/libmypaint-1.6.0.tar.xz : a5ec3624ba469b7b35fd66b6fbee7f07285b7a7813d02291ac9b10e46618140e
+summary     : MyPaint brush engine library
+description : |
+    libmypaint, also known as brushlib, renders MyPaint's brush strokes: brush
+    dynamics, blend modes and the tiled-surface API paint is composited onto.
+    MyPaint and GIMP (from 2.10 onward, where it backs the paintbrush, ink,
+    airbrush, MyPaint brush and smudge tools) both use it; it is being
+    packaged here as a build dependency for GIMP.
+license     : ISC
+builddeps   :
+    - binary(intltool-update)
+    - binary(msgfmt)
+    - binary(xgettext)
+    - pkgconfig(gobject-2.0)
+    - pkgconfig(json-c)
+setup       : |
+    # --enable-gegl is left off: it builds a second, optional libmypaint-gegl
+    # module wrapping brushlib as a GEGL operation, which upstream's own
+    # configure.ac calls "NOT REQUIRED TO BUILD, NOT USED BY ANY MAJOR
+    # PROJECT" - GIMP links against libmypaint's core C API directly, not
+    # through GEGL, so it would only add a build-time dependency on this
+    # repository's own gegl package for a module nothing loads.
+    %configure --enable-introspection=no
+build       : |
+    %make
+install     : |
+    %make_install
+check       : |
+    %make check

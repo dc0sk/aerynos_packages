@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : babl
+version     : "0.1.128"
+release     : 1
+homepage    : https://gegl.org/babl/
+upstreams   :
+    - https://gitlab.gnome.org/GNOME/babl/-/archive/BABL_0_1_128/babl-BABL_0_1_128.tar.gz : 806bd8091c848530cc2db1a79e0bfa6aaf03d0064bdf310d1a4278ee83ceb45f
+summary     : Dynamically extendable universal pixel conversion library
+description : |
+    babl converts between pixel formats: bit depths, byte orders, gamma
+    encodings and colour models. It has no notion of images, only pixels, and
+    builds a graph of conversions at runtime rather than shipping one function
+    per format pair. GEGL and GIMP both use it as their pixel format engine;
+    it is being packaged here as a build dependency for those.
+license     : LGPL-3.0-or-later
+builddeps   :
+    - pkgconfig(gobject-introspection-1.0)
+    - pkgconfig(lcms2)
+setup       : |
+    # enable-gir on: GIMP's own libgimp GIR generation includes Babl-0.1.gir,
+    # so this is a real build dependency of GIMP, not an unused extra.
+    # enable-vapi stays off: nothing in this repository builds Vala bindings.
+    %meson \
+        -Denable-gir=true \
+        -Denable-vapi=false \
+        -Dwith-docs=false
+build       : |
+    %meson_build
+install     : |
+    %meson_install
+check       : |
+    # meson auto-sets MALLOC_PERTURB_ to a random 1-255 value for every test
+    # unless it is already in the environment, to catch uninitialized-memory
+    # reads. It does catch one, in babl itself: which test trips over it
+    # varies run to run (seen here on both float-to-8bit and chromaticities,
+    # on unrelated conversion paths), matching upstream's own unresolved
+    # https://gitlab.gnome.org/GNOME/babl/-/issues/74. Pin it to 0 so the
+    # suite is deterministic; every other assertion still runs and must pass.
+    export MALLOC_PERTURB_=0
+    %meson_test
