@@ -8,6 +8,7 @@ repository.
 | --- | --- | --- |
 | [`apparmor`](a/apparmor) | 5.0.2 | Mandatory access control based on per-program profiles |
 | [`babl`](g/babl) | 0.1.128 | Pixel format conversion library, needed by GEGL and GIMP |
+| [`claude-desktop`](c/claude-desktop) | 1.37937.3 | Desktop application for Claude.ai (proprietary) |
 | [`cosmic-ext-applet-package-updater`](c/cosmic-ext-applet-package-updater) | 1.0.0+git | COSMIC panel applet notifying about package updates, with moss support |
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |

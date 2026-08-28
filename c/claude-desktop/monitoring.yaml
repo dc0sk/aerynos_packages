@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # No release-monitoring.org project, and no public git tags to follow -
+  # Anthropic ships no source, only the apt repository. New versions have to
+  # be read off its own index instead of a feed:
+  #   https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages
+  id: ~
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260828.

@@ -1,0 +1,127 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : claude-desktop
+version     : "1.37937.3"
+release     : 1
+homepage    : https://claude.ai/download
+upstreams   :
+    # A signed .deb, not a source tarball: fetched verbatim and unpacked in
+    # the setup phase, the same way SDRplay's Makeself installer is handled
+    # in s/sdrplay-api. Anthropic ships no source for this application.
+    - https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_1.37937.3_amd64.deb :
+        hash : 53590c5725fb3487299f940f5b89d55182b0faee14ca1bf3e35badae0f61135f
+        unpack : false
+summary     : Desktop application for Claude.ai (proprietary)
+description : |
+    The official Claude desktop app: chat, Cowork (an Anthropic-hosted agent
+    workspace) and a Claude Code session view, in one Electron window. This
+    packages Anthropic's own Linux build - a self-contained Electron/Chromium
+    bundle, not a thin wrapper against a system one - which they have
+    published as a signed .deb for Debian/Ubuntu since 2026-06-30 (see
+    downloads.claude.ai), with no source available; nothing here is built,
+    only repackaged.
+
+    It links directly against this system's own GTK3/X11/NSS/cairo/pango/
+    dbus/alsa stack, which boulder's own dependency analysis picks up from
+    the binary's ELF NEEDED entries the same way it would for anything built
+    here. A handful of libraries and desktop-integration tools are dlopen'd
+    or exec'd instead, which that analysis cannot see - those are declared
+    under rundeps below, straight off the official .deb's own Depends: line.
+
+    Cowork additionally needs a KVM-capable virtualisation stack (QEMU, OVMF,
+    virtiofsd) that this recipe does not pull in: it is one optional feature
+    among three, not something Chat or Claude Code need, and making a chat
+    client hard-depend on a hypervisor stack for everyone would be a poor
+    trade for the common case. Install qemu-system-x86 (or qemu-system-arm
+    on arm64), ovmf/edk2-ovmf and virtiofsd by hand if Cowork is wanted.
+
+    /usr/lib/claude-desktop/chrome-sandbox ships setuid-root, mode 4755 -
+    preserved verbatim from the official .deb, the same as every other
+    Chromium-based browser and Electron app on Linux ships its own copy of
+    this same helper. It is Chromium's classic SUID sandbox: a small, heavily
+    audited binary whose only job is to set up a restricted namespace/chroot
+    for the renderer process before dropping privileges, used as the sandbox
+    entry point on kernels (Debian's and Ubuntu's stock kernel among them)
+    that restrict or disable unprivileged user namespaces. This recipe adds
+    no privilege beyond what Anthropic already ships; it is called out here
+    because a setuid-root file installed by any package is worth knowing
+    about up front.
+
+    This package contains proprietary, closed-source binaries under
+    Anthropic's Consumer Terms
+    (https://www.anthropic.com/legal/consumer-terms), which do not grant
+    redistribution, so the built package should be kept to the machine that
+    built it and not served to anyone else.
+license     : LicenseRef-Anthropic-Consumer-Terms
+builddeps   :
+    # A .deb is itself an ar archive; ar unpacks its two tar.xz members, xz
+    # decompresses them, tar lays the payload directly into installroot.
+    # None of the three are guaranteed present in the build sandbox, and (as
+    # with sdrplay-api's Makeself extractor) the failure mode without them is
+    # opaque rather than a plain "command not found" against a bare name.
+    - binary(ar)
+    - binary(tar)
+    - binary(xz)
+rundeps     :
+    # Everything the app links against directly (GTK3, X11, NSS, cairo,
+    # pango, dbus, alsa, atk/atspi, gbm, udev, glib) is picked up
+    # automatically from the binary's own ELF NEEDED entries - the same
+    # soname-based analysis boulder runs against anything it builds, applied
+    # here to a binary it only repackages.
+    #
+    # These are not ELF-linked - Chromium dlopens them at runtime for
+    # specific features (desktop notifications, the OS keyring, synthetic
+    # input for global shortcuts) or execs them as external tools/services -
+    # so that automatic analysis cannot see them.
+    - libnotify
+    - libsecret
+    - libxtst
+    - binary(xdg-open)
+    - xdg-desktop-portal
+    # AerynOS's native desktop is COSMIC; swap for xdg-desktop-portal-gtk,
+    # -gnome or -kde if building this for a different one.
+    - xdg-desktop-portal-cosmic
+setup       : |
+    # A .deb is itself an ar archive of three members: debian-binary,
+    # control.tar.xz (dpkg's own metadata and postinst/postrm - not needed
+    # here, see the install phase) and data.tar.xz, the actual filesystem
+    # tree. That tree already sits under usr/bin, usr/lib and usr/share,
+    # matching this distribution's own bindir/libdir/datadir exactly, so it
+    # is unpacked wholesale below rather than picked apart file by file.
+    ar x %(sourcedir)/claude-desktop_%(version)_amd64.deb
+install     : |
+    # %(installroot) does not exist yet - every other recipe in this
+    # repository gets it for free from an install macro or a build system's
+    # own `make install`/`meson install`, neither of which run here.
+    mkdir -p %(installroot)
+    tar -C %(installroot) --no-same-owner -xf data.tar.xz ./usr
+
+    # dpkg's postinst is never run. Besides the GNOME search-provider files
+    # handled below, it also writes an AppArmor profile exempting Chromium's
+    # own namespace sandbox from Ubuntu 24.04+'s AppArmor-mediated userns
+    # restriction, and self-registers the apt repository - neither applies
+    # here: AerynOS carries no such restriction to work around (chrome-sandbox
+    # also ships setuid-root regardless, see the description above) and has
+    # no apt repository to register. The lintian override under datadir is
+    # dpkg tooling only and is dropped rather than shipped as dead weight.
+    rm -rf %(installroot)%(datadir)/lintian
+
+    # GNOME Shell search provider (harmless, if unused, under a non-GNOME
+    # desktop like COSMIC): postinst copies these same two files into place
+    # from here.
+    %install_dir %(installroot)%(datadir)/gnome-shell/search-providers
+    %install_dir %(installroot)%(datadir)/dbus-1/services
+    %install_file %(installroot)%(libdir)/claude-desktop/resources/gnome-search-provider/com.anthropic.Claude.search-provider.ini \
+        %(installroot)%(datadir)/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini
+    %install_file %(installroot)%(libdir)/claude-desktop/resources/gnome-search-provider/com.anthropic.Claude.SearchProvider.service \
+        %(installroot)%(datadir)/dbus-1/services/com.anthropic.Claude.SearchProvider.service
+# No check phase: `claude-desktop --no-sandbox --disable-gpu --headless=new
+# --version` does run and exit 0 without a display (verified by hand, in a
+# throwaway root, with an external timeout watching it), but Electron/
+# Chromium spawns its own zygote and helper processes even for that, and
+# boulder's build sandbox enforces no timeout of its own - a hang in there
+# would wedge the build with nobody watching. Real UI behaviour needs a
+# display and a signed-in account regardless, which this build phase has
+# neither. The payload is a prebuilt Electron binary this recipe only
+# repackages, same as sdrplay-api's Makeself payload.
