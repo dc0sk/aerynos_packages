@@ -6,7 +6,6 @@
 			"build-depends": [
 				"binary(desktop-file-validate)",
 				"binary(qmake6)",
-				"binary(sed)",
 				"pkgconfig(Qt6Bluetooth)",
 				"pkgconfig(Qt6Concurrent)",
 				"pkgconfig(Qt6Core)",
@@ -54,6 +53,6 @@
 		}
 	},
 	"source-name": "antscope2",
-	"source-release": "1",
+	"source-release": "3",
 	"source-version": "2.0.3+git.bc7b74db"
 }

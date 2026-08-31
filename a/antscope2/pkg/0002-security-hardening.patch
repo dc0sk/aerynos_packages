@@ -1,0 +1,197 @@
+diff --git a/analyzer/ble_analyzer.cpp b/analyzer/ble_analyzer.cpp
+index 5c86d5e..273c38c 100644
+--- a/analyzer/ble_analyzer.cpp
++++ b/analyzer/ble_analyzer.cpp
+@@ -474,6 +474,13 @@ void BleAnalyzer::dataReceived(const QLowEnergyCharacteristic &c, const QByteArr
+ {
+     if (c.uuid() != QBluetoothUuid(uuidRead))
+         return;
++    if (value.size() < BLE_PACKET_SIZE) {
++        // checkCRC()/returnCRC() index data[BLE_PACKET_SIZE-1] with no
++        // bounds check of their own; a malformed or malicious peripheral
++        // sending a short notification would otherwise read out of bounds.
++        qInfo() << "dataReceived: short packet, ignoring" << value.size();
++        return;
++    }
+     //qInfo() << trace("dataReceived: ", const_cast<QByteArray&>(value));
+     m_lastReadTimeMS = QDateTime::currentMSecsSinceEpoch();
+     if (!checkCRC(value)) {
+diff --git a/analyzer/hid_analyzer.cpp b/analyzer/hid_analyzer.cpp
+index a3d9fd1..85bc0a0 100644
+--- a/analyzer/hid_analyzer.cpp
++++ b/analyzer/hid_analyzer.cpp
+@@ -453,14 +453,20 @@ void HidAnalyzer::hidRead (void)
+     {
+         return;
+     }
+-    unsigned char readBuff[64];
++    unsigned char readBuff[64] = {0};
+     int read = hid_read(m_hidDevice, readBuff, 64);
+     m_mutexRead.lock();
+     if(read > 0)
+     {
+         if(readBuff[0] == ANTSCOPE_REPORT)
+         {
+-            for(int i = 0; i < readBuff[1]; i++)
++            // readBuff[1] is a payload length supplied by the device
++            // (0-255); clamp it to both the fixed-size buffer and to how
++            // many bytes hid_read() actually returned, so a device
++            // reporting more than 62 payload bytes - or a short read -
++            // cannot walk past the end of readBuff.
++            int len = qMin<int>(readBuff[1], qMax(0, read - 2));
++            for(int i = 0; i < len; i++)
+             {
+                 m_incomingBuffer.append(readBuff[i+2]);
+             }
+diff --git a/analyzer/hidanalyzer.cpp b/analyzer/hidanalyzer.cpp
+index 78b3754..dcf643e 100644
+--- a/analyzer/hidanalyzer.cpp
++++ b/analyzer/hidanalyzer.cpp
+@@ -462,14 +462,20 @@ void hidAnalyzer::hidRead (void)
+     {
+         return;
+     }
+-    unsigned char readBuff[64];
++    unsigned char readBuff[64] = {0};
+     int read = hid_read(m_hidDevice, readBuff, 64);
+     m_mutexRead.lock();
+     if(read > 0)
+     {
+         if(readBuff[0] == ANTSCOPE_REPORT)
+         {
+-            for(int i = 0; i < readBuff[1]; i++)
++            // readBuff[1] is a payload length supplied by the device
++            // (0-255); clamp it to both the fixed-size buffer and to how
++            // many bytes hid_read() actually returned, so a device
++            // reporting more than 62 payload bytes - or a short read -
++            // cannot walk past the end of readBuff.
++            int len = qMin<int>(readBuff[1], qMax(0, read - 2));
++            for(int i = 0; i < len; i++)
+             {
+                 m_incomingBuffer.append(readBuff[i+2]);
+             }
+diff --git a/analyzer/updater/aa230firmwareupdater.cpp b/analyzer/updater/aa230firmwareupdater.cpp
+index 8f86a37..2fcdb07 100644
+--- a/analyzer/updater/aa230firmwareupdater.cpp
++++ b/analyzer/updater/aa230firmwareupdater.cpp
+@@ -124,7 +124,10 @@ AA230FirmwareUpdater::FirmwareInfo AA230FirmwareUpdater::firmwareInfo(const ReDe
+         arr = m_port.readAll();
+     }
+ 
+-    if (arr.isEmpty()) {
++    // The probe loop above gives up after 10 timeouts and falls through
++    // regardless of how many bytes actually arrived, so arr can be
++    // shorter than FirmwareInfo on a slow/short/malicious response.
++    if (arr.size() < static_cast<int>(sizeof(FirmwareInfo))) {
+         return info;
+     }
+ 
+diff --git a/analyzer/updater/downloader.cpp b/analyzer/updater/downloader.cpp
+index 47cb10d..529a8c8 100644
+--- a/analyzer/updater/downloader.cpp
++++ b/analyzer/updater/downloader.cpp
+@@ -29,9 +29,6 @@ Downloader::State Downloader::startDownloadInfo(QUrl url)
+     QNetworkRequest request(url);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     m_mng.get(request);
+ 
+@@ -61,9 +58,6 @@ Downloader::State Downloader::startDownloadFw()
+     QNetworkReply *reply;
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     reply = m_mng.get(request);
+     connect(reply, SIGNAL(downloadProgress(qint64,qint64)),
+diff --git a/analyzer/updater/hidfirmwareupdater.cpp b/analyzer/updater/hidfirmwareupdater.cpp
+index 8b039a2..0849462 100644
+--- a/analyzer/updater/hidfirmwareupdater.cpp
++++ b/analyzer/updater/hidfirmwareupdater.cpp
+@@ -167,7 +167,15 @@ HidFirmwareUpdater::FirmwareInfo HidFirmwareUpdater::firmwareInfo(const ReDevice
+     ret = hid_read_timeout(m_handleDev, buff, sizeof(buff), 100);
+ 
+     if (ret > 0) {
+-        memcpy((char*)&info, &buff[6], 60);
++        // buff is 65 bytes (valid indices 0-64); copying 60 bytes
++        // starting at offset 6 would read buff[65], one byte past the
++        // end. Clamp to both the buffer's real size and to how many
++        // bytes were actually received.
++        int avail = qMin<int>(ret, sizeof(buff));
++        int len = qMin(60, avail - 6);
++        if (len > 0) {
++            memcpy((char*)&info, &buff[6], len);
++        }
+     }
+ 
+     closeDevice();
+diff --git a/licenseagent.cpp b/licenseagent.cpp
+index ecfd99d..5c38436 100644
+--- a/licenseagent.cpp
++++ b/licenseagent.cpp
+@@ -62,9 +62,6 @@ void LicenseAgent::requestEmailStatus()
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitEmailStatusWeb);
+     m_mng.get(request);
+@@ -149,9 +146,6 @@ void LicenseAgent::requestLicense(QString key)
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitLicense);
+     m_canceled = false;
+@@ -296,9 +290,6 @@ void LicenseAgent::requestInfo()
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitInfoWeb);
+     //showModeless(tr("Register device"),tr("Registration..."), tr("Cancel"));
+@@ -362,9 +353,6 @@ void LicenseAgent::requestUnit()
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitUnitWeb);
+     m_mng.get(request);
+@@ -432,9 +420,6 @@ void LicenseAgent::requestStatus_B16(QByteArray data)
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitProfileB16);
+     m_mng.get(request);
+@@ -453,9 +438,6 @@ void LicenseAgent::requestInfo_B16(QByteArray data)
+     request.setTransferTimeout(REPLY_TIMEOUT);
+ 
+     m_mng.clearAccessCache();
+-    QSslConfiguration conf = request.sslConfiguration();
+-    conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+-    request.setSslConfiguration(conf);
+ 
+     setState(WaitInfoB16);
+     m_mng.get(request);

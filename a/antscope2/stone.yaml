@@ -3,7 +3,7 @@
 
 name        : antscope2
 version     : "2.0.3+git.bc7b74db"
-release     : 1
+release     : 3
 homepage    : https://github.com/rigexpert/AntScope2
 upstreams   :
     # No tags at all in this repository - upstream cuts Windows/Mac installers
@@ -32,6 +32,16 @@ description : |
     file, icon or udev rule anywhere in the tree. See setup: and install:
     below for how each is handled.
 
+    On top of that, this package carries two further patch sets from the
+    packager's own fork, neither yet sent upstream: fix/security-hardening
+    closes five real out-of-bounds-read/TLS-verification-disabled bugs
+    reachable from device- or network-supplied data, and
+    fix/1sec-timer-flicker fixes a UI bug where the graph/marker hint
+    popups flickered continuously (a mis-set 10Hz timer meant to fire at
+    1Hz, plus a WindowActivate/WindowDeactivate feedback loop the popups'
+    own show/hide triggered, worst on COSMIC/cosmic-comp). See setup:
+    below and https://github.com/dc0sk/AntScope2 for both branches in full.
+
     Bluetooth analyzers need a running bluetoothd (bluez). USB HID analyzers
     (Stick 200/500, the AA-N "Zero" line) need the udev rule this package
     installs - without it /dev/bus/usb/* stays root:root and AntScope2 sees
@@ -51,7 +61,6 @@ license     :
 builddeps   :
     - binary(qmake6)
     - binary(desktop-file-validate)
-    - binary(sed)
     - pkgconfig(Qt6Core)
     - pkgconfig(Qt6Gui)
     - pkgconfig(Qt6Widgets)
@@ -86,17 +95,29 @@ setup       : |
     # for what actually gets put at that path.
     %patch %(pkgdir)/0001-linux-fixed-system-data-path.patch
 
-    # analyzer/ble_analyzer.h #includes "screeninfo.h" and declares a
-    # setScreenInfo(ScreenInfo&) method - screeninfo.h does not exist
-    # anywhere in this repository, at any commit reachable from master, and
-    # setScreenInfo is never defined or called anywhere either. This is an
-    # upstream defect independent of platform (the same missing header would
-    # break a Windows build too). A sed edit is used here rather than a
-    # second patch file because this one file, alone in the tree, carries
-    # CRLF line endings, which GNU patch's context matching does not
-    # tolerate mixed with an LF-authored patch.
-    sed -i '/#include "screeninfo\.h"/d; /void setScreenInfo(ScreenInfo& screen);/d' \
-        analyzer/ble_analyzer.h
+    # Five real security fixes from the packager's own fork (not yet
+    # upstreamed to RigExpert): every QSslConfiguration in the tree
+    # explicitly disabled TLS certificate verification (licenseagent.cpp's
+    # registration traffic, downloader.cpp's firmware downloads), and four
+    # separate out-of-bounds reads exist in device/network-supplied data
+    # (HID firmware-info parsing x2, a short AA-230 firmware-info response,
+    # and unchecked-length BLE notifications). See the patch file itself,
+    # https://github.com/dc0sk/AntScope2/tree/fix/security-hardening, for
+    # the per-commit detail.
+    %patch %(pkgdir)/0002-security-hardening.patch
+
+    # Fixes the flickering-popups bug reported against this package: the
+    # 1-second UI timer that toggles graph hint popups was actually firing
+    # at 10Hz, and - independently - a WindowActivate/WindowDeactivate
+    # feedback loop (observed on COSMIC/cosmic-comp) where those popups'
+    # own show/hide re-triggered the very activation event that drives
+    # show/hide. Also removes the same dead screeninfo.h include/
+    # declaration the old sed workaround here used to delete, so that
+    # workaround is gone. From
+    # https://github.com/dc0sk/AntScope2/tree/fix/1sec-timer-flicker
+    # (its five security commits are identical to 0002's, so this patch
+    # carries only what that branch adds beyond it).
+    %patch %(pkgdir)/0003-fix-1sec-timer-flicker.patch
 build       : |
     qmake6 CONFIG+=release \
         QMAKE_CFLAGS_RELEASE="${CFLAGS}" \
