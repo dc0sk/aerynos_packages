@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=AntScope2
+GenericName=Antenna Analyzer Software
+Comment=Control and graph RigExpert antenna and cable analyzers
+Exec=AntScope2
+Icon=antscope2
+Categories=Utility;Electronics;HamRadio;Qt;
+Terminal=false

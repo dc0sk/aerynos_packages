@@ -6,6 +6,7 @@ repository.
 
 | Package | Version | Summary |
 | --- | --- | --- |
+| [`antscope2`](a/antscope2) | 2.0.3+git | Control and graphing software for RigExpert antenna analyzers |
 | [`apparmor`](a/apparmor) | 5.0.2 | Mandatory access control based on per-program profiles |
 | [`babl`](g/babl) | 0.1.128 | Pixel format conversion library, needed by GEGL and GIMP |
 | [`claude-desktop`](c/claude-desktop) | 1.37937.3 | Desktop application for Claude.ai (proprietary) |

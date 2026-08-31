@@ -1,0 +1,166 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : antscope2
+version     : "2.0.3+git.bc7b74db"
+release     : 1
+homepage    : https://github.com/rigexpert/AntScope2
+upstreams   :
+    # No tags at all in this repository - upstream cuts Windows/Mac installers
+    # off master by hand and never marks a commit for it. Pin the head commit
+    # as of packaging; 2.0.3 is ANTSCOPE2VER in AntScope.pro.
+    - https://github.com/rigexpert/AntScope2/archive/bc7b74db4ea419968d04522d3690f601c4032884.tar.gz : ce86efde9cd7f403c8362b04389c3c93117cc1452fb9a189692076eb75815f3e
+summary     : Control and graphing software for RigExpert antenna analyzers
+description : |
+    AntScope2 talks to RigExpert's USB, Bluetooth and network-attached antenna
+    and cable analyzers (the AA/AA-N/AA-BT series, and third-party NanoVNA
+    devices) and plots SWR, impedance, Smith chart, TDR and other measurements
+    against frequency, with calibration, marker and export support.
+
+    Upstream's own README still lists Linux as "to do" - only Windows is
+    actively developed and released as an installer - but AntScope.pro has
+    carried a real unix branch for some time: libusb-1.0 and Qt's own
+    QSerialPort/QBluetooth stand in for the Windows-only FTDI D2XX driver and
+    WinAPI HID/Bluetooth code. Two things stood between that and an actual
+    build: a header some Bluetooth code includes, screeninfo.h, exists
+    nowhere in the tree at any commit reachable from master (an upstream
+    defect, not a Linux-only gap - a Windows build would hit the same
+    missing file); and unpatched, Settings::localDataPath() resolves every
+    data file relative to the running binary's own directory, a
+    portable-folder assumption from Windows/Mac packaging that does not
+    hold once the binary lives in /usr/bin. There is also no Linux desktop
+    file, icon or udev rule anywhere in the tree. See setup: and install:
+    below for how each is handled.
+
+    Bluetooth analyzers need a running bluetoothd (bluez). USB HID analyzers
+    (Stick 200/500, the AA-N "Zero" line) need the udev rule this package
+    installs - without it /dev/bus/usb/* stays root:root and AntScope2 sees
+    the device in a scan but cannot open it, which looks like "not detected"
+    rather than a permissions error since libusb enumeration itself needs no
+    special access. The older FTDI-serial analyzers (AA-30/AA-55/AA-230) show
+    up as an ordinary /dev/ttyUSB*/ttyACM* device and need no rule of their
+    own beyond whatever this distribution already grants serial ports.
+license     :
+    # AntScope2's own code is upstream's MIT LICENSE.txt. qcustomplot.cpp
+    # (vendored, not a system library - see rundeps below) carries its own
+    # "GPL version 3, or (at your option) any later version" header, and is
+    # compiled directly into the same binary, so the binary as distributed is
+    # bound by the stronger copyleft license, not just the MIT one.
+    - MIT
+    - GPL-3.0-or-later
+builddeps   :
+    - binary(qmake6)
+    - binary(desktop-file-validate)
+    - binary(sed)
+    - pkgconfig(Qt6Core)
+    - pkgconfig(Qt6Gui)
+    - pkgconfig(Qt6Widgets)
+    - pkgconfig(Qt6PrintSupport)
+    - pkgconfig(Qt6Network)
+    - pkgconfig(Qt6Xml)
+    - pkgconfig(Qt6Concurrent)
+    - pkgconfig(Qt6OpenGL)
+    - pkgconfig(Qt6OpenGLWidgets)
+    - pkgconfig(Qt6SerialPort)
+    - pkgconfig(Qt6Bluetooth)
+    - pkgconfig(libusb-1.0)
+rundeps     :
+    # qcustomplot.cpp is vendored source (see license above), not a system
+    # library, so it needs no rundep of its own - it is simply part of the
+    # binary boulder's own ELF scan already accounts for.
+    #
+    # Bluetooth analyzers (the AA-BT range) go through Qt's BlueZ backend at
+    # runtime; nothing in the ELF NEEDED list points at bluez itself.
+    - bluez
+setup       : |
+    # Settings::localDataPath()/localDataFolder() resolve every data file -
+    # cables.txt, the ITU band-plan file, saved calibrations - relative to
+    # QCoreApplication::applicationDirPath()/.., i.e. next to the binary. That
+    # is right for a Windows/Mac-style portable folder, the only shape
+    # upstream currently tests, and wrong for %(bindir)/antscope2 on any
+    # distribution. The same two functions already carry a special case for
+    # Raspbian that reads/writes a fixed /usr/share/RigExpert/AntScope2
+    # instead - exactly a distribution-package install's shape, just gated to
+    # one OS flavour. This patch takes that branch unconditionally on Linux;
+    # see the patch file itself for the reasoning in full and install: below
+    # for what actually gets put at that path.
+    %patch %(pkgdir)/0001-linux-fixed-system-data-path.patch
+
+    # analyzer/ble_analyzer.h #includes "screeninfo.h" and declares a
+    # setScreenInfo(ScreenInfo&) method - screeninfo.h does not exist
+    # anywhere in this repository, at any commit reachable from master, and
+    # setScreenInfo is never defined or called anywhere either. This is an
+    # upstream defect independent of platform (the same missing header would
+    # break a Windows build too). A sed edit is used here rather than a
+    # second patch file because this one file, alone in the tree, carries
+    # CRLF line endings, which GNU patch's context matching does not
+    # tolerate mixed with an LF-authored patch.
+    sed -i '/#include "screeninfo\.h"/d; /void setScreenInfo(ScreenInfo& screen);/d' \
+        analyzer/ble_analyzer.h
+build       : |
+    qmake6 CONFIG+=release \
+        QMAKE_CFLAGS_RELEASE="${CFLAGS}" \
+        QMAKE_CXXFLAGS_RELEASE="${CXXFLAGS}" \
+        QMAKE_LFLAGS="${LDFLAGS}" \
+        AntScope.pro
+    %make
+install     : |
+    # AntScope.pro carries no unix INSTALLS block - "to do" applies to
+    # packaging as much as to the data-path handling above - so every file
+    # below is placed by hand rather than by a `make install` this build
+    # system does not offer.
+    install -Dm00755 build/release/AntScope2 %(installroot)%(bindir)/AntScope2
+
+    # The fixed path the setup: patch now sends localDataPath()/
+    # localDataFolder() to. cables.txt and itu-regions-defaults.txt are
+    # upstream's own shipped defaults - itu-regions.txt itself is a user
+    # override that loadBands() already falls back to the "-defaults" file
+    # when it is missing, as on a fresh install, so it is deliberately not
+    # shipped here.
+    # Calibration is where the Open/Short/Load calibration file dialogs
+    # default to; upstream never creates it either, it just expects it to
+    # exist.
+    #
+    # All three live under %(datadir), which - unlike a per-user config
+    # directory - an ordinary user cannot write to. Loading the shipped
+    # defaults works out of the box; saving a calibration file or a custom
+    # band plan does not unless run as root, which is a real gap against
+    # upstream's own Windows/Mac builds (writable next to the binary or under
+    # the user's profile) and not something this patch attempts to fix - it
+    # would need upstream to separate "read-only shipped data" from
+    # "per-user state" in its own code, which the current single data-path
+    # function does not do.
+    %install_dir %(installroot)%(datadir)/RigExpert/AntScope2
+    %install_dir %(installroot)%(datadir)/RigExpert/AntScope2/Calibration
+    %install_file cables.txt %(installroot)%(datadir)/RigExpert/AntScope2/cables.txt
+    %install_file itu-regions-defaults.txt %(installroot)%(datadir)/RigExpert/AntScope2/itu-regions-defaults.txt
+
+    # No desktop file or icon exists anywhere in the upstream tree; both are
+    # written for this package. AntScope2.png is the only icon upstream
+    # ships that is not Windows (.ico) or Mac (.icns) specific, at a single
+    # 64x64 size.
+    %install_dir %(installroot)%(datadir)/applications
+    %install_file %(pkgdir)/antscope2.desktop %(installroot)%(datadir)/applications/antscope2.desktop
+    desktop-file-validate %(installroot)%(datadir)/applications/antscope2.desktop
+
+    %install_dir %(installroot)%(datadir)/icons/hicolor/64x64/apps
+    %install_file AntScope2.png %(installroot)%(datadir)/icons/hicolor/64x64/apps/antscope2.png
+
+    # No udev rule ships in this repository either - AntScope2 talks to the
+    # HID-class analyzers (Stick 200/500, the AA-N "Zero" line) directly over
+    # /dev/bus/usb/*, which is root:root by default, so a plain user session
+    # cannot open it without one. See the rule file itself for the vendor/
+    # product IDs and why TAG+="uaccess" is used over the vendor's own
+    # world-writable MODE="0666".
+    %install_dir %(installroot)%(udevrulesdir)
+    %install_file %(pkgdir)/66-rigexpert.rules %(installroot)%(udevrulesdir)/66-rigexpert.rules
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file LICENSE.txt %(installroot)%(datadir)/licenses/%(name)/LICENSE.txt
+# No check phase: the binary does start under QT_QPA_PLATFORM=offscreen with
+# no display and no analyzer attached (verified by hand, backgrounded and
+# killed under an external timeout after confirming it stayed up rather than
+# crashing on startup) - it is a real smoke test, but it never terminates on
+# its own, which is a poor fit for a build-time check phase with no external
+# timeout of its own. Its real behaviour needs actual RigExpert hardware,
+# which this build phase has neither.

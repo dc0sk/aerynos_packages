@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # No release-monitoring.org project and no tags to follow - upstream cuts
+  # no tarballs at all, only a Windows installer off master by hand. New
+  # commits have to be watched on the repository itself:
+  #   https://github.com/rigexpert/AntScope2/commits/master
+  id: ~
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20260831.
