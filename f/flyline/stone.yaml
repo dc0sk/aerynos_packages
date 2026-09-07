@@ -1,0 +1,69 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : flyline
+version     : "1.7.1"
+release     : 1
+homepage    : https://github.com/HalFrgrd/flyline
+upstreams   :
+    - https://github.com/HalFrgrd/flyline/archive/refs/tags/v1.7.1.tar.gz : 067b68de0d1484a43fb77124fd2544f19b3ee30691635d038e94f13868ddb27f
+summary     : A Bash plugin that replaces readline for a modern line-editing experience
+description : |
+    flyline is a Bash loadable builtin - a shared library `enable -f`'d into a
+    running bash, not a separate program - that replaces GNU Readline's line
+    editing with a ratatui-based UI: inline fuzzy history and path
+    suggestions, tab completion, configurable keybindings/prompts and small
+    animations. It only affects the interactive shell that loads it; scripts
+    and non-interactive bash are untouched.
+license     :
+    # Upstream's own source (LICENSE-MIT) is MIT. LICENSE-GPLv3 and upstream's
+    # packaging (docker/PKGBUILD's license=('MIT' 'GPL-3.0-only')) apply
+    # GPL-3.0-only to the built library itself: it resolves bash's own symbols
+    # at dlopen time (see build: below) rather than linking a system library,
+    # which upstream treats as forming a combined work with bash - itself
+    # GPLv3 - once loaded.
+    - MIT
+    - GPL-3.0-only
+networking  : true
+rundeps     :
+    # Not a linked dependency - libflyline.so has no DT_NEEDED entry for bash,
+    # it resolves bash's own symbols at dlopen() time (see build: below) - but
+    # the package is inert without a bash new enough to `enable -f` it.
+    - bash
+setup       : |
+    %cargo_fetch
+build       : |
+    # The workspace root here is also the "flyline" package itself (not a
+    # virtual manifest), so plain `cargo build` already builds only that
+    # package's default target - the cdylib - not the two path-dependency
+    # library crates (flybuffer, flycontent) as their own top-level targets.
+    # --lib matches upstream's own build command (docker/PKGBUILD) and rules
+    # out cargo ever trying to build anything but that cdylib.
+    %cargo_build --lib
+install     : |
+    # Same location and load-bearing filename Arch's own PKGBUILD and
+    # upstream's nix module use (.../bash/libflyline.so, loaded with
+    # `enable -f .../bash/libflyline.so flyline`), so upstream's own README
+    # and docs still apply verbatim on this distribution.
+    %install_exe %(cargo_target_dir)/libflyline.so %(installroot)%(libdir)/bash/libflyline.so
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file LICENSE-MIT %(installroot)%(datadir)/licenses/%(name)/LICENSE-MIT
+    %install_file LICENSE-GPLv3 %(installroot)%(datadir)/licenses/%(name)/LICENSE-GPLv3
+
+    %install_dir %(installroot)%(datadir)/doc/%(name)
+    %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md
+check       : |
+    # tests/docker_integration_tests.rs spins up several bash versions under
+    # Docker, unavailable in this sandbox - upstream's own nix build
+    # (nix/package.nix) hits the same wall and skips exactly those tests by
+    # name. --lib scopes cargo test to the crate's own unit tests instead of
+    # skipping the check phase outright.
+    cargo test %(options_cargo_release) --lib
+
+    # A real smoke test beyond the unit tests: confirm bash can actually
+    # dlopen the library just built and register it as a builtin. Mirrors
+    # nix/package.nix's own postCheck, which exists because upstream itself
+    # considers this worth checking for real rather than trusting the unit
+    # tests alone.
+    bash --noprofile --norc -i -c 'enable -f "$1" flyline' flyline-check %(cargo_target_dir)/libflyline.so

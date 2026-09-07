@@ -1,0 +1,28 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"flyline": {
+			"depends": [
+				"bash",
+				"soname(ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))"
+			],
+			"files": [
+				"/usr/lib/bash/libflyline.so",
+				"/usr/share/doc/flyline/README.md",
+				"/usr/share/licenses/flyline/LICENSE-GPLv3",
+				"/usr/share/licenses/flyline/LICENSE-MIT"
+			],
+			"name": "flyline",
+			"provides": [
+				"soname(bash/libflyline.so(x86_64))"
+			]
+		}
+	},
+	"source-name": "flyline",
+	"source-release": "1",
+	"source-version": "1.7.1"
+}
