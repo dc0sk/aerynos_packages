@@ -1,0 +1,103 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"limesuite": {
+			"build-depends": [
+				"pkgconfig(SoapySDR)",
+				"pkgconfig(libusb-1.0)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libstdc++.so.6(x86_64))",
+				"soname(libusb-1.0.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/bin/LimeQuickTest",
+				"/usr/bin/LimeUtil",
+				"/usr/lib/libLimeSuite.so.23.11-1",
+				"/usr/lib/libLimeSuite.so.23.11.0",
+				"/usr/lib/udev/rules.d/64-limesuite.rules"
+			],
+			"name": "limesuite",
+			"provides": [
+				"binary(LimeQuickTest)",
+				"binary(LimeUtil)",
+				"soname(libLimeSuite.so.23.11-1(x86_64))"
+			]
+		},
+		"limesuite-devel": {
+			"build-depends": [
+				"pkgconfig(SoapySDR)",
+				"pkgconfig(libusb-1.0)"
+			],
+			"depends": [
+				"limesuite"
+			],
+			"files": [
+				"/usr/include/lime/ADCUnits.h",
+				"/usr/include/lime/ADF4002.h",
+				"/usr/include/lime/ConnectionHandle.h",
+				"/usr/include/lime/ConnectionRegistry.h",
+				"/usr/include/lime/FPGA_common.h",
+				"/usr/include/lime/IConnection.h",
+				"/usr/include/lime/LMS64CCommands.h",
+				"/usr/include/lime/LMS64CProtocol.h",
+				"/usr/include/lime/LMS7002M.h",
+				"/usr/include/lime/LMS7002M_RegistersMap.h",
+				"/usr/include/lime/LMS7002M_parameters.h",
+				"/usr/include/lime/LMSBoards.h",
+				"/usr/include/lime/LimeSuite.h",
+				"/usr/include/lime/LimeSuiteConfig.h",
+				"/usr/include/lime/Logger.h",
+				"/usr/include/lime/MCU_BD.h",
+				"/usr/include/lime/MCU_File.h",
+				"/usr/include/lime/Si5351C.h",
+				"/usr/include/lime/Streamer.h",
+				"/usr/include/lime/SystemResources.h",
+				"/usr/include/lime/VersionInfo.h",
+				"/usr/include/lime/dataTypes.h",
+				"/usr/include/lime/fifo.h",
+				"/usr/include/lime/limeRFE.h",
+				"/usr/include/lime/lms7_device.h",
+				"/usr/lib/cmake/LimeSuite/LimeSuiteConfig.cmake",
+				"/usr/lib/cmake/LimeSuite/LimeSuiteConfigVersion.cmake",
+				"/usr/lib/libLimeSuite.so",
+				"/usr/lib/pkgconfig/LimeSuite.pc"
+			],
+			"name": "limesuite-devel",
+			"provides": [
+				"cmake(LimeSuite)",
+				"pkgconfig(LimeSuite)"
+			]
+		},
+		"limesuite-soapysdr": {
+			"build-depends": [
+				"pkgconfig(SoapySDR)",
+				"pkgconfig(libusb-1.0)"
+			],
+			"depends": [
+				"soapysdr",
+				"soname(libLimeSuite.so.23.11-1(x86_64))",
+				"soname(libSoapySDR.so.0.8(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libstdc++.so.6(x86_64))"
+			],
+			"files": [
+				"/usr/lib/SoapySDR/modules0.8/libLMS7Support.so"
+			],
+			"name": "limesuite-soapysdr",
+			"provides": [
+				"soname(SoapySDR/modules0.8/libLMS7Support.so(x86_64))"
+			]
+		}
+	},
+	"source-name": "limesuite",
+	"source-release": "1",
+	"source-version": "23.11.0"
+}

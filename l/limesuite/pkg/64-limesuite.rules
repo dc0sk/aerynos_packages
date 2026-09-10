@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+#
+# Same device set as upstream's own udev-rules/64-limesuite.rules, but with
+# TAG+="uaccess" (an ACL for whoever is logged in at the seat) in place of
+# upstream's MODE="666" (world-writable to every local user/process).
+#
+# 04b4:8613 - Cypress FX2 in its default/unconfigured EEPROM state, seen
+#             briefly during LimeSDR-USB firmware upload.
+# 04b4:00f1 - Cypress FX3, LimeSDR-USB's normal operating mode.
+# 0403:601f - FTDI FT601, LimeSDR-Mini's USB3 bridge.
+# 1d50:6108 - LimeSDR-Mini/LimeNET-Micro's own OpenMoko-assigned USB ID.
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="8613", TAG+="uaccess", SYMLINK+="stream-%k"
+SUBSYSTEM=="usb", ATTR{idVendor}=="04b4", ATTR{idProduct}=="00f1", TAG+="uaccess", SYMLINK+="stream-%k"
+SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="601f", TAG+="uaccess", SYMLINK+="stream-%k"
+SUBSYSTEM=="usb", ATTR{idVendor}=="1d50", ATTR{idProduct}=="6108", TAG+="uaccess", SYMLINK+="stream-%k"
+
+# LimeSDR-PCIe/LimeNET-Micro PCIe variants, via the Xillybus kernel driver.
+SUBSYSTEM=="xillybus", TAG+="uaccess"
+
+# FT232-based JTAG/serial bridge on the older EVB7 eval boards.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", TAG+="uaccess"
