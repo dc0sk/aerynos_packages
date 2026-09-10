@@ -3,7 +3,7 @@
 
 name        : limesuite
 version     : "23.11.0"
-release     : 1
+release     : 2
 homepage    : https://github.com/myriadrf/LimeSuite
 upstreams   :
     - https://github.com/myriadrf/LimeSuite/archive/refs/tags/v23.11.0.tar.gz : fd8a448b92bc5ee4012f0ba58785f3c7e0a4d342b24e26275318802dfe00eb33
@@ -19,15 +19,22 @@ description : |
     sdroxide's own LimeSuite backend (sdroxide-lime, which `dlopen`s this
     package's library at runtime rather than linking it).
 
-    Not built here: LimeSuiteGUI and the freedesktop menu entry that launches
-    it (CMake's own ENABLE_GUI/ENABLE_DESKTOP options - need wxWidgets, not
-    yet packaged for AerynOS), and the Octave plugin (needs liboctave-dev,
-    likewise unpackaged and a niche use case). Both are optional CMake
-    subdirectories that cleanly no-op when their dependency is absent rather
-    than failing the build, so omitting them costs nothing else here -
-    LimeUtil and LimeQuickTest both build as CLI-only tools regardless (the
-    latter's own GUI test-results viewer is the only part that needs FLTK/
-    GLUT, gated the same way).
+    LimeSuiteGUI (the limesuite-gui subpackage) needs wxwidgets, now packaged
+    for AerynOS; ENABLE_GUI auto-enables against it (CMake's own
+    cmake_dependent_option, ENABLE_LIBRARY;wxWidgets_FOUND). The desktop
+    launcher and icons are placed directly under /usr/share/applications and
+    the hicolor icon theme rather than through CMake's own ENABLE_DESKTOP
+    (disabled below), which installs them under share/Lime/Desktop alongside
+    install/uninstall shell scripts meant to be run post-install to copy
+    them into place and refresh the XDG caches - a postinst-script model
+    this package format has no equivalent hook for, so the files are placed
+    where they belong directly instead.
+
+    Still not built: the Octave plugin (needs liboctave-dev, unpackaged and
+    a niche use case - and this system's own Octave is a Flatpak, which a
+    native build cannot link against regardless). It is the one remaining
+    optional CMake subdirectory that cleanly no-ops when its dependency is
+    absent rather than failing the build.
 
     The one connection backend confirmed to need a system library is FX3
     (LimeSDR-USB's normal USB3 mode), which needs libusb-1.0 - see
@@ -37,11 +44,26 @@ description : |
     none of those extra dependencies are packaged for AerynOS yet either, so
     this build covers USB (FX3) LimeSDRs and whichever of the others happen
     to need nothing beyond what is already present.
-license     : Apache-2.0
+license     :
+    # oglGraph (the limesuite-gui subpackage's plotting widget) statically
+    # links a vendored copy of GLEW (src/oglGraph/glew), carrying no licence
+    # file of its own here but upstream (BSD/MIT, plus SGI's original terms
+    # on some of the extension headers it wraps).
+    - Apache-2.0
+    - BSD-3-Clause
+    - MIT
+    - SGI-B-2.0
 builddeps   :
     - pkgconfig(libusb-1.0)
     # The limesuite-soapysdr subpackage below.
     - pkgconfig(SoapySDR)
+    # The limesuite-gui subpackage below (LimeSuiteGUI, and oglGraph, the
+    # OpenGL plotting widget it links - GLEW itself is vendored straight
+    # into oglGraph's own sources, not an external dependency).
+    - cmake(wxWidgets)
+    - pkgconfig(gl)
+    - pkgconfig(glu)
+    - binary(desktop-file-validate)
 setup       : |
     # CMAKE_POLICY_VERSION_MINIMUM: upstream declares cmake_minimum_required
     # (VERSION 3.1.3), and CMake 4 refuses to configure anything below 3.5 at
@@ -51,8 +73,12 @@ setup       : |
     # uses MODE="666" (world-writable to every local user and process); see
     # pkg/64-limesuite.rules for the TAG+="uaccess" replacement installed
     # below instead, covering the same device IDs.
+    #
+    # -DENABLE_DESKTOP=OFF: see description: above for why the launcher and
+    # icons are placed by hand in install: instead of through this option.
     %cmake \
-        -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+        -DENABLE_DESKTOP=OFF
 build       : |
     %cmake_build
 install     : |
@@ -60,6 +86,18 @@ install     : |
 
     %install_dir %(installroot)%(udevrulesdir)
     %install_file %(pkgdir)/64-limesuite.rules %(installroot)%(udevrulesdir)/64-limesuite.rules
+
+    # ENABLE_DESKTOP=OFF above skips CMake's own install of these (into a
+    # non-standard share/Lime/Desktop location meant for a postinst script
+    # to relocate - see description:); place them directly instead.
+    %install_dir %(installroot)%(datadir)/applications
+    %install_file Desktop/lime-suite.desktop %(installroot)%(datadir)/applications/lime-suite.desktop
+    desktop-file-validate %(installroot)%(datadir)/applications/lime-suite.desktop
+
+    for _size in 16 22 32 48 64 128; do
+        %install_dir %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps
+        %install_file Desktop/lime-suite-${_size}.png %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps/lime-suite.png
+    done
 # No check phase: LimeQuickTest *is* upstream's test suite, but it is a
 # hardware diagnostic that talks to a real LimeSDR over USB/PCIe, not
 # something ctest runs - there is no automated suite this build phase could
@@ -77,3 +115,15 @@ packages    :
             - /usr/lib/SoapySDR
         rundeps:
             - soapysdr
+    - "limesuite-gui":
+        summary: "Graphical configuration utility for LimeSDR devices"
+        description: |
+            LimeSuiteGUI, upstream's low-level hardware configuration and
+            firmware-update tool for the LMS7002M-based LimeSDR family, plus its
+            desktop launcher and icons. Everything else in the limesuite package
+            (the library, LimeUtil, LimeQuickTest) has no GUI dependency of its
+            own; install this only if you want the graphical tool too.
+        paths:
+            - /usr/bin/LimeSuiteGUI
+            - /usr/share/applications/lime-suite.desktop
+            - /usr/share/icons/hicolor

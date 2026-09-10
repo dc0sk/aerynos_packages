@@ -4,7 +4,11 @@
 	"packages": {
 		"limesuite": {
 			"build-depends": [
+				"binary(desktop-file-validate)",
+				"cmake(wxWidgets)",
 				"pkgconfig(SoapySDR)",
+				"pkgconfig(gl)",
+				"pkgconfig(glu)",
 				"pkgconfig(libusb-1.0)"
 			],
 			"depends": [
@@ -31,7 +35,11 @@
 		},
 		"limesuite-devel": {
 			"build-depends": [
+				"binary(desktop-file-validate)",
+				"cmake(wxWidgets)",
 				"pkgconfig(SoapySDR)",
+				"pkgconfig(gl)",
+				"pkgconfig(glu)",
 				"pkgconfig(libusb-1.0)"
 			],
 			"depends": [
@@ -74,9 +82,49 @@
 				"pkgconfig(LimeSuite)"
 			]
 		},
+		"limesuite-gui": {
+			"build-depends": [
+				"binary(desktop-file-validate)",
+				"cmake(wxWidgets)",
+				"pkgconfig(SoapySDR)",
+				"pkgconfig(gl)",
+				"pkgconfig(glu)",
+				"pkgconfig(libusb-1.0)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libGL.so.1(x86_64))",
+				"soname(libLimeSuite.so.23.11-1(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libstdc++.so.6(x86_64))",
+				"soname(libwx_baseu-3.3.so.3(x86_64))",
+				"soname(libwx_gtk3u_core-3.3.so.3(x86_64))",
+				"soname(libwx_gtk3u_gl-3.3.so.3(x86_64))"
+			],
+			"files": [
+				"/usr/bin/LimeSuiteGUI",
+				"/usr/share/applications/lime-suite.desktop",
+				"/usr/share/icons/hicolor/128x128/apps/lime-suite.png",
+				"/usr/share/icons/hicolor/16x16/apps/lime-suite.png",
+				"/usr/share/icons/hicolor/22x22/apps/lime-suite.png",
+				"/usr/share/icons/hicolor/32x32/apps/lime-suite.png",
+				"/usr/share/icons/hicolor/48x48/apps/lime-suite.png",
+				"/usr/share/icons/hicolor/64x64/apps/lime-suite.png"
+			],
+			"name": "limesuite-gui",
+			"provides": [
+				"binary(LimeSuiteGUI)"
+			]
+		},
 		"limesuite-soapysdr": {
 			"build-depends": [
+				"binary(desktop-file-validate)",
+				"cmake(wxWidgets)",
 				"pkgconfig(SoapySDR)",
+				"pkgconfig(gl)",
+				"pkgconfig(glu)",
 				"pkgconfig(libusb-1.0)"
 			],
 			"depends": [
@@ -98,6 +146,6 @@
 		}
 	},
 	"source-name": "limesuite",
-	"source-release": "1",
+	"source-release": "2",
 	"source-version": "23.11.0"
 }
