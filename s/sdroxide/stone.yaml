@@ -1,0 +1,225 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sdroxide
+version     : "1.6.6"
+release     : 1
+homepage    : https://github.com/dividebysandwich/sdroxide
+upstreams   :
+    # Listed first so it lands in %(workdir): everything else is a git
+    # submodule GitHub's own tag tarball does not include (see setup: below).
+    - https://github.com/dividebysandwich/sdroxide/archive/refs/tags/v1.6.6.tar.gz : eb693a1a517a2b2a08e169ba33f16a7f4e94e95ff6fc1ea5918c482c8e9c18b2
+    # vendor/rade_c (.gitmodules), pinned to the commit v1.6.6 actually carries.
+    - https://github.com/freedv/rade_c/archive/a36161bce0fb37daf3f4602344b095f6817dddb1.tar.gz : eaba2ecbe61dc48748bc62f08b2eb623bccd5b21b8228bf42dedc0e232edf7cd
+    # vendor/rtl_433 (.gitmodules), same pinning.
+    - https://github.com/merbanan/rtl_433/archive/8fa6364c5c7e14665fe3d80d0553883ec14a4116.tar.gz : 6e164f38216f46f1d08494c2adeaa7c72d7f3d5456e0b8c5ae424159d7051753
+    # vendor/faad2 (.gitmodules), same pinning.
+    - https://github.com/knik0/faad2/archive/673a22a3c7c33e96e2ff7aae7c4d2bc190dfbf92.tar.gz : 98725cefc915771f00ffd0286901c865e7d3fd0e5ff6b98d004d6f48904776f9
+summary     : PowerSDR/Thetis-style SDR transceiver with a native GUI
+description : |
+    sdroxide drives software-defined radios (SoapySDR/HackRF, RTL-SDR, RX-888,
+    SDRplay RSP, HackRF, Airspy/AirspyHF, HydraSDR, LimeSDR, PlutoSDR, ELAD
+    FDM, KiwiSDR, plus CAT/OpenHPSDR/TCI/SmartSDR/Icom-LAN-controlled rigs)
+    through a PowerSDR/Thetis-style egui interface: panadapter and waterfall,
+    SSB/CW/AM/FM/digital modes, a built-in FT8/FT4/FT2 engine, a logbook,
+    Winlink email, an ADS-B/VDL2 aircraft display, a CW/RTTY/PSK skimmer, and
+    spoken status announcements via a bundled offline neural voice. The same
+    binary also runs headless as --server, streaming the identical UI to a
+    browser over WebSocket (the browser client itself is not built here - see
+    below).
+
+    Most hardware backends (RTL-SDR, HackRF, Airspy, AirspyHF, HydraSDR,
+    RX-888) are pure-Rust over USB via `nusb` - no libusb, no vendor C library.
+    LimeSDR, SDRplay and the Fobos SDR instead `dlopen` their vendor library at
+    runtime (nothing linked at build time), so this package builds and ships
+    complete regardless of which of those are installed; each simply reports
+    "not installed" if its library is absent.
+
+    Three pieces are git submodules (.gitmodules) that a GitHub tag tarball
+    does not include, so they are fetched as their own pinned-commit
+    upstreams above and vendored into place in setup: below - see that for
+    which crate needs which and why:
+      - vendor/rade_c - the RADE digital-voice codec (FreeDV RADE mode).
+      - vendor/rtl_433 - the embedded rtl_433 ISM-band decoders.
+      - vendor/faad2 - AAC decoding for DRM (Digital Radio Mondiale) reception.
+    rade_c and faad2 are unconditional (every build needs them); rtl_433 is
+    gated by the "rtl433" feature, on by default - see build: below.
+
+    Not built here: the browser client (`crates/sdroxide-web`, the
+    `embed-web` feature). It needs a second toolchain entirely - a
+    rustup-installed wasm32-unknown-unknown target, Trunk, and its own
+    network-fetched wasm-bindgen-cli/wasm-opt - for a server-streamed-to-a-
+    browser mode that is secondary to the native desktop application this
+    package ships. `sdroxide --server` still works without it: it serves the
+    native `--connect` remote client fine, and falls back to a one-line
+    placeholder over HTTP instead of the real page.
+license     :
+    # The core is upstream's own GPL-3.0-or-later. Every build unconditionally
+    # links two stronger/different-licensed components into the one binary,
+    # so the binary as distributed is bound by all of them at once, not just
+    # the first:
+    #   - AGPL-3.0-only: the DeepCW model (crates/sdroxide-deepcw/LICENSE),
+    #     the CW decoder. AGPL's own §13 is the strongest clause in the mix -
+    #     it reaches anyone offered the program over a network, which is
+    #     exactly what `sdroxide --server` does for its remote clients.
+    #   - GPL-2.0-only: vendor/faad2, linked in for DRM/AAC decoding
+    #     (unconditional, like DeepCW above). Upstream carries this
+    #     GPLv2-only/GPLv3-or-later combination as-is; it is not this
+    #     package's place to resolve it, only to record it.
+    # Two more are embedded as data rather than linked, so they constrain
+    # only themselves, not the whole binary:
+    #   - MIT: the RX-888 FX3 firmware image (crates/sdroxide-rx888/firmware),
+    #     embedded with include_bytes!.
+    #   - BSD-2-Clause: CMUdict (crates/sdroxide-speech/assets), embedded for
+    #     grapheme-to-phoneme in the speech feature. Also vendor/rade_c's own
+    #     licence, coincidentally the same.
+    # rtl_433 (GPL-2.0-or-later) is default-on but a togglable feature - see
+    # build:. The bundled Piper TTS voice (assets/voices) is CC-BY-NC-SA-4.0,
+    # which cannot be absorbed into a GPL work; it ships as a genuinely
+    # separate, merely-read data file precisely so it never has to be (see
+    # assets/voices/LICENSE-voice.txt), so it is not listed as a code licence
+    # here.
+    - GPL-3.0-or-later
+    - AGPL-3.0-only
+    - GPL-2.0-only
+    - GPL-2.0-or-later
+    - MIT
+    - BSD-2-Clause
+networking  : true
+builddeps   :
+    - binary(desktop-file-validate)
+    # autoconf/automake/libtool: RADE's CMake wrapper fetches and
+    # autotools-builds a patched, FARGAN-enabled Opus from source (see
+    # setup:/build: below) - this is a genuine build-time network fetch, not
+    # something %cargo_fetch already covers.
+    - binary(autoconf)
+    - binary(automake)
+    - binary(libtool)
+    # rtl_433's own CMake build, and RADE's CMake wrapper around its Opus.
+    # The `cmake` crate defaults to the "Unix Makefiles" generator, which
+    # needs `make` on PATH - not pulled in automatically outside the %cmake
+    # macro's own generator choice, since this package never calls %cmake.
+    - binary(cmake)
+    - binary(make)
+    # cargo's own libgit2-based fetch of deep_filter (a git dependency, see
+    # setup: below) hit a bare "SSL error: unknown error" against
+    # github.com in this sandbox; shelling out to a real git client instead
+    # (net.git-fetch-with-cli) is the documented workaround and needs this.
+    - binary(git)
+    # rade_c's own ExternalProject applies its two opus-nnet.*.diff patches to
+    # the Opus it downloads with a plain `patch` shell call, not boulder's own
+    # %patch macro - so that macro's implicit binary(patch) dependency never
+    # applies here and this needs spelling out.
+    - binary(patch)
+    # Opus's own configure runs dnn/download_model.sh, which shells out to
+    # curl directly rather than going through cargo/cmake's own fetch paths.
+    - binary(curl)
+    # download_model.sh un-tars what curl fetched; the Opus source ExternalProject_Add
+    # downloads is a .zip (cmake's own unpacker), but the DNN model tarball
+    # inside it is gzipped, and `tar` shells out to a real `gzip` for that.
+    - binary(tar)
+    - binary(gzip)
+    # bindgen, for the raw FFI RADE's build.rs generates against rade_c/Opus.
+    - clang-devel
+    - pkgconfig(alsa)
+    # eframe/winit's keyboard-layout handling.
+    - pkgconfig(xkbcommon)
+    # A system Opus for the *server's* audio codec (opus/audiopus_sys, an
+    # unrelated second Opus build from RADE's own): audiopus_sys probes
+    # pkg-config first and, finding one, skips its vendored CMake build
+    # entirely - which is otherwise how "Compatibility with CMake < 3.5 has
+    # been removed" shows up on CMake 4 (README, "Building" section).
+    - pkgconfig(opus)
+    # The soapy feature (default-on, see build:).
+    - pkgconfig(SoapySDR)
+environment : |
+    # /tmp inside the build container is its own 15G tmpfs - RAM, not disk -
+    # separate from the host's. autoconf's configure scratch files, cmake/
+    # make intermediates (RADE's vendored Opus/FARGAN build) and rustc/ld's
+    # own temp files during a debuginfo=2 + thin-LTO link all default to
+    # $TMPDIR/tmp, so a heavy build can spill several GB there and consume
+    # host memory invisibly - the container's tmpfs is torn down the instant
+    # a build is killed, so nothing is left behind to show it happened.
+    # %(workdir) is disk-backed (bind-mounted from the boulder cache dir on
+    # the real filesystem), so point everything at it instead.
+    mkdir -p %(workdir)/.tmp
+    TMPDIR="%(workdir)/.tmp"
+    export TMPDIR
+setup       : |
+    # rade_c, rtl_433 and faad2 are git submodules (.gitmodules) that GitHub's
+    # own tag tarball omits outright - their directories do not even exist
+    # here yet. Each was fetched above as its own pinned-commit upstream,
+    # which boulder extracts as a sibling of %(workdir) named after the
+    # upstream URL's own filename; move each into the path its submodule
+    # entry names.
+    mkdir -p vendor/rade_c vendor/rtl_433 vendor/faad2
+    cp -a ../a36161bce0fb37daf3f4602344b095f6817dddb1.tar.gz/. vendor/rade_c/
+    cp -a ../8fa6364c5c7e14665fe3d80d0553883ec14a4116.tar.gz/. vendor/rtl_433/
+    cp -a ../673a22a3c7c33e96e2ff7aae7c4d2bc190dfbf92.tar.gz/. vendor/faad2/
+
+    # See the binary(git) builddep comment above.
+    CARGO_NET_GIT_FETCH_WITH_CLI=true
+    export CARGO_NET_GIT_FETCH_WITH_CLI
+
+    %cargo_fetch
+build       : |
+    # This workspace's own dev-profile overrides (opt-level=2 across every
+    # DSP-heavy crate) apply to release builds too where they set codegen
+    # units, and combined with debuginfo=2 + thin-LTO on a wgpu/egui GUI and
+    # a full neural denoiser (deep_filter), a handful of these rustc jobs
+    # already run heavy; %(jobs) (= nproc, 16 here) of them at once is what
+    # actually exhausted host memory on the first attempt at this recipe.
+    # Capped independently of %(jobs) rather than by lowering that, since
+    # other unrelated compile jobs (CC/CXX etc.) stay fine at full
+    # parallelism - this is specifically rustc's own per-job footprint here.
+    CARGO_BUILD_JOBS=2
+    export CARGO_BUILD_JOBS
+
+    # default = ["soapy", "rtl433"] already matches what this package wants
+    # (see license:/description: above), so plain %cargo_build needs no
+    # --features of its own. The workspace's own [dependencies] and
+    # default-members exclude the wasm crate entirely - see description: for
+    # why that one is not built here.
+    %cargo_build
+install     : |
+    %install_exe %(cargo_target_dir)/sdroxide %(installroot)%(bindir)/sdroxide
+
+    %install_dir %(installroot)%(datadir)/applications
+    %install_file packaging/linux/sdroxide.desktop %(installroot)%(datadir)/applications/sdroxide.desktop
+    desktop-file-validate %(installroot)%(datadir)/applications/sdroxide.desktop
+
+    %install_dir %(installroot)%(datadir)/icons/hicolor/scalable/apps
+    %install_file packaging/icons/sdroxide.svg %(installroot)%(datadir)/icons/hicolor/scalable/apps/sdroxide.svg
+    for _size in 16 24 32 48 64 128 256 512; do
+        %install_dir %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps
+        %install_file packaging/icons/sdroxide-${_size}.png %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps/sdroxide.png
+    done
+
+    # One rule per USB-attached backend; RTL-SDR's covers the dongles this
+    # binary's own native driver claims. Not shipped: LimeSDR/PlutoSDR (no
+    # rule in packaging/linux at all - LimeSuite/libiio, found by dlopen or
+    # over the network, are expected to bring their own) and SDRplay (its own
+    # sdrplay-api package already installs 66-sdrplay.rules).
+    %install_dir %(installroot)%(udevrulesdir)
+    for _rule in airspy airspyhf elad hackrf hydrasdr limerfe relay rtlsdr rx888; do
+        %install_file packaging/linux/60-sdroxide-${_rule}.rules %(installroot)%(udevrulesdir)/60-sdroxide-${_rule}.rules
+    done
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE-GPL-3.0-or-later
+    %install_file crates/sdroxide-deepcw/LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE-AGPL-3.0-deepcw
+    %install_file vendor/faad2/COPYING %(installroot)%(datadir)/licenses/%(name)/LICENSE-GPL-2.0-faad2
+    %install_file vendor/rtl_433/COPYING %(installroot)%(datadir)/licenses/%(name)/LICENSE-GPL-2.0-or-later-rtl_433
+    %install_file crates/sdroxide-rx888/firmware/LICENSE.txt %(installroot)%(datadir)/licenses/%(name)/LICENSE-MIT-rx888-firmware
+    %install_file crates/sdroxide-speech/assets/LICENSE-cmudict.txt %(installroot)%(datadir)/licenses/%(name)/LICENSE-BSD-cmudict
+    %install_file assets/voices/LICENSE-voice.txt %(installroot)%(datadir)/licenses/%(name)/NOTICE-CC-BY-NC-SA-voice
+
+    %install_dir %(installroot)%(datadir)/doc/%(name)
+    %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md
+# No check phase: this is a 49-crate workspace already carrying an
+# unusually long build (RADE's from-scratch autotools Opus, rtl_433's own
+# CMake build, then the full egui/wgpu GUI under this workspace's own
+# opt-level=2 dev-profile overrides for every DSP-heavy crate); its own test
+# suite is sized to match and would roughly double that again for no gain
+# boulder's own build already gives - a clean compile against every one of
+# these dependencies, native and vendored, is itself the real signal here.

@@ -1,0 +1,73 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"sdroxide": {
+			"build-depends": [
+				"binary(autoconf)",
+				"binary(automake)",
+				"binary(cmake)",
+				"binary(curl)",
+				"binary(desktop-file-validate)",
+				"binary(git)",
+				"binary(gzip)",
+				"binary(libtool)",
+				"binary(make)",
+				"binary(patch)",
+				"binary(tar)",
+				"clang-devel",
+				"pkgconfig(SoapySDR)",
+				"pkgconfig(alsa)",
+				"pkgconfig(opus)",
+				"pkgconfig(xkbcommon)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(ld-linux-x86-64.so.2(x86_64))",
+				"soname(libSoapySDR.so.0.8(x86_64))",
+				"soname(libasound.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libstdc++.so.6(x86_64))"
+			],
+			"files": [
+				"/usr/bin/sdroxide",
+				"/usr/lib/udev/rules.d/60-sdroxide-airspy.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-airspyhf.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-elad.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-hackrf.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-hydrasdr.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-limerfe.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-relay.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-rtlsdr.rules",
+				"/usr/lib/udev/rules.d/60-sdroxide-rx888.rules",
+				"/usr/share/applications/sdroxide.desktop",
+				"/usr/share/doc/sdroxide/README.md",
+				"/usr/share/icons/hicolor/128x128/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/16x16/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/24x24/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/256x256/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/32x32/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/48x48/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/512x512/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/64x64/apps/sdroxide.png",
+				"/usr/share/icons/hicolor/scalable/apps/sdroxide.svg",
+				"/usr/share/licenses/sdroxide/LICENSE-AGPL-3.0-deepcw",
+				"/usr/share/licenses/sdroxide/LICENSE-BSD-cmudict",
+				"/usr/share/licenses/sdroxide/LICENSE-GPL-2.0-faad2",
+				"/usr/share/licenses/sdroxide/LICENSE-GPL-2.0-or-later-rtl_433",
+				"/usr/share/licenses/sdroxide/LICENSE-GPL-3.0-or-later",
+				"/usr/share/licenses/sdroxide/LICENSE-MIT-rx888-firmware",
+				"/usr/share/licenses/sdroxide/NOTICE-CC-BY-NC-SA-voice"
+			],
+			"name": "sdroxide",
+			"provides": [
+				"binary(sdroxide)"
+			]
+		}
+	},
+	"source-name": "sdroxide",
+	"source-release": "1",
+	"source-version": "1.6.6"
+}

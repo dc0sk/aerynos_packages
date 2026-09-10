@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # No release-monitoring.org project yet (checked 20260910) - the project is
+  # very new and tags a release every day or two, so this may appear soon.
+  id: ~
+  rss: https://github.com/dividebysandwich/sdroxide/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260910.
