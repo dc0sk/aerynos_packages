@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/5150/ (GitHub backend)
+  id: 5150
+  rss: https://github.com/wxWidgets/wxWidgets/releases.atom
+security:
+  cpe:
+  - vendor: wxwidgets
+    product: wxwidgets

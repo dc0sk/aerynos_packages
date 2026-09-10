@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : wxwidgets
+version     : "3.3.3"
+release     : 1
+homepage    : https://www.wxwidgets.org
+upstreams   :
+    - https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v3.3.3.tar.gz : 072b388b9e9fca02dedb08520e06591a5abf4b04feed7ae72faf5463e061b1dc
+summary     : Cross-platform C++ GUI toolkit (GTK3 backend)
+description : |
+    wxWidgets wraps each platform's native GUI toolkit behind one C++ API -
+    on Linux, GTK3 - so an application built against it gets native look and
+    feel everywhere rather than a themed reimplementation. Packaged here
+    primarily to unblock LimeSuiteGUI (the limesuite package builds without
+    it, CLI-only, since this did not exist yet).
+
+    .gitmodules carries a dozen vendored copies of libraries that already
+    have their own AerynOS packages - zlib, libpng, expat, libtiff,
+    libjpeg-turbo, libwebp, pcre2 - and wxWidgets' own CMake build already
+    defaults to the system copy of every one of those on Linux
+    (wx_add_thirdparty_library(), build/cmake/functions.cmake), so none of
+    that is fetched or built here. Three more of those submodules back
+    features this build turns off instead (see build: below) rather than
+    populating them: Catch2 (wx's own test suite, not built), Scintilla/
+    Lexilla (wxStyledTextCtrl) and NanoSVG (SVG rasterization) - none of
+    which LimeSuiteGUI needs.
+license     : LGPL-2.0-or-later WITH WxWindows-exception-3.1
+builddeps   :
+    - pkgconfig(gtk+-3.0)
+    - pkgconfig(zlib)
+    - pkgconfig(expat)
+    - pkgconfig(libjpeg)
+    - pkgconfig(libpng)
+    - pkgconfig(libtiff-4)
+    - pkgconfig(libwebp)
+    - pkgconfig(libpcre2-8)
+    # wxUSE_OPENGL, for LimeSuiteGUI's oglGraph plotting widget (the "gl"
+    # component in its find_package(wxWidgets COMPONENTS ... gl) call).
+    - pkgconfig(gl)
+    - pkgconfig(glu)
+setup       : |
+    %cmake \
+        -DwxUSE_OPENGL=ON \
+        -DwxUSE_WEBVIEW=OFF \
+        -DwxUSE_MEDIACTRL=OFF \
+        -DwxUSE_STC=OFF \
+        -DwxUSE_NANOSVG=OFF
+build       : |
+    %cmake_build
+install     : |
+    %cmake_install
+# No check phase: wxBUILD_TESTS defaults to OFF (build/cmake/options.cmake)
+# and is left there - wx's own console test suite needs Catch2, one of the
+# vendored submodules this build deliberately does not populate (see
+# description:).
