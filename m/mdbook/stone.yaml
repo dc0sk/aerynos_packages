@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : mdbook
+version     : "0.5.4"
+release     : 1
+homepage    : https://github.com/rust-lang/mdBook
+upstreams   :
+    - https://github.com/rust-lang/mdBook/archive/refs/tags/v0.5.4.tar.gz : 107614330c35c77d53b6f6ce7826c50eed087650efe5646a4d0a16ca6bf5544b
+summary     : Creates a book from markdown files
+description : |
+    mdBook renders a directory of Markdown chapters (driven by a SUMMARY.md
+    table of contents) into a static HTML book, with search, syntax
+    highlighting and a live-reloading dev server (mdbook watch/serve) built
+    in. It is what builds the official Rust documentation (the Rust Book,
+    the reference, rustc/cargo's own books) and is commonly reused for other
+    projects' documentation.
+license     : MPL-2.0
+networking  : true
+setup       : |
+    %cargo_fetch
+build       : |
+    %cargo_build
+install     : |
+    %cargo_install
+check       : |
+    %cargo_test
