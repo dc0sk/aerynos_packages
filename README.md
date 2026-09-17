@@ -14,6 +14,7 @@ repository.
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
 | [`fio`](f/fio) | 3.42 | Flexible I/O tester |
+| [`flyline`](f/flyline) | 1.7.1 | Bash loadable builtin replacing readline with a modern line editor |
 | [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
 | [`gegl`](g/gegl) | 0.4.70 | Graph based image processing framework, needed by GIMP |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
@@ -21,8 +22,11 @@ repository.
 | [`gimp`](g/gimp) | 3.2.4 | GNU Image Manipulation Program |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
+| [`limesuite`](l/limesuite) | 23.11.0 | Driver and GUI toolkit for LMS7002M-based SDR platforms (LimeSDR) |
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
+| [`mdbook`](m/mdbook) | 0.5.4 | Creates a book from markdown files |
 | [`modemmanager`](m/modemmanager) | 1.24.2 | Mobile broadband modem management daemon |
+| [`mokutil`](m/mokutil) | 0.7.2 | Manage the shim Machine Owner Keys |
 | [`mypaint-brushes`](m/mypaint-brushes) | 2.0.2 | Brush presets for libmypaint-based applications, needed by GIMP |
 | [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
@@ -37,6 +41,8 @@ repository.
 | [`python-sortedcontainers`](p/python-sortedcontainers) | 2.4.0 | Sorted list, dict and set implementations, needed by hypothesis |
 | [`pythran`](p/pythran) | 0.18.1 | Ahead of time compiler for numeric Python kernels |
 | [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
+| [`sbsigntools`](s/sbsigntools) | 0.9.5 | Tools to sign and verify UEFI Secure Boot binaries |
+| [`sdroxide`](s/sdroxide) | 1.6.6 | PowerSDR/Thetis-style SDR transceiver with a native GUI |
 | [`sdrplay-api`](s/sdrplay-api) | 3.15.2 | SDRplay RSP API library and service (proprietary) |
 | [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
 | [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
@@ -46,6 +52,7 @@ repository.
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |
 | [`wtype`](w/wtype) | 0.4 | xdotool type for Wayland |
+| [`wxwidgets`](w/wxwidgets) | 3.3.3 | Cross-platform C++ GUI toolkit (GTK3 backend) |
 | [`xnec2c`](x/xnec2c) | 4.4.18 | Graphical NEC2 antenna simulator |
 
 Deliberately *not* here: `wine`. AerynOS already ships it, currently 11.15, and
