@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : sdroxide
-version     : "1.6.6"
+version     : "1.6.7"
 release     : 1
 homepage    : https://github.com/dividebysandwich/sdroxide
 upstreams   :
     # Listed first so it lands in %(workdir): everything else is a git
     # submodule GitHub's own tag tarball does not include (see setup: below).
-    - https://github.com/dividebysandwich/sdroxide/archive/refs/tags/v1.6.6.tar.gz : eb693a1a517a2b2a08e169ba33f16a7f4e94e95ff6fc1ea5918c482c8e9c18b2
+    - https://github.com/dividebysandwich/sdroxide/archive/refs/tags/v1.6.7.tar.gz : 7c79a55ffb1dd1b24412216fde920c2b73080e57fd644140ba9ebd1d7d5725d0
     # vendor/rade_c (.gitmodules), pinned to the commit v1.6.6 actually carries.
     - https://github.com/freedv/rade_c/archive/a36161bce0fb37daf3f4602344b095f6817dddb1.tar.gz : eaba2ecbe61dc48748bc62f08b2eb623bccd5b21b8228bf42dedc0e232edf7cd
     # vendor/rtl_433 (.gitmodules), same pinning.
@@ -216,7 +216,7 @@ install     : |
 
     %install_dir %(installroot)%(datadir)/doc/%(name)
     %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md
-# No check phase: this is a 49-crate workspace already carrying an
+# No check phase: this is a 50-crate workspace already carrying an
 # unusually long build (RADE's from-scratch autotools Opus, rtl_433's own
 # CMake build, then the full egui/wgpu GUI under this workspace's own
 # opt-level=2 dev-profile overrides for every DSP-heavy crate); its own test
