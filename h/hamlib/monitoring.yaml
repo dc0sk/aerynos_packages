@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # https://release-monitoring.org/project/1292/ (SourceForge backend, but it
+  # tracks the GitHub releases too - current at 4.7.2 when checked)
+  id: 1292
+  rss: https://github.com/Hamlib/Hamlib/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20260925

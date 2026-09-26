@@ -1,0 +1,30 @@
+[Unit]
+Description=Hamlib rigctld - network daemon for radio control
+Documentation=man:rigctld(1)
+After=network.target
+
+[Service]
+Type=simple
+User=rigctld
+Group=rigctld
+# Serial CAT ports are group dialout on this distribution.
+SupplementaryGroups=dialout
+# Required, not optional: RIGCTLD_OPTS says which radio to talk to. The
+# packaged default is seeded into /etc by tmpfiles on first boot.
+EnvironmentFile=/etc/rigctld.conf
+ExecStart=/usr/bin/rigctld $RIGCTLD_OPTS
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

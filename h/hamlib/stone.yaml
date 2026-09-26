@@ -1,0 +1,87 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : hamlib
+version     : "4.7.2"
+release     : 1
+homepage    : https://hamlib.github.io
+upstreams   :
+    # The release tarball rather than a tag archive: it carries the generated
+    # configure script, so no autoreconf is needed. Its SHA256 matches the
+    # SHA256SUM-4.7.2 file upstream publishes alongside it.
+    - https://github.com/Hamlib/Hamlib/releases/download/4.7.2/hamlib-4.7.2.tar.gz : ae1fcf2dbc80ea0786ea8f047b09399c3f7737d1930442f61a031708ed33e88f
+summary     : Control libraries and tools for amateur radio transceivers and rotators
+description : |
+    Hamlib gives programs one API for controlling ham radio equipment -
+    transceivers, receivers, antenna rotators and amplifiers from a few
+    hundred models - over serial, USB and network connections. It is what
+    logging, digital-mode and satellite-tracking software (WSJT-X, fldigi,
+    JS8Call, Gpredict, ...) uses to read and set frequency, mode and PTT.
+
+    The package ships libhamlib, its C++ binding, and the command line tools:
+    rigctl (talk to a radio directly), rotctl and ampctl (rotators and
+    amplifiers), the rigctld, rotctld and ampctld network daemons, plus rigmem,
+    rigsmtr and rigswr.
+
+    rigctld is split out as its own package, rigctld, together with a systemd
+    service for it - it is the one most people run permanently, sharing one
+    radio between several programs over TCP. rotctld and ampctld stay here.
+
+    Not built: the Python, Perl, Tcl and Lua bindings (each is opt-in
+    upstream; Python's in particular goes through swig and distutils-era
+    build glue that has been a problem on new Pythons - see the soapysdr
+    recipe in this repository), the HTML rig-feature matrix (needs libgd, not
+    packaged), INDI support in rotctl (libindi, likewise) and the rigmem XML
+    support.
+license     :
+    # The library and its backends are LGPL; the command line programs in
+    # tests/ (rigctl, rigctld, rotctl, ...) are GPL, per their file headers
+    # and upstream's own LICENSE file.
+    - LGPL-2.1-or-later
+    - GPL-2.0-or-later
+builddeps   :
+    - pkgconfig(libusb-1.0)
+    - pkgconfig(readline)
+setup       : |
+    # --disable-html-matrix and --without-indi are what configure would pick
+    # anyway with libgd and libindi absent ("check"/"detect" defaults); stated
+    # so the result cannot silently change if either ever gets packaged.
+    %configure \
+        --disable-static \
+        --disable-html-matrix \
+        --without-indi
+build       : |
+    %make
+install     : |
+    %make_install
+
+    # Seed for /etc/rigctld.conf, which tmpfiles copies into place on first
+    # boot (AerynOS ships /etc empty). The unit, the sysuser and the tmpfiles
+    # entry all belong to the rigctld subpackage.
+    %install_file %(pkgdir)/rigctld.service -t %(installroot)%(libdir)/systemd/system
+    %install_file %(pkgdir)/rigctld.conf %(installroot)%(vendordir)/%(name)/rigctld.conf
+    %install_file %(pkgdir)/rigctld-sysusers.conf %(installroot)%(sysusersdir)/rigctld.conf
+    %install_file %(pkgdir)/rigctld-tmpfiles.conf %(installroot)%(tmpfilesdir)/rigctld.conf
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING-GPL
+    %install_file COPYING.LIB %(installroot)%(datadir)/licenses/%(name)/COPYING-LGPL
+    %install_file LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE
+check       : |
+    %make check
+packages    :
+    - "rigctld":
+        summary: "Hamlib network daemon for radio control, with a systemd service"
+        description: |
+            rigctld holds one connection to a radio and lets any number of
+            programs share it over TCP, speaking the same protocol as rigctl.
+            Ships rigctld.service (not enabled by default) and a default
+            /etc/rigctld.conf that runs Hamlib's dummy rig on the loopback
+            address only - edit it to name your radio, then enable the service.
+        paths:
+            - /usr/bin/rigctld
+            - /usr/share/man/man1/rigctld.1
+            - /usr/lib/systemd/system/rigctld.service
+            - /usr/lib/sysusers.d/rigctld.conf
+            - /usr/lib/tmpfiles.d/rigctld.conf
+            - /usr/share/defaults/hamlib/rigctld.conf
