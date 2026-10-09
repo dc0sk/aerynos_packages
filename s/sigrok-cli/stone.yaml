@@ -3,7 +3,7 @@
 
 name        : sigrok-cli
 version     : "0.7.2"
-release     : 1
+release     : 3
 homepage    : https://sigrok.org/wiki/Sigrok-cli
 upstreams   :
     - https://sigrok.org/download/source/sigrok-cli/sigrok-cli-0.7.2.tar.gz : 71d0443f36897bf565732dec206830dbea0f2789b6601cf10536b286d1140ab8
@@ -19,6 +19,11 @@ description : |
     The `--driver demo` pseudo-device (a built-in signal generator) works
     with no hardware attached, which is the easy way to check an install.
 license     : GPL-3.0-or-later
+# Releases 2 and 3: rebuilt against the libsigrok and libsigrokdecode git
+# snapshots (both 0.6.0+git). libsigrok's library ABI went from the 0.5.2
+# release's 5:1:1 to 4:0:0, and a binary built against the old headers and
+# run on the new library reported the compile-time and run-time versions
+# disagreeing, which is not something to leave to chance.
 builddeps   :
     - pkgconfig(glib-2.0)
     - pkgconfig(libsigrok)

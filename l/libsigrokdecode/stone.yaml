@@ -2,11 +2,17 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : libsigrokdecode
-version     : "0.5.3"
-release     : 1
+version     : "0.6.0+git.71f45144"
+release     : 2
 homepage    : https://sigrok.org/wiki/Libsigrokdecode
 upstreams   :
-    - https://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.5.3.tar.gz : c50814aa6743cd8c4e88c84a0cdd8889d883c3be122289be90c63d7d67883fc0
+    # A git snapshot of master, not the 0.5.3 release: PulseView master uses
+    # decoder API the release does not have (logic output channels:
+    # srd_decoder.logic_output_channels, SRD_OUTPUT_LOGIC and
+    # srd_proto_data_logic), so it does not compile against 0.5.3. Master is
+    # 0.6.0 in development. A GitHub archive has no configure script, so
+    # setup: runs autoreconf first.
+    - https://github.com/sigrokproject/libsigrokdecode/archive/71f451443029322d57376214c330b518efd84f88.tar.gz : a2fa2d6675775d64c43575febaf02c498a977c8bdc4a8dd3c7e5c87d1c5d7887
 summary     : Protocol decoder library of the sigrok project
 description : |
     libsigrokdecode runs sigrok's protocol decoders - over a hundred, written
@@ -24,14 +30,13 @@ builddeps   :
     - pkgconfig(python3-embed)
     - pkgconfig(check)
 setup       : |
-    # This release's configure tries python-3.8-embed and then falls through
-    # a list of non-embed names (python-3.8 ... python3), none of which knows
-    # about Python 3.14, so it settles on plain python3.pc. That file carries
-    # no -lpython3.14, and the result is a libsigrokdecode.so with the
-    # interpreter's symbols unresolved and no DT_NEEDED on libpython - it
-    # builds, then fails to load. Hand the embed link line over explicitly.
-    %configure --disable-static \
-        LIBS="$(pkg-config --libs python3-embed)"
+    # autoreconf by hand, so the options can be passed to configure (boulder's
+    # reconfigure macro runs it with none). Unlike the 0.5.3 release, master's
+    # configure tries python3-embed, so it links libpython without help.
+    CONFIG_SHELL=/usr/bin/dash; export CONFIG_SHELL
+    SHELL=/usr/bin/dash; export SHELL
+    autoreconf -vfi
+    %configure --disable-static
 build       : |
     %make
 install     : |

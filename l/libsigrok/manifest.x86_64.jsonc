@@ -4,8 +4,12 @@
 	"packages": {
 		"libsigrok": {
 			"build-depends": [
+				"autoconf-archive",
+				"binary(doxygen)",
+				"binary(libtoolize)",
 				"pkgconfig(bluez)",
 				"pkgconfig(glib-2.0)",
+				"pkgconfig(glibmm-2.68)",
 				"pkgconfig(hidapi-hidraw)",
 				"pkgconfig(libserialport)",
 				"pkgconfig(libusb-1.0)",
@@ -15,18 +19,25 @@
 			"depends": [
 				"soname(libbluetooth.so.3(x86_64))",
 				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
 				"soname(libgio-2.0.so.0(x86_64))",
 				"soname(libglib-2.0.so.0(x86_64))",
+				"soname(libglibmm-2.68.so.1(x86_64))",
 				"soname(libgobject-2.0.so.0(x86_64))",
 				"soname(libhidapi-hidraw.so.0(x86_64))",
 				"soname(libm.so.6(x86_64))",
+				"soname(libnettle.so.9(x86_64))",
 				"soname(libserialport.so.0(x86_64))",
+				"soname(libstdc++.so.6(x86_64))",
 				"soname(libusb-1.0.so.0(x86_64))",
+				"soname(libz.so.1(x86_64))",
 				"soname(libzip.so.5(x86_64))"
 			],
 			"files": [
 				"/usr/lib/libsigrok.so.4",
-				"/usr/lib/libsigrok.so.4.1.1",
+				"/usr/lib/libsigrok.so.4.0.0",
+				"/usr/lib/libsigrokcxx.so.4",
+				"/usr/lib/libsigrokcxx.so.4.0.0",
 				"/usr/lib/udev/rules.d/60-libsigrok.rules",
 				"/usr/lib/udev/rules.d/61-libsigrok-uaccess.rules",
 				"/usr/share/icons/hicolor/48x48/mimetypes/libsigrok.png",
@@ -36,13 +47,18 @@
 			],
 			"name": "libsigrok",
 			"provides": [
-				"soname(libsigrok.so.4(x86_64))"
+				"soname(libsigrok.so.4(x86_64))",
+				"soname(libsigrokcxx.so.4(x86_64))"
 			]
 		},
 		"libsigrok-devel": {
 			"build-depends": [
+				"autoconf-archive",
+				"binary(doxygen)",
+				"binary(libtoolize)",
 				"pkgconfig(bluez)",
 				"pkgconfig(glib-2.0)",
+				"pkgconfig(glibmm-2.68)",
 				"pkgconfig(hidapi-hidraw)",
 				"pkgconfig(libserialport)",
 				"pkgconfig(libusb-1.0)",
@@ -54,25 +70,33 @@
 				"pkgconfig(bluez)",
 				"pkgconfig(gio-2.0)",
 				"pkgconfig(glib-2.0)",
+				"pkgconfig(glibmm-2.68)",
 				"pkgconfig(hidapi-hidraw)",
 				"pkgconfig(libserialport)",
 				"pkgconfig(libusb-1.0)",
-				"pkgconfig(libzip)"
+				"pkgconfig(libzip)",
+				"pkgconfig(nettle)",
+				"pkgconfig(zlib)"
 			],
 			"files": [
 				"/usr/include/libsigrok/libsigrok.h",
 				"/usr/include/libsigrok/proto.h",
 				"/usr/include/libsigrok/version.h",
+				"/usr/include/libsigrokcxx/enums.hpp",
+				"/usr/include/libsigrokcxx/libsigrokcxx.hpp",
 				"/usr/lib/libsigrok.so",
-				"/usr/lib/pkgconfig/libsigrok.pc"
+				"/usr/lib/libsigrokcxx.so",
+				"/usr/lib/pkgconfig/libsigrok.pc",
+				"/usr/lib/pkgconfig/libsigrokcxx.pc"
 			],
 			"name": "libsigrok-devel",
 			"provides": [
-				"pkgconfig(libsigrok)"
+				"pkgconfig(libsigrok)",
+				"pkgconfig(libsigrokcxx)"
 			]
 		}
 	},
 	"source-name": "libsigrok",
-	"source-release": "1",
-	"source-version": "0.5.2"
+	"source-release": "2",
+	"source-version": "0.6.0+git.0bc24877"
 }

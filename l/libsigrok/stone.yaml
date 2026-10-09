@@ -2,11 +2,18 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : libsigrok
-version     : "0.5.2"
-release     : 1
+version     : "0.6.0+git.0bc24877"
+release     : 2
 homepage    : https://sigrok.org/wiki/Libsigrok
 upstreams   :
-    - https://sigrok.org/download/source/libsigrok/libsigrok-0.5.2.tar.gz : 4d341f90b6220d3e8cb251dacf726c41165285612248f2c52d15df4590a1ce3c
+    # A git snapshot of master, not the 0.5.2 release: PulseView needs
+    # libsigrok's C++ binding (libsigrokcxx), the 0.5.2 release can only
+    # build that against glibmm-2.4 and AerynOS has glibmm 2.68, and master
+    # is the first to accept glibmm-2.68 ("Accept glibmm-2.68 when glibmm-2.4
+    # is not available", configure.ac). master is 0.6.0 in development and
+    # carries years of driver additions the 2019 release does not. A GitHub
+    # archive has no configure script, so setup: runs autoreconf first.
+    - https://github.com/sigrokproject/libsigrok/archive/0bc2487778e660f4d3116729b6f4aee2b1996bb0.tar.gz : 6bdaa8ae47929050ab6aa125da9eb1cbeeeb0d7b2cef7e1f13f3809a7c13b40a
 summary     : Hardware drivers and acquisition library of the sigrok project
 description : |
     libsigrok is the backend of the sigrok signal-analysis suite: drivers for
@@ -23,10 +30,8 @@ description : |
     clones") need firmware uploaded to them - that is the separate
     sigrok-firmware-fx2lafw package.
 
-    Not built: the C++, Python, Ruby and Java bindings. The C++ binding is
-    what PulseView needs, but this release looks for glibmm-2.4 and AerynOS
-    only has glibmm 2.68; the C++ binding is left out until a build against
-    the current glibmm is wanted.
+    The C++ binding (libsigrokcxx) is built, against glibmm 2.68, because
+    PulseView needs it. The Python, Ruby and Java bindings are not.
 license     : GPL-3.0-or-later
 builddeps   :
     - pkgconfig(glib-2.0)
@@ -36,10 +41,39 @@ builddeps   :
     - pkgconfig(hidapi-hidraw)
     - pkgconfig(bluez)
     - pkgconfig(nettle)
+    # The C++ binding; master takes glibmm-2.68 when 2.4 is absent.
+    - pkgconfig(glibmm-2.68)
+    # configure.ac uses AX_CXX_COMPILE_STDCXX, which autoreconf needs the
+    # macro for - a snapshot carries no generated configure to bring it.
+    - autoconf-archive
+    # The C++ binding is generated from the C headers by a script that parses
+    # Doxygen's XML output; configure reports "C++: no (missing: Doxygen)"
+    # and silently drops the binding without it.
+    - binary(doxygen)
+    - binary(libtoolize)
 setup       : |
+    # AerynOS's libtool is slibtool, and it cannot do the one link master's
+    # build relies on: Makefile.am makes src/libdrivers.o by handing libtool
+    # an output ending in .o, which slibtool takes for an executable and runs
+    # the compiler with an empty -o ("clang: error: argument to '-o' is
+    # missing"). The 0.5.2 release tarball had worked because it carries the
+    # generated GNU libtool script. The patch does that partial link with ld
+    # -r over the same three archives in the same order, which is all the
+    # rule was after (it keeps the driver list's start and end markers around
+    # the drivers), and also leaves a copy in src/.libs/ and points the stub
+    # libtool object at it, since slibtool looks for the PIC object there.
+    %patch %(pkgdir)/0001-link-drivers-object-without-libtool.patch
+
+    # autoreconf is run by hand rather than through boulder's reconfigure
+    # macro, which runs configure with no options and cannot pass the ones
+    # below through. (Do not write macro names in comments: they expand
+    # there too.)
+    CONFIG_SHELL=/usr/bin/dash; export CONFIG_SHELL
+    SHELL=/usr/bin/dash; export SHELL
+    autoreconf -vfi
     %configure \
         --disable-static \
-        --disable-cxx \
+        --enable-cxx \
         --disable-python \
         --disable-ruby \
         --disable-java
