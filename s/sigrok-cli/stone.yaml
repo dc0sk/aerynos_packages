@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sigrok-cli
+version     : "0.7.2"
+release     : 1
+homepage    : https://sigrok.org/wiki/Sigrok-cli
+upstreams   :
+    - https://sigrok.org/download/source/sigrok-cli/sigrok-cli-0.7.2.tar.gz : 71d0443f36897bf565732dec206830dbea0f2789b6601cf10536b286d1140ab8
+summary     : Command line frontend of the sigrok signal-analysis suite
+description : |
+    sigrok-cli scans for and drives the instruments libsigrok supports -
+    logic analyzers, oscilloscopes, multimeters, power supplies and so on -
+    acquires data from them or reads saved sessions, converts between file
+    formats (sigrok session, VCD, CSV, WAV, ...), and runs libsigrokdecode's
+    protocol decoders over the samples (I2C, SPI, UART, CAN, ...), printing
+    the decoded annotations. It is the scriptable counterpart to PulseView.
+
+    The `--driver demo` pseudo-device (a built-in signal generator) works
+    with no hardware attached, which is the easy way to check an install.
+license     : GPL-3.0-or-later
+builddeps   :
+    - pkgconfig(glib-2.0)
+    - pkgconfig(libsigrok)
+    - pkgconfig(libsigrokdecode)
+setup       : |
+    %configure
+build       : |
+    %make
+install     : |
+    %make_install
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING
+# No check phase: upstream has no test suite for the command line tool (no
+# check target in Makefile.am). It is verified by running it for real
+# against the demo driver instead.

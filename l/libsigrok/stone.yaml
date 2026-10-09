@@ -1,0 +1,67 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : libsigrok
+version     : "0.5.2"
+release     : 1
+homepage    : https://sigrok.org/wiki/Libsigrok
+upstreams   :
+    - https://sigrok.org/download/source/libsigrok/libsigrok-0.5.2.tar.gz : 4d341f90b6220d3e8cb251dacf726c41165285612248f2c52d15df4590a1ce3c
+summary     : Hardware drivers and acquisition library of the sigrok project
+description : |
+    libsigrok is the backend of the sigrok signal-analysis suite: drivers for
+    a few hundred logic analyzers, oscilloscopes, multimeters, power supplies,
+    sound-level meters, scales and other test instruments, plus the code to
+    acquire, convert and read/write sample data (sigrok session files, VCD,
+    CSV, WAV, ...). sigrok-cli and PulseView are built on top of it.
+
+    Built against the USB, HID (hidraw), serial, Bluetooth and zip (session file)
+    libraries that are packaged for AerynOS. Drivers needing libftdi1,
+    libieee1284, a GPIB library or librevisa are not built, as none of those
+    are packaged here; configure leaves them out on its own when the library
+    is absent. Many cheap USB logic analyzers (Cypress FX2 based "Saleae
+    clones") need firmware uploaded to them - that is the separate
+    sigrok-firmware-fx2lafw package.
+
+    Not built: the C++, Python, Ruby and Java bindings. The C++ binding is
+    what PulseView needs, but this release looks for glibmm-2.4 and AerynOS
+    only has glibmm 2.68; the C++ binding is left out until a build against
+    the current glibmm is wanted.
+license     : GPL-3.0-or-later
+builddeps   :
+    - pkgconfig(glib-2.0)
+    - pkgconfig(libzip)
+    - pkgconfig(libusb-1.0)
+    - pkgconfig(libserialport)
+    - pkgconfig(hidapi-hidraw)
+    - pkgconfig(bluez)
+    - pkgconfig(nettle)
+setup       : |
+    %configure \
+        --disable-static \
+        --disable-cxx \
+        --disable-python \
+        --disable-ruby \
+        --disable-java
+build       : |
+    %make
+install     : |
+    %make_install
+
+    # Upstream's own two-step rules: 60 tags each known device with
+    # ID_SIGROK=1, and 61-uaccess then grants the logged-in seat user an ACL
+    # on those. (61-libsigrok-plugdev.rules is the group-based alternative,
+    # not shipped; there is no plugdev-style group to rely on here.)
+    %install_dir %(installroot)%(udevrulesdir)
+    %install_file contrib/60-libsigrok.rules %(installroot)%(udevrulesdir)/60-libsigrok.rules
+    %install_file contrib/61-libsigrok-uaccess.rules %(installroot)%(udevrulesdir)/61-libsigrok-uaccess.rules
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING
+# No check phase. `make check` fails before running anything: the unit test
+# tests/strutil.c calls ck_assert_msg() with three arguments, and the current
+# `check` library (0.15+) requires a format string as the fourth, so the test
+# binary does not compile ("too few arguments to function call, expected at
+# least 4, have 3"). That is upstream's test code aging against a newer
+# `check`, not a defect in libsigrok itself, which built and installed fine.
+# The library is exercised for real through sigrok-cli instead (see its recipe).

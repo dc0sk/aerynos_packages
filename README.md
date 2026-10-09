@@ -22,6 +22,9 @@ repository.
 | [`gimp`](g/gimp) | 3.2.4 | GNU Image Manipulation Program |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
+| [`libserialport`](l/libserialport) | 0.1.2 | Cross-platform library for accessing serial ports, needed by libsigrok |
+| [`libsigrok`](l/libsigrok) | 0.5.2 | Hardware drivers and acquisition library of the sigrok project |
+| [`libsigrokdecode`](l/libsigrokdecode) | 0.5.3 | Protocol decoder library of the sigrok project |
 | [`limesuite`](l/limesuite) | 23.11.0 | Driver and GUI toolkit for LMS7002M-based SDR platforms (LimeSDR) |
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
 | [`mdbook`](m/mdbook) | 0.5.4 | Creates a book from markdown files |
@@ -45,6 +48,8 @@ repository.
 | [`sdroxide`](s/sdroxide) | 1.6.6 | PowerSDR/Thetis-style SDR transceiver with a native GUI |
 | [`sdrplay-api`](s/sdrplay-api) | 3.15.2 | SDRplay RSP API library and service (proprietary) |
 | [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
+| [`sigrok-cli`](s/sigrok-cli) | 0.7.2 | Command line frontend of the sigrok signal-analysis suite |
+| [`sigrok-firmware-fx2lafw`](s/sigrok-firmware-fx2lafw) | 0.1.7 | Open firmware for Cypress FX2 based logic analyzers (prebuilt images) |
 | [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
 | [`soapysdrplay3`](s/soapysdrplay3) | 0.5.2 | SoapySDR module for SDRplay RSP receivers |
 | [`tpm2-abrmd`](t/tpm2-abrmd) | 3.0.0 | TPM2 access broker and resource manager daemon |

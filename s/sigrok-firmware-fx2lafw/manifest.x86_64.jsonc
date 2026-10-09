@@ -1,0 +1,29 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"sigrok-firmware-fx2lafw": {
+			"files": [
+				"/usr/share/licenses/sigrok-firmware-fx2lafw/COPYING",
+				"/usr/share/licenses/sigrok-firmware-fx2lafw/COPYING.LESSER",
+				"/usr/share/sigrok-firmware/fx2lafw-braintechnology-usb-lps.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-cwav-usbeeax.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-cwav-usbeedx.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-cwav-usbeesx.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-cwav-usbeezx.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-cypress-fx2.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-hantek-6022be.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-hantek-6022bl.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-sainsmart-dds120.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-saleae-logic.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-sigrok-fx2-16ch.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-sigrok-fx2-8ch.fw",
+				"/usr/share/sigrok-firmware/fx2lafw-yixingdianzi-mdso.fw"
+			],
+			"name": "sigrok-firmware-fx2lafw"
+		}
+	},
+	"source-name": "sigrok-firmware-fx2lafw",
+	"source-release": "1",
+	"source-version": "0.1.7"
+}
