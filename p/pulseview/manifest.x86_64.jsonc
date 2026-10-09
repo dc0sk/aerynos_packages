@@ -1,0 +1,52 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"pulseview": {
+			"build-depends": [
+				"cmake(Boost)",
+				"cmake(Qt6LinguistTools)",
+				"cmake(Qt6Svg)",
+				"cmake(Qt6Widgets)",
+				"pkgconfig(glib-2.0)",
+				"pkgconfig(glibmm-2.68)",
+				"pkgconfig(libsigrokcxx)",
+				"pkgconfig(libsigrokdecode)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libQt6Core.so.6(x86_64))",
+				"soname(libQt6Gui.so.6(x86_64))",
+				"soname(libQt6Widgets.so.6(x86_64))",
+				"soname(libboost_filesystem.so.1.92.0(x86_64))",
+				"soname(libboost_serialization.so.1.92.0(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libglib-2.0.so.0(x86_64))",
+				"soname(libglibmm-2.68.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libsigrok.so.4(x86_64))",
+				"soname(libsigrokcxx.so.4(x86_64))",
+				"soname(libsigrokdecode.so.4(x86_64))",
+				"soname(libstdc++.so.6(x86_64))"
+			],
+			"files": [
+				"/usr/bin/pulseview",
+				"/usr/share/applications/org.sigrok.PulseView.desktop",
+				"/usr/share/doc/pulseview",
+				"/usr/share/icons/hicolor/48x48/apps/pulseview.png",
+				"/usr/share/icons/hicolor/scalable/apps/pulseview.svg",
+				"/usr/share/licenses/pulseview/COPYING",
+				"/usr/share/man/man1/pulseview.1",
+				"/usr/share/metainfo/org.sigrok.PulseView.appdata.xml"
+			],
+			"name": "pulseview",
+			"provides": [
+				"binary(pulseview)"
+			]
+		}
+	},
+	"source-name": "pulseview",
+	"source-release": "1",
+	"source-version": "0.4.2+git.af021987"
+}

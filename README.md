@@ -23,8 +23,8 @@ repository.
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
 | [`libserialport`](l/libserialport) | 0.1.2 | Cross-platform library for accessing serial ports, needed by libsigrok |
-| [`libsigrok`](l/libsigrok) | 0.5.2 | Hardware drivers and acquisition library of the sigrok project |
-| [`libsigrokdecode`](l/libsigrokdecode) | 0.5.3 | Protocol decoder library of the sigrok project |
+| [`libsigrok`](l/libsigrok) | 0.6.0+git | Hardware drivers and acquisition library of the sigrok project |
+| [`libsigrokdecode`](l/libsigrokdecode) | 0.6.0+git | Protocol decoder library of the sigrok project |
 | [`limesuite`](l/limesuite) | 23.11.0 | Driver and GUI toolkit for LMS7002M-based SDR platforms (LimeSDR) |
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
 | [`mdbook`](m/mdbook) | 0.5.4 | Creates a book from markdown files |
@@ -34,6 +34,7 @@ repository.
 | [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
+| [`pulseview`](p/pulseview) | 0.4.2+git | Qt-based GUI for sigrok logic analyzers and oscilloscopes |
 | [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
 | [`python-gast`](p/python-gast) | 0.6.0 | Version-agnostic Python AST, needed by pythran |
 | [`python-hypothesis`](p/python-hypothesis) | 6.165.5 | Property-based testing for Python, needed by the numpy and scipy suites |
