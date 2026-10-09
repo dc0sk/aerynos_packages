@@ -20,6 +20,7 @@ repository.
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
 | [`gexiv2-legacy`](g/gexiv2-legacy) | 0.14.7 | GObject wrapper around Exiv2, the 0.14.x line GIMP needs |
 | [`gimp`](g/gimp) | 3.2.4 | GNU Image Manipulation Program |
+| [`hamlib`](h/hamlib) | 4.7.2 | Control libraries and tools for amateur radio transceivers and rotators, with rigctld split out as its own package |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
 | [`libserialport`](l/libserialport) | 0.1.2 | Cross-platform library for accessing serial ports, needed by libsigrok |

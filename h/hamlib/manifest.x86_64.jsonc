@@ -1,0 +1,149 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"hamlib": {
+			"build-depends": [
+				"pkgconfig(libusb-1.0)",
+				"pkgconfig(readline)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"soname(libreadline.so.8(x86_64))",
+				"soname(libstdc++.so.6(x86_64))",
+				"soname(libusb-1.0.so.0(x86_64))"
+			],
+			"files": [
+				"/usr/bin/ampctl",
+				"/usr/bin/ampctld",
+				"/usr/bin/rigctl",
+				"/usr/bin/rigctlcom",
+				"/usr/bin/rigctlsync",
+				"/usr/bin/rigctltcp",
+				"/usr/bin/rigmem",
+				"/usr/bin/rigsmtr",
+				"/usr/bin/rigswr",
+				"/usr/bin/rigtestlibusb",
+				"/usr/bin/rigtestmcast",
+				"/usr/bin/rigtestmcastrx",
+				"/usr/bin/rotctl",
+				"/usr/bin/rotctld",
+				"/usr/lib/libhamlib++.so.4",
+				"/usr/lib/libhamlib++.so.4.0.7",
+				"/usr/lib/libhamlib.so.4",
+				"/usr/lib/libhamlib.so.4.0.7",
+				"/usr/share/doc/hamlib/COPYING",
+				"/usr/share/doc/hamlib/COPYING.LIB",
+				"/usr/share/doc/hamlib/ChangeLog",
+				"/usr/share/doc/hamlib/LICENSE",
+				"/usr/share/doc/hamlib/README.betatester",
+				"/usr/share/doc/hamlib/README.developer",
+				"/usr/share/doc/hamlib/README.md",
+				"/usr/share/licenses/hamlib/COPYING-GPL",
+				"/usr/share/licenses/hamlib/COPYING-LGPL",
+				"/usr/share/licenses/hamlib/LICENSE",
+				"/usr/share/man/man1/ampctl.1",
+				"/usr/share/man/man1/ampctld.1",
+				"/usr/share/man/man1/rigctl.1",
+				"/usr/share/man/man1/rigctlcom.1",
+				"/usr/share/man/man1/rigctlsync.1",
+				"/usr/share/man/man1/rigctltcp.1",
+				"/usr/share/man/man1/rigmem.1",
+				"/usr/share/man/man1/rigsmtr.1",
+				"/usr/share/man/man1/rigswr.1",
+				"/usr/share/man/man1/rigtestlibusb.1",
+				"/usr/share/man/man1/rigtestmcast.1",
+				"/usr/share/man/man1/rigtestmcastrx.1",
+				"/usr/share/man/man1/rotctl.1",
+				"/usr/share/man/man1/rotctld.1",
+				"/usr/share/man/man7/hamlib-primer.7",
+				"/usr/share/man/man7/hamlib-utilities.7",
+				"/usr/share/man/man7/hamlib.7"
+			],
+			"name": "hamlib",
+			"provides": [
+				"binary(ampctl)",
+				"binary(ampctld)",
+				"binary(rigctl)",
+				"binary(rigctlcom)",
+				"binary(rigctlsync)",
+				"binary(rigctltcp)",
+				"binary(rigmem)",
+				"binary(rigsmtr)",
+				"binary(rigswr)",
+				"binary(rigtestlibusb)",
+				"binary(rigtestmcast)",
+				"binary(rigtestmcastrx)",
+				"binary(rotctl)",
+				"binary(rotctld)",
+				"soname(libhamlib++.so.4(x86_64))",
+				"soname(libhamlib.so.4(x86_64))"
+			]
+		},
+		"hamlib-devel": {
+			"build-depends": [
+				"pkgconfig(libusb-1.0)",
+				"pkgconfig(readline)"
+			],
+			"depends": [
+				"hamlib",
+				"pkgconfig(libusb-1.0)"
+			],
+			"files": [
+				"/usr/include/hamlib/amp_state.h",
+				"/usr/include/hamlib/ampclass.h",
+				"/usr/include/hamlib/amplifier.h",
+				"/usr/include/hamlib/amplist.h",
+				"/usr/include/hamlib/multicast.h",
+				"/usr/include/hamlib/port.h",
+				"/usr/include/hamlib/rig.h",
+				"/usr/include/hamlib/rig_dll.h",
+				"/usr/include/hamlib/rig_state.h",
+				"/usr/include/hamlib/rigclass.h",
+				"/usr/include/hamlib/riglist.h",
+				"/usr/include/hamlib/rot_state.h",
+				"/usr/include/hamlib/rotator.h",
+				"/usr/include/hamlib/rotclass.h",
+				"/usr/include/hamlib/rotlist.h",
+				"/usr/lib/libhamlib++.so",
+				"/usr/lib/libhamlib.so",
+				"/usr/lib/pkgconfig/hamlib.pc",
+				"/usr/share/aclocal/hamlib.m4"
+			],
+			"name": "hamlib-devel",
+			"provides": [
+				"pkgconfig(hamlib)"
+			]
+		},
+		"rigctld": {
+			"build-depends": [
+				"pkgconfig(libusb-1.0)",
+				"pkgconfig(readline)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libhamlib.so.4(x86_64))",
+				"soname(libreadline.so.8(x86_64))"
+			],
+			"files": [
+				"/usr/bin/rigctld",
+				"/usr/lib/systemd/system/rigctld.service",
+				"/usr/lib/sysusers.d/rigctld.conf",
+				"/usr/lib/tmpfiles.d/rigctld.conf",
+				"/usr/share/defaults/hamlib/rigctld.conf",
+				"/usr/share/man/man1/rigctld.1"
+			],
+			"name": "rigctld",
+			"provides": [
+				"binary(rigctld)"
+			]
+		}
+	},
+	"source-name": "hamlib",
+	"source-release": "1",
+	"source-version": "4.7.2"
+}
