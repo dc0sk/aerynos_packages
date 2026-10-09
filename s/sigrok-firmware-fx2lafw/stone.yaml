@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : sigrok-firmware-fx2lafw
+version     : "0.1.7"
+release     : 1
+homepage    : https://sigrok.org/wiki/Fx2lafw
+upstreams   :
+    # The project's own prebuilt images, not the source tarball next to it.
+    # Building from source needs sdcc (the Small Device C Compiler, an 8051
+    # cross compiler) and its tools, and sdcc is not packaged for AerynOS. So
+    # this repackages the binaries the sigrok project builds and publishes
+    # from sigrok-firmware-fx2lafw-0.1.7.tar.gz; nothing is compiled here.
+    - https://sigrok.org/download/binary/sigrok-firmware-fx2lafw/sigrok-firmware-fx2lafw-bin-0.1.7.tar.gz : c876fd075549e7783a6d5bfc8d99a695cfc583ddbcea0217d8e3f9351d1723af
+summary     : Open firmware for Cypress FX2 based logic analyzers and oscilloscopes
+description : |
+    Firmware images that libsigrok uploads to cheap USB logic analyzers built
+    on the Cypress EZ-USB FX2(LP) chip - the Saleae Logic clones, CWAV
+    USBee, Braintechnology USB-LPS, sigrok's own FX2 boards - and to the
+    Hantek 6022BE/6022BL and Sainsmart DDS120 USB oscilloscopes. These
+    devices have no firmware of their own: libsigrok's fx2lafw driver loads
+    the matching image at the moment the device is plugged in, so without
+    this package they enumerate but cannot capture.
+
+    Installed to /usr/share/sigrok-firmware, one of the directories libsigrok
+    searches (its compiled-in FIRMWARE_DIR).
+license     :
+    # The firmware code is GPL-2.0-or-later; it is linked with the bundled
+    # fx2lib, which is LGPL-2.1-or-later.
+    - GPL-2.0-or-later
+    - LGPL-2.1-or-later
+install     : |
+    %install_dir %(installroot)%(datadir)/sigrok-firmware
+    for _fw in *.fw; do
+        %install_file ${_fw} %(installroot)%(datadir)/sigrok-firmware/${_fw}
+    done
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING
+    %install_file COPYING.LESSER %(installroot)%(datadir)/licenses/%(name)/COPYING.LESSER
+# No check phase: there is nothing to run - these are device firmware
+# images, only usable with the hardware attached.

@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : libserialport
+version     : "0.1.2"
+release     : 1
+homepage    : https://sigrok.org/wiki/Libserialport
+upstreams   :
+    - https://sigrok.org/download/source/libserialport/libserialport-0.1.2.tar.gz : 5deb92b5ca72c0347b07b786848350deca2dcfd975ce613b8e0e1d947a4b4ca9
+summary     : Cross-platform library for accessing serial ports
+description : |
+    libserialport is a small C library from the sigrok project for talking to
+    serial ports (RS-232, USB-serial adapters, Bluetooth serial) with one API
+    on Linux, macOS, Windows and the BSDs: enumeration, configuration, blocking
+    and non-blocking I/O, and flow control. Packaged here because libsigrok
+    needs it for every serial-attached instrument.
+license     : LGPL-3.0-or-later
+setup       : |
+    %configure --disable-static
+build       : |
+    %make
+install     : |
+    %make_install
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING
+# No check phase: the only test program (test_timing) times real serial
+# transfers against an attached port, so it cannot run in a build sandbox.

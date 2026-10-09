@@ -1,0 +1,34 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"sigrok-cli": {
+			"build-depends": [
+				"pkgconfig(glib-2.0)",
+				"pkgconfig(libsigrok)",
+				"pkgconfig(libsigrokdecode)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libglib-2.0.so.0(x86_64))",
+				"soname(libsigrok.so.4(x86_64))",
+				"soname(libsigrokdecode.so.4(x86_64))"
+			],
+			"files": [
+				"/usr/bin/sigrok-cli",
+				"/usr/share/applications/org.sigrok.sigrok-cli.desktop",
+				"/usr/share/icons/hicolor/scalable/apps/sigrok-cli.svg",
+				"/usr/share/licenses/sigrok-cli/COPYING",
+				"/usr/share/man/man1/sigrok-cli.1"
+			],
+			"name": "sigrok-cli",
+			"provides": [
+				"binary(sigrok-cli)"
+			]
+		}
+	},
+	"source-name": "sigrok-cli",
+	"source-release": "1",
+	"source-version": "0.7.2"
+}

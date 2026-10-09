@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : libsigrokdecode
+version     : "0.5.3"
+release     : 1
+homepage    : https://sigrok.org/wiki/Libsigrokdecode
+upstreams   :
+    - https://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.5.3.tar.gz : c50814aa6743cd8c4e88c84a0cdd8889d883c3be122289be90c63d7d67883fc0
+summary     : Protocol decoder library of the sigrok project
+description : |
+    libsigrokdecode runs sigrok's protocol decoders - over a hundred, written
+    in Python: I2C, SPI, UART, CAN, 1-Wire, JTAG, SWD, USB, many more -
+    against captured logic-analyzer sample data and turns raw edges into
+    annotated, stackable protocol-level output. It embeds the Python
+    interpreter. sigrok-cli and PulseView use it to decode captures.
+license     :
+    # The library itself is GPL-3.0-or-later; nearly all of the decoders
+    # (decoders/*/pd.py) are GPL-2.0-or-later, a few GPL-3.0-or-later.
+    - GPL-3.0-or-later
+    - GPL-2.0-or-later
+builddeps   :
+    - pkgconfig(glib-2.0)
+    - pkgconfig(python3-embed)
+    - pkgconfig(check)
+setup       : |
+    # This release's configure tries python-3.8-embed and then falls through
+    # a list of non-embed names (python-3.8 ... python3), none of which knows
+    # about Python 3.14, so it settles on plain python3.pc. That file carries
+    # no -lpython3.14, and the result is a libsigrokdecode.so with the
+    # interpreter's symbols unresolved and no DT_NEEDED on libpython - it
+    # builds, then fails to load. Hand the embed link line over explicitly.
+    %configure --disable-static \
+        LIBS="$(pkg-config --libs python3-embed)"
+build       : |
+    %make
+install     : |
+    %make_install
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file COPYING %(installroot)%(datadir)/licenses/%(name)/COPYING
+check       : |
+    %make check
