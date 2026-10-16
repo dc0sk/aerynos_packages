@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Keymapp
+GenericName=ZSA keyboard manager
+Comment=Flash and monitor ZSA keyboards (Moonlander, Voyager, ErgoDox EZ, Planck EZ)
+Exec=keymapp
+Icon=keymapp
+Terminal=false
+Categories=Utility;HardwareSettings;
+Keywords=ZSA;keyboard;Oryx;Moonlander;Voyager;ErgoDox;Planck;flash;
+StartupWMClass=keymapp

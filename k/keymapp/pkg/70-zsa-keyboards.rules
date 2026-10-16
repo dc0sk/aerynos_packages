@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+#
+# Access for Keymapp (and ZSA's Wally/Oryx flashing) to ZSA keyboards, with
+# TAG+="uaccess" - an ACL for whoever is logged in at the seat - rather than
+# ZSA's world-writable MODE:="0666" for the Voyager's bootloader and their
+# docs' GROUP="plugdev" rules (which need a group this system does not have).
+#
+# The bootloader and Teensy rules are ZSA's own, from the 50-wally.rules in
+# github.com/zsa/wally (dist/linux64), with the Voyager one changed from
+# MODE:="0666" to uaccess. The hidraw/usb rules for the keyboards themselves
+# are written here: Keymapp talks to a running keyboard (live training, layer
+# display) over hidraw and USB, and ZSA's vendor id for that is 3297.
+
+# Running keyboards: ZSA (Moonlander, Voyager, ErgoDox EZ, Planck EZ) is 3297,
+# older ErgoDox EZ firmware shows up as the Teensy vendor 16c0.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3297", TAG+="uaccess"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="16c0", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="3297", TAG+="uaccess"
+
+# Teensy rules for the Ergodox EZ Original / Shine / Glow
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", ENV{ID_MM_DEVICE_IGNORE}="1"
+ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789A]?", ENV{MTP_NO_PROBE}="1"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789ABCD]?", TAG+="uaccess"
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="04[789B]?", TAG+="uaccess"
+
+# STM32 DFU bootloader of the Moonlander and Planck EZ Standard / Glow
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", TAG+="uaccess", SYMLINK+="stm32_dfu"
+
+# Voyager bootloader (shares the ZSA vendor id; the usb rule above grants access)
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="3297", SYMLINK+="ignition_dfu"
