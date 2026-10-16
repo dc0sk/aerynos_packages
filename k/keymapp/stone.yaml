@@ -1,0 +1,64 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : keymapp
+# ZSA publishes no version number and no versioned URL: the only download is
+# the moving keymapp-latest.tar.gz, served with Last-Modified 2025-05-19. This
+# is that date, which can be checked, rather than a number read out of the
+# binary: a string "1.3.7" sits next to the flashing code in it (beside the
+# gRPC port 50051 and "wally"), which suggests it is Keymapp's own version, but
+# nothing ZSA publishes confirms that.
+version     : "2025.05.19"
+release     : 1
+homepage    : https://www.zsa.io/keymapp
+upstreams   :
+    # Closed source, distributed as a prebuilt tarball of two files at its
+    # root (keymapp, icon.png). Not unpacked by boulder: it strips one leading
+    # directory from every archive, which here would strip the files
+    # themselves. setup: extracts it instead.
+    #
+    # The URL is mutable. When ZSA replaces the file, this hash stops matching
+    # and the build fails loudly; the fix is to re-pin it, not to trust the
+    # new file blindly.
+    - https://oryx.nyc3.cdn.digitaloceanspaces.com/keymapp/keymapp-latest.tar.gz :
+        hash : a87bc7083cd6461ba10e0da4b94f249a29100d712542d54498f01e947cf868fa
+        unpack : false
+summary     : ZSA's keyboard manager for flashing and monitoring ZSA keyboards (proprietary)
+description : |
+    Keymapp is ZSA Technology Labs' desktop application for their keyboards -
+    the Moonlander, Voyager, ErgoDox EZ and Planck EZ. It flashes layouts built
+    in the Oryx configurator onto a keyboard, shows the active layer and
+    key presses live, and can train a layout on the device.
+
+    This repackages ZSA's own prebuilt Linux binary; nothing is built here and
+    ZSA publishes no source. It is a Go program using WebKitGTK for its
+    window, linked against this system's GTK3, WebKitGTK 4.1, libsoup 3,
+    libusb and udev, which boulder picks up from the binary itself.
+
+    The udev rules grant the logged-in seat user access to the keyboards and
+    their bootloaders; unplug and replug the keyboard after installing.
+
+    This package contains proprietary, closed-source software from ZSA, with no
+    redistribution terms published, so the built package should be kept to the
+    machine that built it and not served to anyone else.
+license     : LicenseRef-ZSA-Keymapp-proprietary
+builddeps   :
+    - binary(tar)
+    - binary(gzip)
+    - binary(desktop-file-validate)
+setup       : |
+    tar -xzf %(sourcedir)/keymapp-latest.tar.gz
+install     : |
+    %install_exe keymapp %(installroot)%(bindir)/keymapp
+
+    %install_dir %(installroot)%(datadir)/applications
+    %install_file %(pkgdir)/keymapp.desktop %(installroot)%(datadir)/applications/keymapp.desktop
+    desktop-file-validate %(installroot)%(datadir)/applications/keymapp.desktop
+
+    # The icon is 1024x1024, larger than the sizes hicolor themes are searched
+    # for, so it goes in pixmaps, which every desktop falls back to.
+    %install_file icon.png %(installroot)%(datadir)/pixmaps/keymapp.png
+
+    %install_dir %(installroot)%(udevrulesdir)
+    %install_file %(pkgdir)/70-zsa-keyboards.rules %(installroot)%(udevrulesdir)/70-zsa-keyboards.rules
+# No check phase: a prebuilt binary, and a GUI that needs a keyboard attached.

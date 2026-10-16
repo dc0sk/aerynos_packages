@@ -22,6 +22,7 @@ repository.
 | [`gimp`](g/gimp) | 3.2.4 | GNU Image Manipulation Program |
 | [`hamlib`](h/hamlib) | 4.7.2 | Control libraries and tools for amateur radio transceivers and rotators, with rigctld split out as its own package |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
+| [`keymapp`](k/keymapp) | 2025.05.19 | ZSA's keyboard manager for flashing and monitoring ZSA keyboards (proprietary) |
 | [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
 | [`libserialport`](l/libserialport) | 0.1.2 | Cross-platform library for accessing serial ports, needed by libsigrok |
 | [`libsigrok`](l/libsigrok) | 0.6.0+git | Hardware drivers and acquisition library of the sigrok project |

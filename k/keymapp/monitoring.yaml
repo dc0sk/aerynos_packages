@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # Nothing to follow: ZSA publishes no release feed, no versions and no
+  # release-monitoring.org project exists; only a moving keymapp-latest URL.
+  id: ~
+  rss: ~
+security:
+  cpe: ~ # No known CPE. Last checked 20261016
