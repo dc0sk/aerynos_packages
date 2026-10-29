@@ -55,6 +55,7 @@ repository.
 | [`sigrok-firmware-fx2lafw`](s/sigrok-firmware-fx2lafw) | 0.1.7 | Open firmware for Cypress FX2 based logic analyzers (prebuilt images) |
 | [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
 | [`soapysdrplay3`](s/soapysdrplay3) | 0.5.2 | SoapySDR module for SDRplay RSP receivers |
+| [`solidcraft`](s/solidcraft) | 0.26.0 | Open-source parametric 3D CAD application written in Rust |
 | [`tpm2-abrmd`](t/tpm2-abrmd) | 3.0.0 | TPM2 access broker and resource manager daemon |
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
