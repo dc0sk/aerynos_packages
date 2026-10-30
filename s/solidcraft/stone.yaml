@@ -3,7 +3,7 @@
 
 name        : solidcraft
 version     : "0.26.0"
-release     : 1
+release     : 2
 homepage    : https://solidcraft.io
 upstreams   :
     - https://github.com/tangency-labs/solidcraft/archive/refs/tags/v0.26.0.tar.gz : b69118fcfad07b2379db534cda4b1d0160388c8a2e936dc6566644daea0a1697
@@ -18,7 +18,8 @@ description : |
 
     This package ships the desktop application (solidcraft) and the headless
     command runner and MCP server for AI agents (solidcraft-cli, plus
-    solvecraft-cli, the pre-rename name kept by upstream as an alias).
+    solvecraft-cli, the pre-rename name kept by upstream as an alias), and a
+    udev rule giving the logged-in user access to 3Dconnexion 3D mice.
 
     Not built here: the browser build (apps/solidcraft-web), which needs a
     wasm toolchain and Trunk. The windowing system and GPU libraries are
@@ -69,6 +70,11 @@ install     : |
     %install_dir %(installroot)%(datadir)/applications
     %install_file assets/platforms/linux/io.tangencylabs.solidcraft.desktop %(installroot)%(datadir)/applications/io.tangencylabs.solidcraft.desktop
     desktop-file-validate %(installroot)%(datadir)/applications/io.tangencylabs.solidcraft.desktop
+
+    # solidcraft reads a 3D mouse straight from its hidraw node (unless
+    # spacenavd is running), so the logged-in user needs access to it.
+    %install_dir %(installroot)%(udevrulesdir)
+    %install_file %(pkgdir)/70-3d-mouse.rules %(installroot)%(udevrulesdir)/70-3d-mouse.rules
 
     %install_dir %(installroot)%(datadir)/mime/packages
     %install_file assets/platforms/linux/io.tangencylabs.solidcraft.mime.xml %(installroot)%(datadir)/mime/packages/io.tangencylabs.solidcraft.xml
