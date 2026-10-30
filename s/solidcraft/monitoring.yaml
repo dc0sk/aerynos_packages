@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+releases:
+  # No release-monitoring.org project known; follow the GitHub releases feed.
+  id: ~
+  rss: https://github.com/tangency-labs/solidcraft/releases.atom
+security:
+  cpe: ~ # No known CPE. Last checked 20261029.

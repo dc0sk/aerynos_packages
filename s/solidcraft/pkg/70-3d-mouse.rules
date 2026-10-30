@@ -1,0 +1,6 @@
+# 3Dconnexion 3D mice for SolidCraft, which reads /dev/hidrawN directly.
+# Current 3Dconnexion vendor id (USB), and its Bluetooth devices (HID id).
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="256f", TAG+="uaccess"
+SUBSYSTEM=="hidraw", KERNELS=="0005:256F:*", TAG+="uaccess"
+# Older SpaceNavigator, still under Logitech's vendor id.
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c626", TAG+="uaccess"

@@ -1,0 +1,58 @@
+/** Human readable report. This is not consumed by boulder */
+{
+	"manifest-version": "0.2",
+	"packages": {
+		"solidcraft": {
+			"build-depends": [
+				"binary(desktop-file-validate)"
+			],
+			"depends": [
+				"interpreter(/usr/lib/ld-linux-x86-64.so.2(x86_64))",
+				"libx11",
+				"libxcursor",
+				"libxi",
+				"libxkbcommon",
+				"libxkbcommon-x11",
+				"mesa-vulkan-drivers",
+				"shared-mime-info",
+				"soname(ld-linux-x86-64.so.2(x86_64))",
+				"soname(libc.so.6(x86_64))",
+				"soname(libgcc_s.so.1(x86_64))",
+				"soname(libm.so.6(x86_64))",
+				"vulkan-loader",
+				"wayland",
+				"xdg-desktop-portal"
+			],
+			"files": [
+				"/usr/bin/solidcraft",
+				"/usr/bin/solidcraft-cli",
+				"/usr/bin/solvecraft-cli",
+				"/usr/share/applications/io.tangencylabs.solidcraft.desktop",
+				"/usr/share/doc/solidcraft/README.md",
+				"/usr/share/icons/hicolor/128x128/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/16x16/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/24x24/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/256x256/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/32x32/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/48x48/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/512x512/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/icons/hicolor/64x64/apps/io.tangencylabs.solidcraft.png",
+				"/usr/share/licenses/solidcraft/LICENSE-Apache-2.0",
+				"/usr/share/licenses/solidcraft/LICENSE-MIT",
+				"/usr/share/licenses/solidcraft/NOTICE",
+				"/usr/share/licenses/solidcraft/THIRD-PARTY-LICENSES.txt",
+				"/usr/share/metainfo/io.tangencylabs.solidcraft.metainfo.xml",
+				"/usr/share/mime/packages/io.tangencylabs.solidcraft.xml"
+			],
+			"name": "solidcraft",
+			"provides": [
+				"binary(solidcraft)",
+				"binary(solidcraft-cli)",
+				"binary(solvecraft-cli)"
+			]
+		}
+	},
+	"source-name": "solidcraft",
+	"source-release": "1",
+	"source-version": "0.26.0"
+}

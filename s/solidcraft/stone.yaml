@@ -1,0 +1,103 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : solidcraft
+version     : "0.26.0"
+release     : 2
+homepage    : https://solidcraft.io
+upstreams   :
+    - https://github.com/tangency-labs/solidcraft/archive/refs/tags/v0.26.0.tar.gz : b69118fcfad07b2379db534cda4b1d0160388c8a2e936dc6566644daea0a1697
+summary     : Open-source parametric 3D CAD application written in Rust
+description : |
+    SolidCraft is a parametric 3D CAD application: sketches with a built-in
+    constraint solver, a parametric feature timeline (extrude, revolve, sweep,
+    loft, fillet, chamfer, shell, draft, holes, threads, patterns), unit-aware
+    parameters and configurations, assemblies with joints and motion studies,
+    and sheet metal. It reads and writes STEP, IGES, 3MF, STL, OBJ and glTF,
+    and has its own .sc design format.
+
+    This package ships the desktop application (solidcraft) and the headless
+    command runner and MCP server for AI agents (solidcraft-cli, plus
+    solvecraft-cli, the pre-rename name kept by upstream as an alias), and a
+    udev rule giving the logged-in user access to 3Dconnexion 3D mice.
+
+    Not built here: the browser build (apps/solidcraft-web), which needs a
+    wasm toolchain and Trunk. The windowing system and GPU libraries are
+    loaded at runtime rather than linked, so they are declared as runtime
+    dependencies.
+license     :
+    - Apache-2.0
+    - MIT
+networking  : true
+builddeps   :
+    - binary(desktop-file-validate)
+rundeps     :
+    # Windowing and graphics are dlopen'd at runtime (winit, wgpu), so the
+    # ELF analysis boulder runs cannot see them; this mirrors the library
+    # list upstream's own .deb declares.
+    - libx11
+    - libxcursor
+    - libxi
+    - libxkbcommon
+    - libxkbcommon-x11
+    - vulkan-loader
+    - wayland
+    - mesa-vulkan-drivers
+    - shared-mime-info
+    - xdg-desktop-portal
+environment : |
+    # The container's /tmp is a RAM-backed tmpfs; keep rustc and linker
+    # scratch space on the disk-backed workdir instead.
+    mkdir -p %(workdir)/.tmp
+    TMPDIR="%(workdir)/.tmp"
+    export TMPDIR
+setup       : |
+    %cargo_fetch
+build       : |
+    # Heavy rustc jobs (egui and wgpu with thin LTO and line-table debug
+    # info): bound them independently of the general job count.
+    CARGO_BUILD_JOBS=2
+    export CARGO_BUILD_JOBS
+
+    # The workspace also holds the wasm browser app and an xtask helper, so
+    # build only the two shipped binaries.
+    %cargo_build -p solidcraft -p solidcraft-cli
+install     : |
+    %install_exe %(cargo_target_dir)/solidcraft %(installroot)%(bindir)/solidcraft
+    %install_exe %(cargo_target_dir)/solidcraft-cli %(installroot)%(bindir)/solidcraft-cli
+    %install_exe %(cargo_target_dir)/solvecraft-cli %(installroot)%(bindir)/solvecraft-cli
+
+    %install_dir %(installroot)%(datadir)/applications
+    %install_file assets/platforms/linux/io.tangencylabs.solidcraft.desktop %(installroot)%(datadir)/applications/io.tangencylabs.solidcraft.desktop
+    desktop-file-validate %(installroot)%(datadir)/applications/io.tangencylabs.solidcraft.desktop
+
+    # solidcraft reads a 3D mouse straight from its hidraw node (unless
+    # spacenavd is running), so the logged-in user needs access to it.
+    %install_dir %(installroot)%(udevrulesdir)
+    %install_file %(pkgdir)/70-3d-mouse.rules %(installroot)%(udevrulesdir)/70-3d-mouse.rules
+
+    %install_dir %(installroot)%(datadir)/mime/packages
+    %install_file assets/platforms/linux/io.tangencylabs.solidcraft.mime.xml %(installroot)%(datadir)/mime/packages/io.tangencylabs.solidcraft.xml
+
+    # The metainfo file is a template; fill in the version and release date
+    # the way upstream's own package script does.
+    %install_dir %(installroot)%(datadir)/metainfo
+    sed -e "s/@VERSION@/%(version)/g" -e "s/@DATE@/2026-10-29/g" \
+        assets/platforms/linux/io.tangencylabs.solidcraft.metainfo.xml.in \
+        > %(installroot)%(datadir)/metainfo/io.tangencylabs.solidcraft.metainfo.xml
+
+    for _size in 16 24 32 48 64 128 256 512; do
+        %install_dir %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps
+        %install_file assets/icons/app/linux/exports/hicolor/${_size}x${_size}/apps/io.tangencylabs.solidcraft.png %(installroot)%(datadir)/icons/hicolor/${_size}x${_size}/apps/io.tangencylabs.solidcraft.png
+    done
+
+    %install_dir %(installroot)%(datadir)/licenses/%(name)
+    %install_file LICENSE-APACHE %(installroot)%(datadir)/licenses/%(name)/LICENSE-Apache-2.0
+    %install_file LICENSE-MIT %(installroot)%(datadir)/licenses/%(name)/LICENSE-MIT
+    %install_file NOTICE %(installroot)%(datadir)/licenses/%(name)/NOTICE
+    %install_file THIRD-PARTY-LICENSES.txt %(installroot)%(datadir)/licenses/%(name)/THIRD-PARTY-LICENSES.txt
+
+    %install_dir %(installroot)%(datadir)/doc/%(name)
+    %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md
+# No check phase: the test suite is workspace-wide (CAD kernel reference
+# parts, GPU and UI tests) and far heavier than the build itself.
