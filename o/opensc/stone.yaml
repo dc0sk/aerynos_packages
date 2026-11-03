@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: 2026 AerynOS Developers
+# SPDX-License-Identifier: MPL-2.0
+
+name        : opensc
+version     : "0.27.1"
+release     : 1
+homepage    : https://github.com/OpenSC/OpenSC
+upstreams   :
+    - https://github.com/OpenSC/OpenSC/releases/download/0.27.1/opensc-0.27.1.tar.gz : 976f4a23eaf3397a1a2c3a7aac80bf971a8c3d829c9a79f06145bfaeeae5eca7
+summary     : Smart card tools and PKCS#11 module
+description : |
+    OpenSC provides a set of libraries and utilities for working with smart
+    cards, mainly cards and USB tokens that hold cryptographic keys and
+    certificates (PKI cards, national ID cards, PIV, OpenPGP, many vendor
+    tokens). It implements a PKCS#11 module (opensc-pkcs11.so) that browsers,
+    OpenSSH, OpenVPN and other programs can load, plus command line tools:
+    opensc-tool, pkcs15-tool, pkcs11-tool, pkcs15-init, piv-tool,
+    opensc-explorer, opensc-notify and others.
+
+    Cards are reached through PC/SC, so the pcscd service (package pcsclite)
+    and a reader driver (package ccid for USB readers) are needed at run time.
+license     : LGPL-2.1-or-later
+builddeps   :
+    - pkgconfig(libpcsclite)
+    - pkgconfig(openssl)
+    - pkgconfig(readline)
+    - pkgconfig(zlib)
+rundeps     :
+    # The cards are reached through the PC/SC daemon, which the library only
+    # dlopen's, so the ELF analysis cannot see it.
+    - pcsclite
+    - ccid
+setup       : |
+    # Man pages need docbook-xsl and xsltproc; leave them out rather than
+    # pull a documentation toolchain into the build.
+    %configure --disable-man --disable-static \
+        --with-pcsc-provider=libpcsclite.so.1
+build       : |
+    %make
+install     : |
+    %make_install
+
+    # The notification helper is not built (it needs glib), so its desktop
+    # entry would point at a missing opensc-notify.
+    rm -f %(installroot)%(datadir)/applications/org.opensc.notify.desktop
+
+    %install_dir %(installroot)%(datadir)/p11-kit/modules
+    %install_file %(pkgdir)/opensc.module %(installroot)%(datadir)/p11-kit/modules/opensc.module
+check       : |
+    # Most of upstream's tests are skipped without cmocka and a real card, so
+    # this is a smoke test of the build rather than a test of any card driver.
+    %make check
