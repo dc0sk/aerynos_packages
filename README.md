@@ -169,7 +169,7 @@ build wins over an upstream package of the same name. From then on:
 
 ```sh
 sudo moss sync            # pick up newly indexed builds
-sudo moss install ufw
+sudo moss pkg add ufw
 ```
 
 Re-running `scripts/local-repo.sh` after a recipe change is enough — moss reads
