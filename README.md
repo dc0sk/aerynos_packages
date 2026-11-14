@@ -41,7 +41,6 @@ repository.
 | [`python-beniget`](p/python-beniget) | 0.5.1 | Static analysis of Python code, needed by pythran |
 | [`python-gast`](p/python-gast) | 0.7.0 | Version-agnostic Python AST, needed by pythran |
 | [`python-hypothesis`](p/python-hypothesis) | 6.170.15 | Property-based testing for Python, needed by the numpy and scipy suites |
-| [`python-jinja2`](p/python-jinja2) | 3.1.6 | Template engine for Python, needed to build fwupd |
 | [`python-numpy`](p/python-numpy) | 2.5.4 | Fundamental package for scientific computing with Python |
 | [`python-pyserial`](p/python-pyserial) | 3.5 | Serial port access for Python |
 | [`python-scipy`](p/python-scipy) | 1.18.1 | Fundamental algorithms for scientific computing in Python |
@@ -96,8 +95,9 @@ boulder build u/ufw/stone.yaml
 
 ### Packages that depend on other packages here
 
-`fwupd` needs `python-jinja2` from this repository at build time, and boulder's
-default profile only knows about the stock AerynOS repositories. Build against a
+Some packages (for example the python scientific stack and `soapysdr` users such
+as `sdroxide`) need other packages from this repository at build time, and
+boulder's default profile only knows about the stock AerynOS repositories. Build against a
 profile that also carries the local index:
 
 ```sh
@@ -105,8 +105,8 @@ boulder profile add local-x86_64 \
     --repo name=unstable,base-uri=https://cdn.aerynos.dev/,channel=main,version=stream/unstable,priority=0 \
     --repo name=local,uri=file:///home/dc0sk/git/aerynos_packages/local/x86_64/stone.index,priority=10
 
-scripts/local-repo.sh p/python-jinja2       # build and index the dependency first
-boulder build -p local-x86_64 f/fwupd/stone.yaml
+scripts/local-repo.sh s/soapysdr            # build and index the dependency first
+boulder build -p local-x86_64 s/sdroxide/stone.yaml
 ```
 
 The stock repository in that profile should name the same stream the machine
