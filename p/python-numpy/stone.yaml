@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : python-numpy
-version     : "2.5.2"
-release     : 1
+version     : "2.5.4"
+release     : 2
 homepage    : https://numpy.org/
 upstreams   :
-    - https://files.pythonhosted.org/packages/9a/80/db0b4559e57ec36362bedbb05530a87fafbcb6067708c946967a41d449e7/numpy-2.5.2.tar.gz : d482d171c406ae88c5b19cad3b6a1c4c5209f886ab74bc44c2c865c23f52d860
+    - https://files.pythonhosted.org/packages/95/b0/c7453d0b6e2073c3264468b106ee1563750cecc910965e67357e3698c83e/numpy-2.5.4.tar.gz : 9a94cf751c9ad8ebaa835bcd3d40dacf8534ad086b88c38029b65123c7999d2a
 summary     : Fundamental package for scientific computing with Python
 description : |
     NumPy provides the N-dimensional array that most of the Python scientific

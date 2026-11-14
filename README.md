@@ -38,15 +38,15 @@ repository.
 | [`opensc`](o/opensc) | 0.27.1 | Smart card tools and PKCS#11 module |
 | [`passim`](p/passim) | 0.1.13 | Local caching server for shared metadata |
 | [`pulseview`](p/pulseview) | 0.4.2+git | Qt-based GUI for sigrok logic analyzers and oscilloscopes |
-| [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
-| [`python-gast`](p/python-gast) | 0.6.0 | Version-agnostic Python AST, needed by pythran |
-| [`python-hypothesis`](p/python-hypothesis) | 6.165.5 | Property-based testing for Python, needed by the numpy and scipy suites |
+| [`python-beniget`](p/python-beniget) | 0.5.1 | Static analysis of Python code, needed by pythran |
+| [`python-gast`](p/python-gast) | 0.7.0 | Version-agnostic Python AST, needed by pythran |
+| [`python-hypothesis`](p/python-hypothesis) | 6.170.15 | Property-based testing for Python, needed by the numpy and scipy suites |
 | [`python-jinja2`](p/python-jinja2) | 3.1.6 | Template engine for Python, needed to build fwupd |
-| [`python-numpy`](p/python-numpy) | 2.5.2 | Fundamental package for scientific computing with Python |
+| [`python-numpy`](p/python-numpy) | 2.5.4 | Fundamental package for scientific computing with Python |
 | [`python-pyserial`](p/python-pyserial) | 3.5 | Serial port access for Python |
-| [`python-scipy`](p/python-scipy) | 1.18.0 | Fundamental algorithms for scientific computing in Python |
+| [`python-scipy`](p/python-scipy) | 1.18.1 | Fundamental algorithms for scientific computing in Python |
 | [`python-sortedcontainers`](p/python-sortedcontainers) | 2.4.0 | Sorted list, dict and set implementations, needed by hypothesis |
-| [`pythran`](p/pythran) | 0.18.1 | Ahead of time compiler for numeric Python kernels |
+| [`pythran`](p/pythran) | 0.19.0 | Ahead of time compiler for numeric Python kernels |
 | [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
 | [`sbsigntools`](s/sbsigntools) | 0.9.5 | Tools to sign and verify UEFI Secure Boot binaries |
 | [`sdroxide`](s/sdroxide) | 1.6.6 | PowerSDR/Thetis-style SDR transceiver with a native GUI |

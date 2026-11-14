@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : pythran
-version     : "0.18.1"
-release     : 1
+version     : "0.19.0"
+release     : 2
 homepage    : https://pythran.readthedocs.io/
 upstreams   :
-    - https://files.pythonhosted.org/packages/d4/84/17c4c44a24f5ec709991e603e601bf316d09c4fe915fbe348c689dede998/pythran-0.18.1.tar.gz : 8803ed948bf841a11bbbb10472a8ff6ea24ebd70e67c3f77b77be3db900eccfe
+    - https://files.pythonhosted.org/packages/bb/a3/03098a8a5d2c9f801c227cf941d85976934f5f47307ef3d819734370acdc/pythran-0.19.0.tar.gz : 18a096daa8b4bbe3ace06ce5d7325be5ff57aec4cf67b91834cf1b757b3e5392
 summary     : Ahead of time compiler for numeric Python kernels
 description : |
     pythran compiles annotated Python numeric kernels into native extension

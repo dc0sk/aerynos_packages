@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : python-hypothesis
-version     : "6.165.5"
-release     : 1
+version     : "6.170.15"
+release     : 2
 homepage    : https://hypothesis.readthedocs.io/
 upstreams   :
-    - https://files.pythonhosted.org/packages/7a/3a/b840ea8b26e0c4795584dc93c832c5d1a9ff37db1818cc91b2ee8110f757/hypothesis-6.165.5.tar.gz : 0df7fdefd2e10bbfe7d690eb22c7181a739e8040026907207faa305d86e6e4db
+    - https://files.pythonhosted.org/packages/96/ec/59f14eb701087710888b66bfef2dc8bee9dd4a364c69a732db0cc1d3d2dc/hypothesis-6.170.15.tar.gz : a4a57e5fb106ecb29cad37e22e411d957e20d933bfb9fb029e1999b1deb8a0b6
 summary     : Property-based testing for Python
 description : |
     Hypothesis generates test inputs from a description of what is valid,
