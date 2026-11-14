@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : mokutil
-version     : "0.7.2"
-release     : 1
+version     : "0.7.3"
+release     : 2
 homepage    : https://github.com/lcp/mokutil
 upstreams   :
-    - https://github.com/lcp/mokutil/archive/refs/tags/0.7.2.tar.gz : 839d677c4fc9805f1565703ca32863e4652692c53da66a88ae9b9e30676f9e17
+    - https://github.com/lcp/mokutil/archive/refs/tags/0.7.3.tar.gz : c741db1ffe48f59ce31ce49186886422957c57bef69b5b0e2c18a80406d946da
 summary     : Manage the shim Machine Owner Keys
 description : |
     mokutil manages the Machine Owner Key list that shim consults under UEFI

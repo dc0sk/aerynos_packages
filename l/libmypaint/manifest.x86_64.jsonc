@@ -16,8 +16,8 @@
 				"soname(libm.so.6(x86_64))"
 			],
 			"files": [
-				"/usr/lib/libmypaint-1.6.so.1",
-				"/usr/lib/libmypaint-1.6.so.1.1.2",
+				"/usr/lib/libmypaint.so.0",
+				"/usr/lib/libmypaint.so.0.0.0",
 				"/usr/share/locale/af/LC_MESSAGES/libmypaint.mo",
 				"/usr/share/locale/ar/LC_MESSAGES/libmypaint.mo",
 				"/usr/share/locale/as/LC_MESSAGES/libmypaint.mo",
@@ -102,7 +102,7 @@
 			],
 			"name": "libmypaint",
 			"provides": [
-				"soname(libmypaint-1.6.so.1(x86_64))"
+				"soname(libmypaint.so.0(x86_64))"
 			]
 		},
 		"libmypaint-devel": {
@@ -145,6 +145,6 @@
 		}
 	},
 	"source-name": "libmypaint",
-	"source-release": "1",
-	"source-version": "1.6.0"
+	"source-release": "2",
+	"source-version": "1.6.1"
 }

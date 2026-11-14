@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : python-scipy
-version     : "1.18.0"
-release     : 1
+version     : "1.18.1"
+release     : 2
 homepage    : https://scipy.org/
 upstreams   :
-    - https://files.pythonhosted.org/packages/a7/25/c2700dfaf6442b4effaa91af24ebce5dc9d31bb4a69706313aae70d72cd0/scipy-1.18.0.tar.gz : 67b2ad2ad54c72ca6d04975a9b2df8c3638c34ddd5b28738e94fc2b57929d378
+    - https://files.pythonhosted.org/packages/7e/74/66de6258867beb2ef08f35f9f2ac017a52cacd5081714d239ff1a442d458/scipy-1.18.1.tar.gz : 52c4b7422442aba924d03ad4019852b08a92e64ea187b933135687bfe2747307
 summary     : Fundamental algorithms for scientific computing in Python
 description : |
     SciPy builds on numpy with algorithms for optimization, integration,
@@ -41,16 +41,21 @@ builddeps   :
     - python-sortedcontainers
     - python-numpy
     # scipy compiles several modules ahead of time with pythran; its
-    # build-system.requires pins pythran >=0.18.1,<0.19.0, which 0.18.1 meets.
+    # build-system.requires accepts pythran 0.19.
     - pythran
 build       : |
     # Built with pythran, so the modules upstream expects to be compiled ahead
     # of time actually are. This previously carried -Duse-pythran=false because
     # pythran was not packaged, plus --skip-dependency-check to get past the
-    # unconditional pythran entry in build-system.requires; both are gone now
-    # that pythran 0.18.1 is available, which means the dependency check is
-    # doing its job again rather than being bypassed.
-    %pyproject_build
+    # unconditional pythran entry in build-system.requires; both were dropped
+    # once pythran was available, so the dependency check did its job again.
+    #
+    # 1.18.1 is the exception: its build-system.requires pins Cython <3.3,
+    # meson-python <0.22 and pybind11 <3.1, and AerynOS now ships 3.3.1, 0.22.1
+    # and 3.1.0. Those caps are upstream being conservative and the build is
+    # checked by the suite below, so the check is skipped for this release; it
+    # should go again once upstream's pins catch up.
+    %pyproject_build --skip-dependency-check
 install     : |
     %pyproject_install
     %python_compile

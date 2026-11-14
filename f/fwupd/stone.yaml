@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : fwupd
-version     : "2.1.7"
-release     : 1
+version     : "2.1.9"
+release     : 2
 homepage    : https://fwupd.org
 upstreams   :
-    - https://github.com/fwupd/fwupd/archive/refs/tags/2.1.7.tar.gz : 338ea5b139f9a37447ff2215d0a8d2cf23851fb5a39fba7b1b0ded52a40240cc
+    - https://github.com/fwupd/fwupd/archive/refs/tags/2.1.9.tar.gz : cf8a5f4c66a71f982ae79b17d382ffba1d12077eb9c3b47045fb43f794c4ac97
 summary     : Firmware update daemon
 description : |
     fwupd manages firmware updates on Linux. It exposes a D-Bus interface used
@@ -69,8 +69,10 @@ builddeps   :
     - pkgconfig(xmlb)
     - pkgconfig(zlib)
     # meson.build calls error() outright if the jinja2 python module is absent;
-    # it is used to generate sources. Packaged in this repository.
-    - python-jinja2
+    # it is used to generate sources. AerynOS now ships it as python-jinja
+    # (3.1.6), which provides python(jinja2); this repository's own
+    # python-jinja2 is no longer needed for it.
+    - python(jinja2)
 rundeps     :
     - hwdata
 setup       : |

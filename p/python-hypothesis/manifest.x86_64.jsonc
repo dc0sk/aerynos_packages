@@ -27,12 +27,12 @@
 				"/usr/lib/python3.14/site-packages/_hypothesis_ftz_detector.py",
 				"/usr/lib/python3.14/site-packages/_hypothesis_globals.py",
 				"/usr/lib/python3.14/site-packages/_hypothesis_pytestplugin.py",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/METADATA",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/RECORD",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/WHEEL",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/entry_points.txt",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/licenses/LICENSE.txt",
-				"/usr/lib/python3.14/site-packages/hypothesis-6.165.5.dist-info/sboms/hypothesis-native.cyclonedx.json",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/METADATA",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/RECORD",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/WHEEL",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/entry_points.txt",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/licenses/LICENSE.txt",
+				"/usr/lib/python3.14/site-packages/hypothesis-6.170.15.dist-info/sboms/hypothesis-native.cyclonedx.json",
 				"/usr/lib/python3.14/site-packages/hypothesis/__init__.py",
 				"/usr/lib/python3.14/site-packages/hypothesis/__pycache__/__init__.cpython-314.opt-1.pyc",
 				"/usr/lib/python3.14/site-packages/hypothesis/__pycache__/__init__.cpython-314.pyc",
@@ -342,6 +342,7 @@
 				"/usr/lib/python3.14/site-packages/hypothesis/vendor/__pycache__/__init__.cpython-314.pyc",
 				"/usr/lib/python3.14/site-packages/hypothesis/vendor/__pycache__/pretty.cpython-314.opt-1.pyc",
 				"/usr/lib/python3.14/site-packages/hypothesis/vendor/__pycache__/pretty.cpython-314.pyc",
+				"/usr/lib/python3.14/site-packages/hypothesis/vendor/leap-seconds.txt",
 				"/usr/lib/python3.14/site-packages/hypothesis/vendor/pretty.py",
 				"/usr/lib/python3.14/site-packages/hypothesis/vendor/tlds-alpha-by-domain.txt",
 				"/usr/lib/python3.14/site-packages/hypothesis/version.py"
@@ -355,6 +356,6 @@
 		}
 	},
 	"source-name": "python-hypothesis",
-	"source-release": "1",
-	"source-version": "6.165.5"
+	"source-release": "2",
+	"source-version": "6.170.15"
 }

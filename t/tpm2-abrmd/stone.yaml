@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : tpm2-abrmd
-version     : "3.0.0"
-release     : 1
+version     : "3.1.0"
+release     : 2
 homepage    : https://github.com/tpm2-software/tpm2-abrmd
 upstreams   :
-    - https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.0.0/tpm2-abrmd-3.0.0.tar.gz : d59aff34164aa705b05155b86607f6b66918a433104f754a3fcf76216dd9f465
+    - https://github.com/tpm2-software/tpm2-abrmd/releases/download/3.1.0/tpm2-abrmd-3.1.0.tar.gz : 6486df47871095bc6cd143355ec51582d53e53b68118818ff789a53be3b996a3
 summary     : TPM2 access broker and resource manager daemon
 description : |
     tpm2-abrmd is a system daemon that arbitrates access to a TPM 2.0 between

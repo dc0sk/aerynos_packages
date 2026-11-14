@@ -3,7 +3,7 @@
 
 name        : limesuite
 version     : "23.11.0"
-release     : 2
+release     : 3
 homepage    : https://github.com/myriadrf/LimeSuite
 upstreams   :
     - https://github.com/myriadrf/LimeSuite/archive/refs/tags/v23.11.0.tar.gz : fd8a448b92bc5ee4012f0ba58785f3c7e0a4d342b24e26275318802dfe00eb33

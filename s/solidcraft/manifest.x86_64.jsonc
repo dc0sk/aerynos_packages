@@ -27,6 +27,7 @@
 				"/usr/bin/solidcraft",
 				"/usr/bin/solidcraft-cli",
 				"/usr/bin/solvecraft-cli",
+				"/usr/lib/udev/rules.d/70-3d-mouse.rules",
 				"/usr/share/applications/io.tangencylabs.solidcraft.desktop",
 				"/usr/share/doc/solidcraft/README.md",
 				"/usr/share/icons/hicolor/128x128/apps/io.tangencylabs.solidcraft.png",
@@ -53,6 +54,6 @@
 		}
 	},
 	"source-name": "solidcraft",
-	"source-release": "1",
-	"source-version": "0.26.0"
+	"source-release": "3",
+	"source-version": "0.41.0"
 }
