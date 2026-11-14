@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : solidcraft
-version     : "0.26.0"
-release     : 2
+version     : "0.41.0"
+release     : 3
 homepage    : https://solidcraft.io
 upstreams   :
-    - https://github.com/tangency-labs/solidcraft/archive/refs/tags/v0.26.0.tar.gz : b69118fcfad07b2379db534cda4b1d0160388c8a2e936dc6566644daea0a1697
+    - https://github.com/tangency-labs/solidcraft/archive/refs/tags/v0.41.0.tar.gz : 8776fdc23d276ba0db657db478007be94981de958d4a88f11f6acc5b86b4b007
 summary     : Open-source parametric 3D CAD application written in Rust
 description : |
     SolidCraft is a parametric 3D CAD application: sketches with a built-in
@@ -54,14 +54,24 @@ environment : |
 setup       : |
     %cargo_fetch
 build       : |
-    # Heavy rustc jobs (egui and wgpu with thin LTO and line-table debug
-    # info): bound them independently of the general job count.
-    CARGO_BUILD_JOBS=2
-    export CARGO_BUILD_JOBS
+    # Heavy rustc jobs (egui and wgpu, thin LTO, debug info): %(jobs) of them
+    # at once exhausted 20G of memory within minutes. The cargo macros pass
+    # -j explicitly, which beats CARGO_BUILD_JOBS, so cargo is spelled out here
+    # with its own job count.
+    #
+    # The final thin-LTO link of the desktop binary also runs one LTO job per
+    # core by default and peaked past 14G plus 16G of swap; two jobs trade a
+    # longer link for a bounded peak.
+    #
+    # Boulder's default is -C debuginfo=2, which overrides the line-tables-only
+    # that upstream's own release profile asks for. Full debug info on the
+    # egui UI crate pushed a two-job build past 20G, so use upstream's level.
+    RUSTFLAGS="${RUSTFLAGS} -C link-args=-Wl,--thinlto-jobs=2 -C debuginfo=1"
+    export RUSTFLAGS
 
     # The workspace also holds the wasm browser app and an xtask helper, so
     # build only the two shipped binaries.
-    %cargo_build -p solidcraft -p solidcraft-cli
+    cargo build -v -j 2 --frozen --target %(target_triple)  --release -p solidcraft -p solidcraft-cli
 install     : |
     %install_exe %(cargo_target_dir)/solidcraft %(installroot)%(bindir)/solidcraft
     %install_exe %(cargo_target_dir)/solidcraft-cli %(installroot)%(bindir)/solidcraft-cli
@@ -82,7 +92,7 @@ install     : |
     # The metainfo file is a template; fill in the version and release date
     # the way upstream's own package script does.
     %install_dir %(installroot)%(datadir)/metainfo
-    sed -e "s/@VERSION@/%(version)/g" -e "s/@DATE@/2026-10-29/g" \
+    sed -e "s/@VERSION@/%(version)/g" -e "s/@DATE@/2026-11-13/g" \
         assets/platforms/linux/io.tangencylabs.solidcraft.metainfo.xml.in \
         > %(installroot)%(datadir)/metainfo/io.tangencylabs.solidcraft.metainfo.xml
 
