@@ -35,6 +35,7 @@ repository.
 | [`mypaint-brushes`](m/mypaint-brushes) | 2.0.2 | Brush presets for libmypaint-based applications, needed by GIMP |
 | [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
+| [`opensc`](o/opensc) | 0.27.1 | Smart card tools and PKCS#11 module |
 | [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
 | [`pulseview`](p/pulseview) | 0.4.2+git | Qt-based GUI for sigrok logic analyzers and oscilloscopes |
 | [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
@@ -169,7 +170,7 @@ build wins over an upstream package of the same name. From then on:
 
 ```sh
 sudo moss sync            # pick up newly indexed builds
-sudo moss install ufw
+sudo moss pkg add ufw
 ```
 
 Re-running `scripts/local-repo.sh` after a recipe change is enough — moss reads

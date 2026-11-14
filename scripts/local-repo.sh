@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 # Build the recipes in this repository and publish the results as a local moss
-# repository, so that `moss install ufw` etc. resolve against these packages.
+# repository, so that `moss pkg add ufw` etc. resolve against these packages.
 #
 # Usage:
 #   scripts/local-repo.sh                 # build everything, then index
@@ -62,7 +62,7 @@ if [[ ${index_only} -eq 0 ]]; then
 fi
 
 echo ":: Indexing ${outdir}"
-moss index "${outdir}"
+moss index -i "${outdir}"
 
 # Refresh any boulder profile that carries this index. boulder caches the repo
 # contents, so a freshly indexed package stays invisible to builds until the
