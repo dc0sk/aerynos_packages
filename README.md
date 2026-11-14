@@ -13,9 +13,9 @@ repository.
 | [`cosmic-ext-applet-package-updater`](c/cosmic-ext-applet-package-updater) | 1.0.0+git | COSMIC panel applet notifying about package updates, with moss support |
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
-| [`fio`](f/fio) | 3.42 | Flexible I/O tester |
+| [`fio`](f/fio) | 3.43 | Flexible I/O tester |
 | [`flyline`](f/flyline) | 1.7.1 | Bash loadable builtin replacing readline with a modern line editor |
-| [`fwupd`](f/fwupd) | 2.1.7 | Firmware update daemon |
+| [`fwupd`](f/fwupd) | 2.1.9 | Firmware update daemon |
 | [`gegl`](g/gegl) | 0.4.70 | Graph based image processing framework, needed by GIMP |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
 | [`gexiv2-legacy`](g/gexiv2-legacy) | 0.14.7 | GObject wrapper around Exiv2, the 0.14.x line GIMP needs |
@@ -23,7 +23,7 @@ repository.
 | [`hamlib`](h/hamlib) | 4.7.2 | Control libraries and tools for amateur radio transceivers and rotators, with rigctld split out as its own package |
 | [`ipset`](i/ipset) | 7.24 | Administration tool for IP sets |
 | [`keymapp`](k/keymapp) | 2025.05.19 | ZSA's keyboard manager for flashing and monitoring ZSA keyboards (proprietary) |
-| [`libmypaint`](l/libmypaint) | 1.6.0 | MyPaint brush engine library, needed by GIMP |
+| [`libmypaint`](l/libmypaint) | 1.6.1 | MyPaint brush engine library, needed by GIMP |
 | [`libserialport`](l/libserialport) | 0.1.2 | Cross-platform library for accessing serial ports, needed by libsigrok |
 | [`libsigrok`](l/libsigrok) | 0.6.0+git | Hardware drivers and acquisition library of the sigrok project |
 | [`libsigrokdecode`](l/libsigrokdecode) | 0.6.0+git | Protocol decoder library of the sigrok project |
@@ -31,12 +31,12 @@ repository.
 | [`mandoc`](m/mandoc) | 1.14.6 | Formatter for BSD mdoc and man documentation |
 | [`mdbook`](m/mdbook) | 0.5.4 | Creates a book from markdown files |
 | [`modemmanager`](m/modemmanager) | 1.24.2 | Mobile broadband modem management daemon |
-| [`mokutil`](m/mokutil) | 0.7.2 | Manage the shim Machine Owner Keys |
+| [`mokutil`](m/mokutil) | 0.7.3 | Manage the shim Machine Owner Keys |
 | [`mypaint-brushes`](m/mypaint-brushes) | 2.0.2 | Brush presets for libmypaint-based applications, needed by GIMP |
 | [`nec2c`](n/nec2c) | 1.3.3 | NEC2 antenna modelling engine translated to C |
 | [`nvme-cli`](n/nvme-cli) | 2.16 | NVM Express user space tooling |
 | [`opensc`](o/opensc) | 0.27.1 | Smart card tools and PKCS#11 module |
-| [`passim`](p/passim) | 0.1.12 | Local caching server for shared metadata |
+| [`passim`](p/passim) | 0.1.13 | Local caching server for shared metadata |
 | [`pulseview`](p/pulseview) | 0.4.2+git | Qt-based GUI for sigrok logic analyzers and oscilloscopes |
 | [`python-beniget`](p/python-beniget) | 0.4.2.post1 | Static analysis of Python code, needed by pythran |
 | [`python-gast`](p/python-gast) | 0.6.0 | Version-agnostic Python AST, needed by pythran |
@@ -57,11 +57,11 @@ repository.
 | [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
 | [`soapysdrplay3`](s/soapysdrplay3) | 0.5.2 | SoapySDR module for SDRplay RSP receivers |
 | [`solidcraft`](s/solidcraft) | 0.26.0 | Open-source parametric 3D CAD application written in Rust |
-| [`tpm2-abrmd`](t/tpm2-abrmd) | 3.0.0 | TPM2 access broker and resource manager daemon |
+| [`tpm2-abrmd`](t/tpm2-abrmd) | 3.1.0 | TPM2 access broker and resource manager daemon |
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |
-| [`wtype`](w/wtype) | 0.4 | xdotool type for Wayland |
+| [`wtype`](w/wtype) | 0.5 | xdotool type for Wayland |
 | [`wxwidgets`](w/wxwidgets) | 3.3.3 | Cross-platform C++ GUI toolkit (GTK3 backend) |
 | [`xnec2c`](x/xnec2c) | 4.4.18 | Graphical NEC2 antenna simulator |
 

@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : passim
-version     : "0.1.12"
-release     : 1
+version     : "0.1.13"
+release     : 2
 homepage    : https://github.com/hughsie/passim
 upstreams   :
-    - https://github.com/hughsie/passim/archive/refs/tags/0.1.12.tar.gz : b362a05f81f5d3efc05d062ae0ecd6c24a8285f93260a76efc32f6af5d6dd1d1
+    - https://github.com/hughsie/passim/archive/refs/tags/0.1.13.tar.gz : 5dd4c46b6f183a92908604e4eedf850e1b7da5c66bf5bbdecd214e780266cf22
 summary     : Local caching server for shared metadata
 description : |
     passim shares files that several machines on a network would otherwise
