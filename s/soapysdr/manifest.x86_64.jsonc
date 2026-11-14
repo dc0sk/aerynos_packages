@@ -12,13 +12,12 @@
 				"soname(libc.so.6(x86_64))",
 				"soname(libgcc_s.so.1(x86_64))",
 				"soname(libm.so.6(x86_64))",
-				"soname(libpython3.14.so.1.0(x86_64))",
 				"soname(libstdc++.so.6(x86_64))"
 			],
 			"files": [
 				"/usr/bin/SoapySDRUtil",
-				"/usr/lib/libSoapySDR.so.0.8",
-				"/usr/lib/libSoapySDR.so.0.8.1",
+				"/usr/lib/libSoapySDR.so.0.9",
+				"/usr/lib/libSoapySDR.so.0.9.0",
 				"/usr/lib/python3.14/site-packages/SoapySDR.py",
 				"/usr/lib/python3.14/site-packages/_SoapySDR.so",
 				"/usr/share/man/man1/SoapySDRUtil.1"
@@ -26,7 +25,7 @@
 			"name": "soapysdr",
 			"provides": [
 				"binary(SoapySDRUtil)",
-				"soname(libSoapySDR.so.0.8(x86_64))",
+				"soname(libSoapySDR.so.0.9(x86_64))",
 				"soname(python3.14/site-packages/_SoapySDR.so(x86_64))"
 			]
 		},
@@ -78,6 +77,6 @@
 		}
 	},
 	"source-name": "soapysdr",
-	"source-release": "1",
-	"source-version": "0.8.1"
+	"source-release": "2",
+	"source-version": "0.9.0"
 }

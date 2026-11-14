@@ -54,8 +54,8 @@ repository.
 | [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
 | [`sigrok-cli`](s/sigrok-cli) | 0.7.2 | Command line frontend of the sigrok signal-analysis suite |
 | [`sigrok-firmware-fx2lafw`](s/sigrok-firmware-fx2lafw) | 0.1.7 | Open firmware for Cypress FX2 based logic analyzers (prebuilt images) |
-| [`soapysdr`](s/soapysdr) | 0.8.1 | Vendor neutral SDR support library |
-| [`soapysdrplay3`](s/soapysdrplay3) | 0.5.2 | SoapySDR module for SDRplay RSP receivers |
+| [`soapysdr`](s/soapysdr) | 0.9.0 | Vendor neutral SDR support library |
+| [`soapysdrplay3`](s/soapysdrplay3) | 0.5.3 | SoapySDR module for SDRplay RSP receivers |
 | [`solidcraft`](s/solidcraft) | 0.26.0 | Open-source parametric 3D CAD application written in Rust |
 | [`tpm2-abrmd`](t/tpm2-abrmd) | 3.1.0 | TPM2 access broker and resource manager daemon |
 | [`tpm2-tools`](t/tpm2-tools) | 5.8 | Command line tools for the TPM 2.0 software stack |

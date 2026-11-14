@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : soapysdr
-version     : "0.8.1"
-release     : 1
+version     : "0.9.0"
+release     : 2
 homepage    : https://github.com/pothosware/SoapySDR
 upstreams   :
-    - https://github.com/pothosware/SoapySDR/archive/refs/tags/soapy-sdr-0.8.1.tar.gz : a508083875ed75d1090c24f88abef9895ad65f0f1b54e96d74094478f0c400e6
+    - https://github.com/pothosware/SoapySDR/archive/refs/tags/soapy-sdr-0.9.0.tar.gz : 64f97c1ad241156fe299acb8902169019eab34517cd580b563968a43d7533509
 summary     : Vendor neutral and platform independent SDR support library
 description : |
     SoapySDR presents one API for software defined radio hardware, with
@@ -17,26 +17,19 @@ builddeps   :
     - binary(swig)
     - python-devel
 setup       : |
-    %patch %(pkgdir)/0001-get_python_lib-use-sysconfig-instead-of-distutils.patch
-
-    # CMAKE_POLICY_VERSION_MINIMUM: upstream still declares
-    # cmake_minimum_required(VERSION 3.1.0), and CMake 4 removed compatibility
-    # with anything below 3.5, so it refuses to configure. This is the escape
-    # hatch CMake itself points at in the error, and is less invasive than
-    # rewriting upstream's build files.
+    # CMAKE_POLICY_VERSION_MINIMUM: upstream still declares an old
+    # cmake_minimum_required, and CMake 4 removed compatibility with anything
+    # below 3.5, so it refuses to configure. This is the escape hatch CMake
+    # itself points at in the error, and is less invasive than rewriting
+    # upstream's build files.
     #
-    # ENABLE_PYTHON, not ENABLE_PYTHON3, despite appearances. In 0.8.1 the
-    # python/ directory builds bindings against whatever interpreter
-    # FindPythonInterp turns up, which here is python 3.14. python3/ is a
-    # fallback for systems whose primary python is python2: its
-    # cmake_dependent_option also requires BUILD_PYTHON3, which python/ only
-    # sets when it found a python older than 3.0 or found none at all.
-    # Passing -DENABLE_PYTHON3=ON therefore cannot switch it on, and turning
-    # ENABLE_PYTHON off disables the bindings entirely - silently, since the
-    # build still succeeds and simply ships no python module.
+    # ENABLE_PYTHON3 is the switch for the bindings since 0.9.0 (0.8.1 called
+    # it ENABLE_PYTHON). It is a dependent option, so it falls back to off
+    # silently when swig or python are missing; the build succeeds and ships
+    # no python module. The builddeps above are what keep it on.
     %cmake \
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-        -DENABLE_PYTHON=ON
+        -DENABLE_PYTHON3=ON
 build       : |
     %cmake_build
 install     : |
