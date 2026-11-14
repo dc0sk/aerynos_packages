@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : sdroxide
-version     : "1.6.9"
-release     : 1
+version     : "1.7.2"
+release     : 2
 homepage    : https://github.com/dividebysandwich/sdroxide
 upstreams   :
     # Listed first so it lands in %(workdir): everything else is a git
     # submodule GitHub's own tag tarball does not include (see setup: below).
-    - https://github.com/dividebysandwich/sdroxide/archive/refs/tags/v1.6.9.tar.gz : 00ecc7951536d30594f645b91f07ba706c6378f87325234f1f5d14c4568dd620
+    - https://github.com/dividebysandwich/sdroxide/archive/refs/tags/v1.7.2.tar.gz : 0166fa622092c32bbfbe971d07431ab6b56e606ddc958f51f535584cd8abfa98
     # vendor/rade_c (.gitmodules), pinned to the commit v1.6.6 actually carries.
     - https://github.com/freedv/rade_c/archive/a36161bce0fb37daf3f4602344b095f6817dddb1.tar.gz : eaba2ecbe61dc48748bc62f08b2eb623bccd5b21b8228bf42dedc0e232edf7cd
     # vendor/rtl_433 (.gitmodules), same pinning.
@@ -18,6 +18,12 @@ upstreams   :
     # vendor/xng (.gitmodules, new in 1.6.9): the HFDL decode core, pinned to
     # the one commit sdroxide's Cargo.toml path-depends on.
     - https://github.com/airframesio/xng/archive/096c805278faa0a904de7d98066bf4cf395cb6c2.tar.gz : 2d7339ef9e89e711641838034ab2d039dbae9d5e907a786f39df1b931395aebe
+    # vendor/mercury (.gitmodules, new in 1.7.0): Rhizomatica's HF data modem,
+    # pinned to the commit v1.7.2 carries.
+    - https://github.com/Rhizomatica/mercury/archive/09f258f84a0b69cb4d8556530a25822617ea17dd.tar.gz : 48796f32d433806b073dd400eca7f7d48a06b252ad90f4539d9837f36fc36431
+    # vendor/data2g (.gitmodules, new in 1.7.0): the Data2G OFDM modem core,
+    # same pinning.
+    - https://github.com/arodland/Data2G/archive/f5388f792425d80ac4d175ff1838260e790a3433.tar.gz : 953355cac4a83b24c32c15f89418517c2d13f944147d0c804f458b7b38be6d71
 summary     : PowerSDR/Thetis-style SDR transceiver with a native GUI
 description : |
     sdroxide drives software-defined radios (SoapySDR/HackRF, RTL-SDR, RX-888,
@@ -38,7 +44,7 @@ description : |
     complete regardless of which of those are installed; each simply reports
     "not installed" if its library is absent.
 
-    Four pieces are git submodules (.gitmodules) that a GitHub tag tarball
+    Six pieces are git submodules (.gitmodules) that a GitHub tag tarball
     does not include, so they are fetched as their own pinned-commit
     upstreams above and vendored into place in setup: below - see that for
     which crate needs which and why:
@@ -47,7 +53,9 @@ description : |
       - vendor/faad2 - AAC decoding for DRM (Digital Radio Mondiale) reception.
       - vendor/xng - the HFDL (ARINC 635) decode core, path-depended on by
         xng-mode-hfdl. Upstream's own workspace, excluded from ours.
-    rade_c, faad2 and xng are unconditional (every build needs them); rtl_433 is
+      - vendor/mercury - Rhizomatica's HF data modem (sdroxide-mercury).
+      - vendor/data2g - the Data2G OFDM modem core (sdroxide-data2g).
+    rade_c, faad2, xng, mercury and data2g are unconditional (every build needs them); rtl_433 is
     gated by the "rtl433" feature, on by default - see build: below.
 
     Not built here: the browser client (`crates/sdroxide-web`, the
@@ -84,6 +92,10 @@ license     :
     # separate, merely-read data file precisely so it never has to be (see
     # assets/voices/LICENSE-voice.txt), so it is not listed as a code licence
     # here.
+    # Mercury (vendor/mercury, GPL-3.0-or-later) and Data2G (vendor/data2g,
+    # Artistic-2.0 with Apache-2.0 parts) are compiled in unconditionally,
+    # like faad2 and DeepCW above. Mercury bundles a codec2 subset under
+    # LGPL-2.1 and iniparser and nanorq under MIT.
     # xng (vendor/xng) is MIT OR Apache-2.0 and compiled into the binary as
     # a plain path dependency; both terms are permissive, so they sit under
     # the GPL without changing what the binary is bound by.
@@ -94,6 +106,8 @@ license     :
     - GPL-2.0-or-later
     - MIT
     - BSD-2-Clause
+    - LGPL-2.1-only
+    - Artistic-2.0
 networking  : true
 builddeps   :
     - binary(desktop-file-validate)
@@ -167,6 +181,9 @@ setup       : |
     cp -a ../673a22a3c7c33e96e2ff7aae7c4d2bc190dfbf92.tar.gz/. vendor/faad2/
     mkdir -p vendor/xng
     cp -a ../096c805278faa0a904de7d98066bf4cf395cb6c2.tar.gz/. vendor/xng/
+    mkdir -p vendor/mercury vendor/data2g
+    cp -a ../09f258f84a0b69cb4d8556530a25822617ea17dd.tar.gz/. vendor/mercury/
+    cp -a ../f5388f792425d80ac4d175ff1838260e790a3433.tar.gz/. vendor/data2g/
 
     # See the binary(git) builddep comment above.
     CARGO_NET_GIT_FETCH_WITH_CLI=true
@@ -183,15 +200,15 @@ build       : |
     # Capped independently of %(jobs) rather than by lowering that, since
     # other unrelated compile jobs (CC/CXX etc.) stay fine at full
     # parallelism - this is specifically rustc's own per-job footprint here.
-    CARGO_BUILD_JOBS=2
-    export CARGO_BUILD_JOBS
+    # CARGO_BUILD_JOBS does not do it: the cargo macros pass -j explicitly,
+    # which beats that variable, so cargo is spelled out below with -j 4.
 
     # default = ["soapy", "rtl433"] already matches what this package wants
-    # (see license:/description: above), so plain %cargo_build needs no
+    # (see license:/description: above), so a plain release build needs no
     # --features of its own. The workspace's own [dependencies] and
     # default-members exclude the wasm crate entirely - see description: for
     # why that one is not built here.
-    %cargo_build
+    cargo build -v -j 4 --frozen --target %(target_triple) --release
 install     : |
     %install_exe %(cargo_target_dir)/sdroxide %(installroot)%(bindir)/sdroxide
 
@@ -224,6 +241,9 @@ install     : |
     %install_file crates/sdroxide-rx888/firmware/LICENSE.txt %(installroot)%(datadir)/licenses/%(name)/LICENSE-MIT-rx888-firmware
     %install_file crates/sdroxide-speech/assets/LICENSE-cmudict.txt %(installroot)%(datadir)/licenses/%(name)/LICENSE-BSD-cmudict
     %install_file assets/voices/LICENSE-voice.txt %(installroot)%(datadir)/licenses/%(name)/NOTICE-CC-BY-NC-SA-voice
+    %install_file vendor/mercury/LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE-GPL-3.0-or-later-mercury
+    %install_file vendor/mercury/LICENSE-freedv %(installroot)%(datadir)/licenses/%(name)/LICENSE-LGPL-2.1-mercury-freedv
+    %install_file vendor/data2g/LICENSE %(installroot)%(datadir)/licenses/%(name)/LICENSE-Artistic-2.0-data2g
 
     %install_dir %(installroot)%(datadir)/doc/%(name)
     %install_file README.md %(installroot)%(datadir)/doc/%(name)/README.md

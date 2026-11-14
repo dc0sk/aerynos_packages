@@ -49,7 +49,7 @@ repository.
 | [`pythran`](p/pythran) | 0.19.0 | Ahead of time compiler for numeric Python kernels |
 | [`reaction`](r/reaction) | 2.7.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
 | [`sbsigntools`](s/sbsigntools) | 0.9.5 | Tools to sign and verify UEFI Secure Boot binaries |
-| [`sdroxide`](s/sdroxide) | 1.6.6 | PowerSDR/Thetis-style SDR transceiver with a native GUI |
+| [`sdroxide`](s/sdroxide) | 1.7.2 | PowerSDR/Thetis-style SDR transceiver with a native GUI |
 | [`sdrplay-api`](s/sdrplay-api) | 3.15.2 | SDRplay RSP API library and service (proprietary) |
 | [`sedutil`](s/sedutil) | 1.20.0+git | Manage TCG Opal self-encrypting drives |
 | [`sigrok-cli`](s/sigrok-cli) | 0.7.2 | Command line frontend of the sigrok signal-analysis suite |
