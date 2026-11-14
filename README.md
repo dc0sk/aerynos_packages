@@ -14,7 +14,7 @@ repository.
 | [`efibootmgr`](e/efibootmgr) | 18 | Manipulate the UEFI boot manager configuration |
 | [`efivar`](e/efivar) | 39 | Tools and library to manipulate EFI variables |
 | [`fio`](f/fio) | 3.43 | Flexible I/O tester |
-| [`flyline`](f/flyline) | 1.7.1 | Bash loadable builtin replacing readline with a modern line editor |
+| [`flyline`](f/flyline) | 1.10.0 | Bash loadable builtin replacing readline with a modern line editor |
 | [`fwupd`](f/fwupd) | 2.1.9 | Firmware update daemon |
 | [`gegl`](g/gegl) | 0.4.70 | Graph based image processing framework, needed by GIMP |
 | [`geteltorito`](g/geteltorito) | 0.6 | El Torito boot image extractor |
@@ -47,7 +47,7 @@ repository.
 | [`python-scipy`](p/python-scipy) | 1.18.1 | Fundamental algorithms for scientific computing in Python |
 | [`python-sortedcontainers`](p/python-sortedcontainers) | 2.4.0 | Sorted list, dict and set implementations, needed by hypothesis |
 | [`pythran`](p/pythran) | 0.19.0 | Ahead of time compiler for numeric Python kernels |
-| [`reaction`](r/reaction) | 2.5.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
+| [`reaction`](r/reaction) | 2.7.1 | Scans program output for repeated patterns and takes action (a fail2ban successor) |
 | [`sbsigntools`](s/sbsigntools) | 0.9.5 | Tools to sign and verify UEFI Secure Boot binaries |
 | [`sdroxide`](s/sdroxide) | 1.6.6 | PowerSDR/Thetis-style SDR transceiver with a native GUI |
 | [`sdrplay-api`](s/sdrplay-api) | 3.15.2 | SDRplay RSP API library and service (proprietary) |
@@ -62,7 +62,7 @@ repository.
 | [`ufw`](u/ufw) | 0.36.2 | Uncomplicated Firewall, a front-end for Netfilter |
 | [`wch-ble-extcap`](w/wch-ble-extcap) | 0.1.1 | Wireshark extcap plugin for the WCH BLE Analyzer Pro |
 | [`wtype`](w/wtype) | 0.5 | xdotool type for Wayland |
-| [`wxwidgets`](w/wxwidgets) | 3.3.3 | Cross-platform C++ GUI toolkit (GTK3 backend) |
+| [`wxwidgets`](w/wxwidgets) | 3.3.4 | Cross-platform C++ GUI toolkit (GTK3 backend) |
 | [`xnec2c`](x/xnec2c) | 4.4.18 | Graphical NEC2 antenna simulator |
 
 Deliberately *not* here: `wine`. AerynOS already ships it, currently 11.15, and

@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: MPL-2.0
 
 name        : wxwidgets
-version     : "3.3.3"
-release     : 1
+version     : "3.3.4"
+release     : 2
 homepage    : https://www.wxwidgets.org
 upstreams   :
-    - https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v3.3.3.tar.gz : 072b388b9e9fca02dedb08520e06591a5abf4b04feed7ae72faf5463e061b1dc
+    - https://github.com/wxWidgets/wxWidgets/archive/refs/tags/v3.3.4.tar.gz : b23b7f54bcf49b2b6ff68b4a6fcab0c87535258b4b1b213d7ba33777346974ee
 summary     : Cross-platform C++ GUI toolkit (GTK3 backend)
 description : |
     wxWidgets wraps each platform's native GUI toolkit behind one C++ API -

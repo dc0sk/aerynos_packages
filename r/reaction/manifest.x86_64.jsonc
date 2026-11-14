@@ -4,6 +4,8 @@
 	"packages": {
 		"reaction": {
 			"build-depends": [
+				"binary(cmake)",
+				"binary(make)",
 				"nftables-devel"
 			],
 			"depends": [
@@ -30,6 +32,7 @@
 				"/usr/share/man/man1/reaction-show.1",
 				"/usr/share/man/man1/reaction-start.1",
 				"/usr/share/man/man1/reaction-test-config.1",
+				"/usr/share/man/man1/reaction-test-filter.1",
 				"/usr/share/man/man1/reaction-test-regex.1",
 				"/usr/share/man/man1/reaction-trigger.1",
 				"/usr/share/man/man1/reaction.1",
@@ -45,6 +48,6 @@
 		}
 	},
 	"source-name": "reaction",
-	"source-release": "3",
-	"source-version": "2.5.1"
+	"source-release": "4",
+	"source-version": "2.7.1"
 }
